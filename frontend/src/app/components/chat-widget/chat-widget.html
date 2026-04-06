@@ -1,0 +1,54 @@
+<div class="chat-widget-wrapper" [class.open]="isOpen">
+  <!-- Closed State -->
+  <div class="chat-bubble" *ngIf="!isOpen" (click)="toggleWidget()">
+    <i class="fas fa-comment-alt"></i> Tin nhắn
+  </div>
+
+  <!-- Opened State -->
+  <div class="chat-panel" *ngIf="isOpen">
+    <!-- Header -->
+    <div class="chat-header" (click)="toggleWidget()">
+      <span style="font-weight: 600;">Tin nhắn</span>
+      <i class="fas fa-chevron-down"></i>
+    </div>
+
+    <!-- Active Chat Window -->
+    <div class="active-chat" *ngIf="activeChatUser">
+      <div class="active-chat-header">
+        <div class="chat-back" (click)="closeChat($event)">
+          <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="chat-user-info">
+          <img [src]="activeChatUser.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'" class="chat-avatar">
+          <span style="font-weight: 600;">{{ activeChatUser.displayName || activeChatUser.username }}</span>
+        </div>
+      </div>
+      
+      <div class="chat-messages" id="chat-messages-container">
+        <div *ngIf="messages.length === 0" class="empty-chat">
+          Hãy bắt đầu trò chuyện với {{ activeChatUser.username }}!
+        </div>
+        <div *ngFor="let msg of messages" class="chat-message-row" [class.my-message]="msg.sender.username === currentUser.username">
+          <img *ngIf="msg.sender.username !== currentUser.username" [src]="msg.sender.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'" class="msg-avatar">
+          <div class="msg-bubble">{{ msg.content }}</div>
+        </div>
+      </div>
+
+      <div class="chat-inputbox">
+        <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Nhập tin nhắn..." autocomplete="off">
+        <button (click)="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+
+    <!-- User List Window -->
+    <div class="user-list" *ngIf="!activeChatUser">
+      <div *ngIf="followingList.length === 0" class="empty-list">
+        Bạn chưa theo dõi ai cả. Hãy theo dõi ai đó để chat nhé!
+      </div>
+      <div class="user-row" *ngFor="let user of followingList" (click)="openChat(user)">
+        <img [src]="user.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'">
+        <span class="user-name">{{ user.displayName || user.username }}</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<div class="news-container">
+  <div class="news-main-feed">
+    
+    <div class="feed-header news-mode">
+      <h2 class="feed-title"><i class="fa-regular fa-newspaper" style="color: #0079D3; margin-right: 8px;"></i>Tin tức thế giới</h2>
+      <p class="feed-subtitle">Cập nhật tin tức nhanh và chính xác nhất từ giới Công nghệ - Tài chính</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingNews" class="news-loading-skeleton">
+       <div class="spinner-large"></div>
+       <p>Đang tải tin bài từ vệ tinh...</p>
+    </div>
+
+    <!-- News List -->
+    <div *ngIf="!loadingNews" class="news-list-wrapper">
+      <a [href]="news.url" target="_blank" class="news-card" *ngFor="let news of newsList; let i = index">
+        <div class="news-rank">{{ i + 1 }}</div>
+        
+        <!-- Hình ảnh Thumbnail đại diện cho tin tức bám sát ngữ cảnh Tiêu đề -->
+        <div class="news-thumbnail">
+           <img [src]="'https://loremflickr.com/140/90/' + getKeyword(news.title) + '?lock=' + news.id" [alt]="news.title" loading="lazy">
+        </div>
+
+        <div class="news-content-box">
+          <h3 class="news-headline">{{ news.title }}</h3>
+          <div class="news-meta">
+            <span class="news-score"><i class="fa-solid fa-arrow-up"></i> {{ news.score }} điểm</span>
+            <span class="dot">•</span>
+            <span>viết bởi <strong style="color:var(--text-main)">{{ news.by }}</strong></span>
+            <span class="dot">•</span>
+            <span>💬 {{ news.descendants || 0 }} bình luận</span>
+          </div>
+        </div>
+        <div class="news-action-ic">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </div>
+      </a>
+    </div>
+
+  </div>
+</div>

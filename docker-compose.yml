@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: "005928"
+      MYSQL_DATABASE: "blogforum_db"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  # Enable this part if you also want to build and run the Spring Boot backend inside Docker:
+  backend:
+    build: ./backend
+    container_name: spring_backend
+    environment:
+      DB_HOST: "mysql-db"
+      DB_PORT: "3306"
+      DB_USER: "root"
+      DB_PASSWORD: "005928"
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+  frontend:
+    image: node:20-alpine
+    container_name: angular_frontend
+    working_dir: /app
+    # Ánh xạ thư mục local vào container để theo dõi mọi biến đổi (Hot reload)
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    # Chạy npm install và khởi động Angular Development Server
+    command: sh -c "npm install --legacy-peer-deps && npm start -- --host 0.0.0.0 --poll 2000"
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

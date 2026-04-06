@@ -1,0 +1,23 @@
+<app-navbar></app-navbar>
+
+<div *ngIf="toastMessage" class="toast-notification glass-effect">
+  <div class="toast-icon">🔔</div>
+  <div class="toast-content">{{ toastMessage }}</div>
+  <button class="toast-close" (click)="toastMessage = null">×</button>
+</div>
+
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<app-image-modal></app-image-modal>
+
+<app-onboarding-wizard></app-onboarding-wizard>
+<!-- ĐÂY CHÍNH LÀ REDDIT LOGIN POPUP -->
+<app-login *ngIf="authModalService.isOpen$ | async"></app-login>
+
+<!-- Chat Widget for logged in users -->
+<app-chat-widget *ngIf="isLoggedIn"></app-chat-widget>
