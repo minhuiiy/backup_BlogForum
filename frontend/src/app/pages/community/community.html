@@ -1,189 +1,178 @@
-<div class="community-page-wrapper">
+<div class="max-w-[1440px] mx-auto px-8 py-10 w-full min-h-screen">
   
-  <!-- Kéo Bìa Dài (Banner Section) -->
-  <div class="community-banner" [style.background-color]="communityData?.isAdult ? '#ff4500' : '#24a0ed'">
-    <!-- Hiệu ứng Pattern / Nền tối nhẹ -->
+  <!-- Banner & Header Section -->
+  <div class="relative w-full h-[240px] rounded-3xl overflow-hidden mb-8 ghost-border shadow-md">
+    <div class="absolute inset-0 transition-colors duration-500" [ngClass]="communityData?.isAdult ? 'bg-error/80' : 'bg-primary/80'"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent opacity-90"></div>
+    <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
   </div>
 
-  <div class="community-info-container">
-    <div class="community-info-inner">
-      
-      <div class="avatar-column">
-        <div class="community-avatar" style="overflow: hidden; background: white; padding: 4px; box-sizing: content-box;">
-          <img *ngIf="communityData?.imageUrl" [src]="communityData.imageUrl" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
-          <ng-container *ngIf="!communityData?.imageUrl">
-            <i class="fa-solid fa-satellite-dish" *ngIf="communityData?.type === 'public' || !communityData?.type"></i>
-            <i class="fa-solid fa-lock" *ngIf="communityData?.type === 'private'"></i>
-            <i class="fa-solid fa-eye-slash" *ngIf="communityData?.type === 'restricted'"></i>
-          </ng-container>
+  <div class="flex flex-col lg:flex-row gap-12 relative -mt-24 px-8 z-10 w-full max-w-[1240px] mx-auto">
+    
+    <!-- Left Column (Avatar & Info) -->
+    <div class="w-full lg:w-[320px] shrink-0">
+      <div class="bg-surface-container-lowest rounded-3xl p-6 ghost-border shadow-xl flex flex-col items-center text-center">
+        
+        <div class="w-32 h-32 rounded-full bg-surface border-8 border-surface-container-lowest shadow-md overflow-hidden flex items-center justify-center -mt-20 mb-4 z-20">
+          <img *ngIf="communityData?.imageUrl" [src]="communityData.imageUrl" class="w-full h-full object-cover">
+          <div *ngIf="!communityData?.imageUrl" class="w-full h-full bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[48px]" *ngIf="communityData?.type === 'public' || !communityData?.type">public</span>
+            <span class="material-symbols-outlined text-[48px]" *ngIf="communityData?.type === 'private'">lock</span>
+            <span class="material-symbols-outlined text-[48px]" *ngIf="communityData?.type === 'restricted'">visibility</span>
+          </div>
+        </div>
+
+        <h1 class="text-2xl font-bold font-headline text-on-surface mb-1 flex items-center justify-center gap-2">
+          {{ communityData?.displayName || communityData?.name || 'Tên Cộng Đồng' }}
+        </h1>
+        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-6 border border-outline-variant/20 px-3 py-1 rounded-full">{{ communityName || 'cộng_đồng' }}</p>
+
+        <div class="flex gap-4 mb-8 w-full">
+           <div class="flex-1 text-center bg-surface-container rounded-2xl py-3 border border-outline-variant/10">
+             <p class="text-xl font-bold text-primary">{{ memberCount | number }}</p>
+             <p class="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant mt-1">Thành viên</p>
+           </div>
+           <div class="flex-1 text-center bg-surface-container rounded-2xl py-3 border border-outline-variant/10 relative overflow-hidden">
+             <div class="absolute inset-0 bg-green-500/10"></div>
+             <p class="text-xl font-bold text-green-600 relative z-10">{{ onlineCount | number }}</p>
+             <p class="text-[10px] uppercase font-bold tracking-widest text-green-700/80 mt-1 relative z-10">Đang trực tuyến</p>
+           </div>
+        </div>
+
+        <div class="w-full space-y-3">
+          <button class="w-full py-3 bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant font-bold text-sm tracking-widest uppercase rounded-full flex items-center justify-center gap-2" *ngIf="isLoggedIn && commMock.isJoined(communityName, currentUser?.username)" (click)="leaveCommunity($event)" title="Click để rời">
+            <span class="material-symbols-outlined text-[18px]">check_circle</span> Đã tham gia
+          </button>
+          
+          <button class="w-full py-3 kinetic-gradient text-white font-bold text-sm tracking-widest uppercase rounded-full shadow-md hover:scale-[0.98] transition-transform flex items-center justify-center gap-2" *ngIf="!isLoggedIn || !commMock.isJoined(communityName, currentUser?.username)" (click)="joinCommunity($event)">
+            <span class="material-symbols-outlined text-[18px]">group_add</span> Tham gia ngay
+          </button>
+
+          <button class="w-full py-3 border-2 border-primary text-primary hover:bg-primary/5 transition-colors font-bold text-sm tracking-widest uppercase rounded-full flex items-center justify-center gap-2" [routerLink]="['/create-post']" [queryParams]="{community: communityName}">
+            <span class="material-symbols-outlined text-[18px]">edit_square</span> Viết bài
+          </button>
+        </div>
+
+      </div>
+
+      <!-- About Section / Edit Mode -->
+      <div class="bg-surface-container-lowest rounded-3xl p-6 ghost-border shadow-md mt-6">
+        <div class="flex items-center justify-between mb-4">
+           <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface">Giới thiệu</h3>
+           <button *ngIf="isModerator && !isEditing" class="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors flex items-center justify-center" (click)="toggleEdit()" title="Chỉnh sửa">
+              <span class="material-symbols-outlined text-[18px]">edit</span>
+           </button>
+        </div>
+
+        <!-- Edit Form -->
+        <div *ngIf="isEditing" class="space-y-4 bg-surface-container p-4 rounded-2xl animate-fade-in border border-primary/20">
+          <div>
+             <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Tên hiển thị</label>
+             <input type="text" [(ngModel)]="editData.displayName" class="w-full bg-surface border border-outline-variant/30 focus:border-primary rounded-lg px-3 py-2 text-sm font-bold text-on-surface outline-none transition-all">
+          </div>
+          <div>
+             <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Mô tả chi tiết</label>
+             <textarea [(ngModel)]="editData.description" rows="3" class="w-full bg-surface border border-outline-variant/30 focus:border-primary rounded-lg px-3 py-2 text-sm font-medium text-on-surface outline-none transition-all resize-none"></textarea>
+          </div>
+          <div>
+             <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Đổi ảnh đại diện</label>
+             <input type="file" (change)="onFileSelected($event)" accept="image/*" class="w-full text-xs text-on-surface-variant file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all">
+             <div *ngIf="isUploading" class="text-[10px] font-bold text-primary mt-2 animate-pulse">Đang tải lên...</div>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button class="flex-1 py-2 kinetic-gradient text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-sm" (click)="saveSettings()" [disabled]="isUploading">Lưu thay đổi</button>
+            <button class="flex-1 py-2 bg-surface-container-high text-on-surface-variant text-xs font-bold uppercase tracking-widest rounded-full hover:bg-outline-variant/20 transition-colors" (click)="toggleEdit()">Hủy</button>
+          </div>
+        </div>
+
+        <p class="text-sm font-medium text-on-surface-variant leading-relaxed" *ngIf="!isEditing">
+          {{ communityData?.description || 'Chưa có thông tin mô tả cho cộng đồng này.' }}
+        </p>
+
+        <div class="flex flex-wrap gap-2 mt-6" *ngIf="communityData?.topics?.length > 0">
+           <span *ngFor="let t of communityData.topics" class="bg-surface-container-high text-on-surface text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-outline-variant/10">{{ t }}</span>
         </div>
       </div>
-      
-      <div class="details-column">
-        <h1 class="community-title" style="display: flex; align-items: center; gap: 8px;">
-          {{ communityData?.displayName || communityData?.name }}
-          <span *ngIf="isModerator" class="mod-badge" style="font-size: 10px; background: #ff4500; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;" title="Bạn là Kiểm duyệt viên của nhóm này"><i class="fa-solid fa-shield-halved"></i> Moderator</span>
-        </h1>
-        <p class="community-sub">{{ communityName }}</p>
-      </div>
-
-      <div class="action-column">
-        <button class="btn-joined" *ngIf="isLoggedIn && commMock.isJoined(communityName, currentUser?.username)" (click)="leaveCommunity($event)" title="Nhấn để rời khỏi nhóm"><i class="fa-solid fa-check"></i> Đã tham gia</button>
-        <button class="btn-join" *ngIf="!isLoggedIn || !commMock.isJoined(communityName, currentUser?.username)" (click)="joinCommunity($event)" style="background: #0045ac; color: white; border-radius: 99px; padding: 8px 16px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-plus"></i> Tham gia</button>
-        <button class="btn-bell" *ngIf="isLoggedIn && commMock.isJoined(communityName, currentUser?.username)"><i class="fa-regular fa-bell"></i></button>
-      </div>
-
     </div>
-  </div>
 
-  <div class="community-content-layout">
-    
-    <!-- Cột Bảng Tin -->
-    <div class="main-feed-col">
-      <div class="feed-header community-mode">
-        <h2 class="feed-title">Bài viết mới nhất</h2>
-      </div>
-
-      <!-- Loading State -->
-      <div *ngIf="loadingFeed" class="news-loading" style="padding: 20px; text-align: center;">
-        Đang tải bài viết...
-      </div>
-
-      <!-- Khung thông báo Trống (Empty State) -->
-      <div *ngIf="!loadingFeed && filteredPosts.length === 0" style="background: white; border: 1px solid var(--border-color); padding: 40px 20px; text-align: center; border-radius: 4px; margin-bottom: 24px; color: var(--text-meta);">
-        <i class="fa-solid fa-parachute-box" style="font-size: 32px; margin-bottom: 16px; color: #878a8c;"></i>
-        <h3 style="font-size: 16px; color: #1a1a1b; font-weight: 600; margin-bottom: 8px;">Cộng đồng này đang tĩnh lặng</h3>
-        <p style="font-size: 14px;">Hãy trở thành người đầu tiên chia sẻ một bài viết để thắp sáng nhóm nhé!</p>
-      </div>
+    <!-- Right Column (Feed) -->
+    <div class="flex-1 min-w-0 mt-8 lg:mt-0">
       
-      <!-- Posts list -->
-      <div class="post-card" *ngFor="let post of filteredPosts" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 16px; padding: 12px; cursor: pointer; transition: border-color 0.2s;">
-        <div class="post-content-area">
-          <div class="post-meta-top" style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; font-size: 12px; color: var(--text-meta);">
-            <ng-container *ngIf="post.category">
-              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
-                <span class="community-icon" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:var(--primary-color); color:#fff; font-size:12px; font-weight:bold;">
-                  {{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name)?.charAt(0) | uppercase }}
-                </span>
-                <span class="community-name">{{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name) }}</span>
-              </div>
-              <button class="btn-join-sm" 
-                      *ngIf="!isLoggedIn || !commMock.isJoined(post.category.name, currentUser?.username)" 
-                      (click)="joinCommunityFromPost(post.category.name, $event)"
-                      style="margin-left: 4px; font-weight: 700; font-size: 12px; color: #fff; background-color: #0045ac; border-radius: 99px; padding: 4px 12px; border: none; cursor: pointer;">
-                Tham gia
-              </button>
-              <span class="dot-separator">•</span>
-              <span class="post-author">Đăng bởi {{ post.author?.username }}</span>
-            </ng-container>
+      <div class="mb-8 flex items-center justify-between">
+         <h2 class="text-2xl font-bold font-headline text-on-surface flex items-center gap-2">
+           <span class="material-symbols-outlined text-primary">dynamic_feed</span> Bảng tin mới nhất
+         </h2>
+      </div>
 
-            <ng-container *ngIf="!post.category">
-              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
-                <span class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold;">
-                  {{ post.author?.username?.charAt(0) | uppercase }}
-                </span>
-                <span class="community-name">{{ post.author?.username }}</span>
-              </div>
-            </ng-container>
+      <!-- Loading -->
+      <div *ngIf="loadingFeed" class="text-center py-12 text-on-surface-variant font-medium animate-pulse border border-outline-variant/20 rounded-3xl bg-surface-container/30">
+        <span class="material-symbols-outlined text-4xl mb-2 text-primary/50 block">hourglass_empty</span>
+        Hệ thống đang đồng bộ dữ liệu...
+      </div>
 
-            <span class="dot-separator">•</span>
-            <span class="post-date">{{ post.createdAt | timeAgo }}</span>
+      <!-- Empty -->
+      <div *ngIf="!loadingFeed && filteredPosts.length === 0" class="bg-surface-container-lowest rounded-3xl p-12 text-center ghost-border shadow-sm border border-dashed border-outline-variant/40 hover:border-primary/50 transition-colors group">
+         <div class="w-20 h-20 bg-surface-container rounded-full mx-auto flex items-center justify-center mb-6 border-4 border-surface group-hover:bg-primary/5 transition-colors">
+            <span class="material-symbols-outlined text-4xl text-outline-variant group-hover:text-primary transition-colors">rocket_launch</span>
+         </div>
+         <h3 class="text-xl font-bold text-on-surface mb-2 font-headline">Chưa có bài viết nào</h3>
+         <p class="text-sm font-medium text-on-surface-variant mb-6 max-w-sm mx-auto">Không gian này còn khá mới. Hãy là người đầu tiên tạo nên lịch sử ở đây đi nào!</p>
+         <button class="kinetic-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all text-sm uppercase tracking-widest inline-block" [routerLink]="['/create-post']" [queryParams]="{community: communityName}">
+           Bắt đầu thảo luận
+         </button>
+      </div>
+
+      <!-- Post List -->
+      <div class="space-y-6">
+        <div *ngFor="let post of filteredPosts" class="bg-surface-container-lowest rounded-3xl p-6 sm:p-8 ghost-border hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 border border-outline-variant/15 flex flex-col cursor-pointer group">
+          
+          <!-- Post Meta -->
+          <div class="flex items-center gap-3 mb-4 flex-wrap">
+            <div class="w-6 h-6 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[10px] uppercase">
+               {{ post.author?.username?.charAt(0) || 'U' }}
+            </div>
+            <span class="text-xs font-bold text-on-surface">{{ post.author?.username }}</span>
+            <span class="text-[10px] text-outline-variant uppercase tracking-widest">• {{ post.createdAt | timeAgo }}</span>
           </div>
 
-          <a [routerLink]="['/post', post.id]" class="post-title-link" style="text-decoration: none;">
-            <h3 class="post-title" style="font-size: 18px; font-weight: 600; color: var(--text-main); margin-top: 0; margin-bottom: 8px;">{{ post.title }}</h3>
+          <!-- Post Title -->
+          <a [routerLink]="['/post', post.id]" class="block mb-3">
+             <h3 class="text-xl sm:text-2xl font-bold font-headline text-on-surface group-hover:text-primary transition-colors leading-tight">{{ post.title }}</h3>
           </a>
 
-          <div class="post-excerpt" style="font-size: 14px; color: var(--text-main); line-height: 1.5; margin-bottom: 12px;">
-            <div [innerHTML]="post.strippedContent | safeHtml" class="clamped-content"></div>
+          <!-- Post Content Excerpt -->
+          <div class="text-sm text-on-surface-variant font-medium leading-relaxed mb-6 line-clamp-3">
+             <div [innerHTML]="post.strippedContent | safeHtml"></div>
           </div>
 
-          <!-- Carousel / Images -->
-          <div class="post-carousel" *ngIf="post.extractedImages && post.extractedImages.length > 1" style="position: relative; margin-top: 12px; border-radius: 8px; overflow: hidden; background: #000; text-align: center;">
-            <button class="carousel-btn prev-btn" (click)="prevImage($event, post)" [class.dimmed]="post.currentImageIndex === 0" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❮</button>
-            <img [src]="post.extractedImages[post.currentImageIndex]" class="carousel-img" loading="eager" (click)="openImageOverlay(post.extractedImages[post.currentImageIndex])" style="width: 100%; max-height: 500px; object-fit: contain; cursor: zoom-in;">
-            <button class="carousel-btn next-btn" (click)="nextImage($event, post)" [class.dimmed]="post.currentImageIndex === post.extractedImages.length - 1" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❯</button>
-            
-            <div class="carousel-indicators" style="position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px;">
-              <span class="indicator-dot" *ngFor="let src of post.extractedImages; let i = index" [style.background]="i === post.currentImageIndex ? '#fff' : 'rgba(255,255,255,0.5)'" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
-            </div>
-          </div>
-          
-          <div class="post-single-image" *ngIf="post.extractedImages && post.extractedImages.length === 1" style="margin-top: 12px; border-radius: 8px; overflow: hidden; background: #000; text-align: center;">
-             <img [src]="post.extractedImages[0]" class="carousel-img" loading="eager" (click)="openImageOverlay(post.extractedImages[0])" style="width: 100%; max-height: 500px; object-fit: contain; cursor: zoom-in;">
+          <!-- Post Media Overlay -->
+          <div *ngIf="post.extractedImages && post.extractedImages.length > 0" class="mb-6 rounded-2xl overflow-hidden bg-black/5 border border-outline-variant/10 relative group/media aspect-video flex items-center justify-center">
+             <img [src]="post.extractedImages[0]" class="w-full h-full object-cover">
+             <div *ngIf="post.extractedImages.length > 1" class="absolute bottom-4 right-4 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-md border border-white/10">
+               +{{ post.extractedImages.length - 1 }} media
+             </div>
           </div>
 
-          <div class="post-action-bar" style="display: flex; gap: 4px; margin-top: 12px;">
-            <button class="action-btn fb-like-btn" [class.liked]="isPostLiked(post.id)" (click)="votePost(post)" style="display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: transparent; border: none; border-radius: 4px; cursor: pointer; color: var(--text-meta); transition: background-color 0.2s;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"></path>
-              </svg>
-              <span class="action-text" style="font-size: 13px; font-weight: 600;">Thích ({{ post.likes }})</span>
-            </button>
-            <a [routerLink]="['/post', post.id]" class="action-btn" style="text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: transparent; border: none; border-radius: 4px; cursor: pointer; color: var(--text-meta); transition: background-color 0.2s;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"></path>
-              </svg>
-              <span class="action-text" style="font-size: 13px; font-weight: 600;">Bình luận {{ post.commentCount > 0 ? '(' + post.commentCount + ')' : '' }}</span>
-            </a>
-            <button class="action-btn" style="display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: transparent; border: none; border-radius: 4px; cursor: pointer; color: var(--text-meta); transition: background-color 0.2s;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                <path d="m14 2 6 6-6 6V9c-4.5 0-8.1 3.2-8.9 7.5-.1.5-.5.9-1 .8-.5-.1-.8-.5-.8-1C3.3 9.7 8.3 5 14 5V2z"></path>
-              </svg>
-              <span class="action-text" style="font-size: 13px; font-weight: 600;">Chia sẻ</span>
-            </button>
+          <!-- Action Bar -->
+          <div class="flex items-center gap-2 mt-auto border-t border-outline-variant/10 pt-4">
+             <button class="flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs bg-surface text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors border border-outline-variant/20 shadow-sm" [class.text-primary]="isPostLiked(post.id)" [class.bg-primary/5]="isPostLiked(post.id)" [class.border-primary/20]="isPostLiked(post.id)" (click)="votePost(post)">
+               <span class="material-symbols-outlined text-[18px]">thumb_up</span>
+               {{ post.likes }} Lượt thích
+             </button>
+             <button class="flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs bg-surface text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container transition-colors border border-outline-variant/20 shadow-sm" [routerLink]="['/post', post.id]">
+               <span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+               {{ post.commentCount }} Phản hồi
+             </button>
+             <button class="flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs bg-surface text-on-surface-variant hover:bg-tertiary-container hover:text-on-tertiary-container transition-colors border border-outline-variant/20 shadow-sm hidden sm:flex ml-auto">
+               <span class="material-symbols-outlined text-[18px]">share</span>
+               Chia sẻ
+             </button>
           </div>
+
         </div>
       </div>
-      
-    </div>
 
-    <!-- Cột Bên Phải (Widget mô tả / Luật lệ) -->
-    <div class="sidebar-widget-col">
-      <div class="widget-box">
-        <h3 class="widget-title">Giới thiệu về Cộng đồng</h3>
-        <button *ngIf="isModerator && !isEditing" class="btn btn-outline-primary btn-sm mb-3 w-100" (click)="toggleEdit()"><i class="fa-solid fa-pen"></i> Chỉnh sửa Cộng đồng</button>
-
-        <div *ngIf="isEditing" style="background:#f8f9fa; padding:12px; border-radius:4px; margin-bottom:16px; font-size:14px; text-align: left;">
-          <label class="fw-bold">Tên hiển thị:</label>
-          <input type="text" [(ngModel)]="editData.displayName" class="form-control mb-2" style="font-size:14px;">
-          
-          <label class="fw-bold">Mô tả:</label>
-          <textarea [(ngModel)]="editData.description" class="form-control mb-2" style="font-size:14px;"></textarea>
-          
-          <label class="fw-bold">Ảnh đại diện:</label>
-          <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control mb-2" style="font-size:14px;">
-          <div *ngIf="isUploading" class="text-info mb-2" style="font-size: 13px;">Đang tải lên...</div>
-          
-          <div class="d-flex gap-2">
-            <button class="btn btn-primary btn-sm flex-fill" (click)="saveSettings()" [disabled]="isUploading">Lưu</button>
-            <button class="btn btn-secondary btn-sm flex-fill" (click)="toggleEdit()">Hủy</button>
-          </div>
-        </div>
-
-        <p class="widget-desc" *ngIf="!isEditing">{{ communityData?.description }}</p>
-        
-        <div class="widget-stats">
-          <div class="stat-item">
-            <span class="stat-num">{{ memberCount | number }}</span>
-            <span class="stat-label">Thành viên</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-num">{{ onlineCount | number }}</span>
-            <span class="stat-label">Online</span>
-          </div>
-        </div>
-        
-        <hr class="widget-divider">
-        
-        <div class="topics-list" *ngIf="communityData?.topics?.length > 0">
-           <span class="mock-pill" *ngFor="let t of communityData.topics">{{ t }}</span>
-        </div>
-
-        <button class="btn-primary w-100" style="margin-top: 16px;" [routerLink]="['/create-post']" [queryParams]="{community: communityName}">Tạo bài viết mới</button>
-      </div>
     </div>
 
   </div>
-
 </div>

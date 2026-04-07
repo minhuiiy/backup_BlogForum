@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#000000",
+                    "on-secondary-container": "#203ea2",
+                    "tertiary-fixed-dim": "#e48fec",
+                    "inverse-surface": "#0b0f10",
+                    "on-primary-fixed-variant": "#002a61",
+                    "on-error": "#ffefee",
+                    "outline": "#747779",
+                    "on-tertiary-fixed-variant": "#6a1f76",
+                    "on-primary": "#f0f2ff",
+                    "tertiary-dim": "#7a2f86",
+                    "on-tertiary-container": "#60136d",
+                    "surface-container-high": "#dfe3e6",
+                    "tertiary-fixed": "#f39cfb",
+                    "surface-variant": "#d9dde0",
+                    "error-container": "#fb5151",
+                    "error-dim": "#9f0519",
+                    "error": "#b31b25",
+                    "on-secondary-fixed-variant": "#2c48ac",
+                    "on-surface": "#2c2f31",
+                    "surface": "#f5f7f9",
+                    "surface-container-highest": "#d9dde0",
+                    "secondary-dim": "#2b47ab",
+                    "outline-variant": "#abadaf",
+                    "primary-fixed": "#6c9fff",
+                    "secondary-fixed": "#c6cfff",
+                    "surface-tint": "#0058bb",
+                    "primary-container": "#6c9fff",
+                    "surface-dim": "#d0d5d8",
+                    "tertiary-container": "#f39cfb",
+                    "surface-bright": "#f5f7f9",
+                    "primary-dim": "#004ca4",
+                    "on-primary-container": "#00214f",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface-variant": "#595c5e",
+                    "surface-container": "#e5e9eb",
+                    "on-secondary-fixed": "#00288d",
+                    "primary-fixed-dim": "#5191ff",
+                    "on-error-container": "#570008",
+                    "surface-container-low": "#eef1f3",
+                    "inverse-on-surface": "#9a9d9f",
+                    "tertiary": "#883c93",
+                    "secondary-fixed-dim": "#b4c1ff",
+                    "primary": "#0058bb",
+                    "on-background": "#2c2f31",
+                    "inverse-primary": "#4b8eff",
+                    "secondary-container": "#c6cfff",
+                    "on-tertiary": "#ffeefb",
+                    "on-secondary": "#f2f1ff",
+                    "secondary": "#3853b7",
+                    "background": "#f5f7f9",
+                    "on-tertiary-fixed": "#41004d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .kinetic-gradient {
+            background: linear-gradient(135deg, #0058bb 0%, #6c9fff 100%);
+        }
+        .ghost-border {
+            outline: 1px solid rgba(171, 173, 175, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-[#f5f7f9] text-on-surface">
+<!-- TopNavBar -->
+<header class="bg-[#f5f7f9] dark:bg-slate-950 docked full-width top-0 sticky z-50">
+<nav class="flex justify-between items-center w-full px-8 py-4 max-w-[1440px] mx-auto">
+<div class="text-2xl font-bold tracking-tight text-[#2c2f31] dark:text-slate-100 font-['Space_Grotesk']">
+                Atelier
+            </div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#2c2f31]/70 dark:text-slate-400 font-medium hover:text-[#007AFF] transition-colors" href="#">Tech Blog</a>
+<a class="text-[#0058bb] dark:text-blue-300 font-bold border-b-2 border-[#007AFF] pb-1" href="#">Q&amp;A Forum</a>
+<a class="text-[#2c2f31]/70 dark:text-slate-400 font-medium hover:text-[#007AFF] transition-colors" href="#">Documentation</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary w-64 transition-all" placeholder="Search discussions..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-[#2c2f31]/70 hover:bg-[#eef1f3] p-2 rounded-full transition-all">notifications</button>
+<button class="kinetic-gradient text-white px-6 py-2 rounded-full font-semibold text-sm hover:scale-95 transition-transform active:scale-100">Create Post</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
+<img alt="User avatar" data-alt="Close-up professional portrait of a software engineer with soft studio lighting and neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDlm3kvO9kcl7XDeTv-3nnsC5lAothb7hjlhZhSdztQGzhvQXOAJNa9sfItuZQjWPHQdq0DLAnbzSN8RCI6iFg8jqGmVyQ_QZMfu3VJj4H9ACdzbgb3-DYSiDiwOpcqZ4GGhyeP0c-L-HcNX-GtvbJ2ywGpJKV5J3P1w_cx2Br8kFIkyuKDseuYduCWWHSGLqS_PznX3nhikFvrDNV8cwswP6xe9XSnLhQ6CQ-gqO2h4fOn_d7BGfUvAsu1cjzaKbDDdRz1x_L_SQ"/>
+</div>
+</div>
+</nav>
+</header>
+<main class="max-w-[1440px] mx-auto px-8 py-8 flex gap-12">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col w-64 sticky top-24 h-[calc(100vh-120px)] overflow-y-auto">
+<div class="mb-8">
+<h3 class="text-lg font-bold font-['Space_Grotesk'] text-on-surface">Navigation</h3>
+<p class="text-xs text-[#2c2f31]/60 font-['Inter'] tracking-wide">Browse Categories</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-6 py-3 text-[#2c2f31]/60 dark:text-slate-500 hover:text-[#007AFF] hover:bg-white/50 rounded-r-full transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-lg">trending_up</span>
+<span class="font-['Inter'] text-sm tracking-wide">Trending</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 text-[#007AFF] font-semibold rounded-r-full shadow-sm" href="#">
+<span class="material-symbols-outlined text-lg">code</span>
+<span class="font-['Inter'] text-sm tracking-wide">JavaScript</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#2c2f31]/60 dark:text-slate-500 hover:text-[#007AFF] hover:bg-white/50 rounded-r-full transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-lg">terminal</span>
+<span class="font-['Inter'] text-sm tracking-wide">Rust</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#2c2f31]/60 dark:text-slate-500 hover:text-[#007AFF] hover:bg-white/50 rounded-r-full transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-lg">account_tree</span>
+<span class="font-['Inter'] text-sm tracking-wide">Architecture</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#2c2f31]/60 dark:text-slate-500 hover:text-[#007AFF] hover:bg-white/50 rounded-r-full transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-lg">memory</span>
+<span class="font-['Inter'] text-sm tracking-wide">Systems</span>
+</a>
+</nav>
+<div class="mt-auto p-6 bg-primary-container/10 rounded-xl ghost-border">
+<p class="text-xs font-bold text-primary mb-2 uppercase tracking-widest">Community</p>
+<p class="text-sm text-on-surface-variant mb-4">Engage with 50k+ elite engineers worldwide.</p>
+<button class="w-full kinetic-gradient text-white py-2 rounded-lg font-semibold text-xs transition-transform hover:scale-[0.98]">Join Community</button>
+</div>
+</aside>
+<!-- Main Content -->
+<section class="flex-1 min-w-0">
+<header class="mb-12">
+<h1 class="text-5xl font-bold font-headline tracking-tighter text-on-surface mb-4">Knowledge Repository</h1>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="flex gap-2">
+<button class="px-5 py-2 rounded-full bg-white text-primary font-semibold text-sm shadow-sm ghost-border">Latest</button>
+<button class="px-5 py-2 rounded-full text-on-surface-variant hover:bg-surface-container-low font-medium text-sm transition-colors">Most Voted</button>
+<button class="px-5 py-2 rounded-full text-on-surface-variant hover:bg-surface-container-low font-medium text-sm transition-colors">Unanswered</button>
+</div>
+<button class="kinetic-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-primary/20 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined">add_circle</span>
+                        Ask a Question
+                    </button>
+</div>
+</header>
+<div class="space-y-6">
+<!-- Question Card 1 -->
+<article class="bg-surface-container-lowest p-8 rounded-xl ghost-border hover:shadow-xl hover:shadow-on-surface/5 transition-all duration-300 flex gap-8 group">
+<div class="flex flex-col items-center gap-4 text-center min-w-[64px]">
+<div class="space-y-1">
+<p class="text-xl font-bold font-headline text-primary">42</p>
+<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Votes</p>
+</div>
+<div class="space-y-1 bg-secondary-container/30 px-3 py-2 rounded-lg">
+<p class="text-xl font-bold font-headline text-secondary">12</p>
+<p class="text-[10px] uppercase tracking-widest font-bold text-secondary">Answers</p>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface-variant">1.2k</p>
+<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Views</p>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-3">
+<img alt="Avatar" class="w-6 h-6 rounded-full" data-alt="Portrait of a young developer in a creative workspace with warm natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCai3kTC8MhPCB8Xb2JG_K8HVsRuwm2pigZhUd3vfG_r5B26_ss-KnNXu3bx5ffi0zaJ8EWyJUHN_TsmA91E9Ml1xT1gq5YeuUQZGKPm0GlsKj8RPVsdnpJ84EVFmSjipHykHTRZXQiNMaU-wIv4JNUPhZ2jhjqkmF3C_BBb654SMWLj0wHEcazPYDufAr7Raah1OWuHv-k3fR5bwncu8v4yNv7glk-XQgJW5gz0ehlZzzHaN27ONcjdyGF8Ox7UpZ2OzH0Iov0E6E"/>
+<span class="text-xs font-semibold text-on-surface-variant">alex_dev_99</span>
+<span class="text-[10px] text-outline-variant uppercase tracking-widest">• 2 hours ago</span>
+</div>
+<h2 class="text-2xl font-bold font-headline text-on-surface mb-3 group-hover:text-primary transition-colors leading-tight">Implementing custom reconciler in React 18 for high-performance canvas rendering</h2>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-6 leading-relaxed">I'm attempting to bridge a custom PixiJS engine into the React lifecycle using the new concurrent features. What are the current best practices for avoiding layout thrashing during fiber commits...</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">React</span>
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">TypeScript</span>
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">Performance</span>
+</div>
+</div>
+</article>
+<!-- Question Card 2 -->
+<article class="bg-surface-container-lowest p-8 rounded-xl ghost-border hover:shadow-xl hover:shadow-on-surface/5 transition-all duration-300 flex gap-8 group">
+<div class="flex flex-col items-center gap-4 text-center min-w-[64px]">
+<div class="space-y-1">
+<p class="text-xl font-bold font-headline text-on-surface-variant">156</p>
+<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Votes</p>
+</div>
+<div class="space-y-1 border border-primary/20 px-3 py-2 rounded-lg">
+<p class="text-xl font-bold font-headline text-primary">3</p>
+<p class="text-[10px] uppercase tracking-widest font-bold text-primary">Answers</p>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface-variant">8.4k</p>
+<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Views</p>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-3">
+<img alt="Avatar" class="w-6 h-6 rounded-full" data-alt="Professional woman in business casual attire with soft office background lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSeWHLJWTOZoohkRknE3CmQJ5vI4jwzLzIb1N-wIlyjEOP2Zd4qdVqMLyuZKMh2ECAwkEppFGPAFGn81xrRlOZgpGPBEe33tLlgvWqNJ76pzg9jPVvhaL_zJx_vYhc2tZzDbqaRzD4RpB7zcO6jOTydsMbmWtZ3Qt4t7ojys_GR5-KboCjHapzWZYfmZbTruLvrW6V7-fIcbgSMtwzqhP2-aNhvvrxcqOeZsalQtRZDHjG244zGizn3zV7LVKvLlFpbh0jNCl3NVQ"/>
+<span class="text-xs font-semibold text-on-surface-variant">k8s_commander</span>
+<span class="text-[10px] text-outline-variant uppercase tracking-widest">• 5 hours ago</span>
+</div>
+<h2 class="text-2xl font-bold font-headline text-on-surface mb-3 group-hover:text-primary transition-colors leading-tight">Handling graceful shutdowns for Kubernetes pods with long-running WebSocket connections</h2>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-6 leading-relaxed">Our clusters are cycling nodes frequently during scale-up/down. We're seeing issues where connections are dropped before our preStop hooks finish draining the queues...</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">Kubernetes</span>
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">DevOps</span>
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">WebSockets</span>
+</div>
+</div>
+</article>
+<!-- Question Card 3 -->
+<article class="bg-surface-container-lowest p-8 rounded-xl ghost-border hover:shadow-xl hover:shadow-on-surface/5 transition-all duration-300 flex gap-8 group">
+<div class="flex flex-col items-center gap-4 text-center min-w-[64px]">
+<div class="space-y-1">
+<p class="text-xl font-bold font-headline text-on-surface-variant">12</p>
+<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Votes</p>
+</div>
+<div class="space-y-1 bg-error-container/10 px-3 py-2 rounded-lg">
+<p class="text-xl font-bold font-headline text-error">0</p>
+<p class="text-[10px] uppercase tracking-widest font-bold text-error">Answers</p>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface-variant">420</p>
+<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Views</p>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-3">
+<img alt="Avatar" class="w-6 h-6 rounded-full" data-alt="Portrait of a young adult male with glasses in a minimalist modern room with soft cool lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD6SMJ_NXUCfvVmvEX30X-o8B2loQc3aVM9Y7S4QG1-XifPLHWpHuj3eMAY5O7jSgdIGK8tHaAorqrBRkRBpHlZbooj_2qVPsarwHSzfNXwR8X5Th2J2ODlVCmOr3P-LZEmB79SqdzfzDswLN5Z3NLWnNWO5AQsuco5feRZFGl2kYXKpmTlOLcQSEe3BFRzpPjj3dLFLXuR27a2rJP8uE0tpooPuZQFXEujn557LuCi7PErWoqlWrVDtOVHhHfWEPKDmnv2ucR7AY"/>
+<span class="text-xs font-semibold text-on-surface-variant">rust_acean</span>
+<span class="text-[10px] text-outline-variant uppercase tracking-widest">• 8 hours ago</span>
+</div>
+<h2 class="text-2xl font-bold font-headline text-on-surface mb-3 group-hover:text-primary transition-colors leading-tight">Optimization flags for Rust SIMD instructions on Apple M2 Silicon</h2>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-6 leading-relaxed">I'm noticing inconsistent throughput when using portable_simd on macOS. Is there a specific target-feature I should be targeting to maximize the NEON unit utilization?</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">Rust</span>
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">Systems</span>
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">ARM</span>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Sidebar -->
+<aside class="hidden xl:block w-80 space-y-8 sticky top-24 h-fit">
+<div class="bg-white p-8 rounded-xl ghost-border">
+<h3 class="text-lg font-bold font-headline mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                    Hot Topics
+                </h3>
+<ul class="space-y-6">
+<li>
+<a class="group block" href="#">
+<p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Architecture</p>
+<p class="text-sm font-semibold text-on-surface group-hover:text-primary transition-colors leading-snug">The transition from Microservices back to Monoliths in 2024</p>
+<div class="flex gap-4 mt-2">
+<span class="text-[10px] text-outline-variant font-medium">84 comments</span>
+<span class="text-[10px] text-outline-variant font-medium">1.2k views</span>
+</div>
+</a>
+</li>
+<li>
+<a class="group block" href="#">
+<p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">AI / ML</p>
+<p class="text-sm font-semibold text-on-surface group-hover:text-primary transition-colors leading-snug">Optimizing Llama 3 for edge device inference</p>
+<div class="flex gap-4 mt-2">
+<span class="text-[10px] text-outline-variant font-medium">56 comments</span>
+<span class="text-[10px] text-outline-variant font-medium">940 views</span>
+</div>
+</a>
+</li>
+<li>
+<a class="group block" href="#">
+<p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Backend</p>
+<p class="text-sm font-semibold text-on-surface group-hover:text-primary transition-colors leading-snug">Why Go is winning the platform engineering war</p>
+<div class="flex gap-4 mt-2">
+<span class="text-[10px] text-outline-variant font-medium">212 comments</span>
+<span class="text-[10px] text-outline-variant font-medium">4.5k views</span>
+</div>
+</a>
+</li>
+</ul>
+</div>
+<!-- Beta Signup Card -->
+<div class="relative overflow-hidden kinetic-gradient p-8 rounded-xl text-white shadow-2xl shadow-primary/20">
+<div class="relative z-10">
+<h3 class="text-xl font-bold font-headline mb-2 leading-tight">Join the DevLume Beta</h3>
+<p class="text-sm text-white/80 mb-6 font-medium">Get early access to our AI-powered code auditing tools and premium technical workshops.</p>
+<div class="space-y-3">
+<input class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-sm placeholder:text-white/50 focus:ring-2 focus:ring-white/30 focus:outline-none backdrop-blur-sm transition-all" placeholder="dev@company.com" type="email"/>
+<button class="w-full bg-white text-primary font-bold py-3 rounded-lg text-sm hover:bg-surface transition-colors shadow-lg">Sign Up Now</button>
+</div>
+</div>
+<!-- Abstract Design Elements -->
+<div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute -left-4 -top-4 w-24 h-24 bg-primary-container/20 rounded-full blur-2xl"></div>
+</div>
+</aside>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 border-t border-[#abadaf]/15 bg-[#f5f7f9] mt-20">
+<div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50">
+                © 2024 Kinetic Atelier. Engineered for performance.
+            </p>
+<div class="flex gap-8">
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Changelog</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Security</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">API</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Terms</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Privacy</a>
+</div>
+</div>
+</footer>
+</body></html>

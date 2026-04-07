@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-primary-fixed": "#000000",
+                "on-secondary-container": "#203ea2",
+                "tertiary-fixed-dim": "#e48fec",
+                "inverse-surface": "#0b0f10",
+                "on-primary-fixed-variant": "#002a61",
+                "on-error": "#ffefee",
+                "outline": "#747779",
+                "on-tertiary-fixed-variant": "#6a1f76",
+                "on-primary": "#f0f2ff",
+                "tertiary-dim": "#7a2f86",
+                "on-tertiary-container": "#60136d",
+                "surface-container-high": "#dfe3e6",
+                "tertiary-fixed": "#f39cfb",
+                "surface-variant": "#d9dde0",
+                "error-container": "#fb5151",
+                "error-dim": "#9f0519",
+                "error": "#b31b25",
+                "on-secondary-fixed-variant": "#2c48ac",
+                "on-surface": "#2c2f31",
+                "surface": "#f5f7f9",
+                "surface-container-highest": "#d9dde0",
+                "secondary-dim": "#2b47ab",
+                "outline-variant": "#abadaf",
+                "primary-fixed": "#6c9fff",
+                "secondary-fixed": "#c6cfff",
+                "surface-tint": "#0058bb",
+                "primary-container": "#6c9fff",
+                "surface-dim": "#d0d5d8",
+                "tertiary-container": "#f39cfb",
+                "surface-bright": "#f5f7f9",
+                "primary-dim": "#004ca4",
+                "on-primary-container": "#00214f",
+                "surface-container-lowest": "#ffffff",
+                "on-surface-variant": "#595c5e",
+                "surface-container": "#e5e9eb",
+                "on-secondary-fixed": "#00288d",
+                "primary-fixed-dim": "#5191ff",
+                "on-error-container": "#570008",
+                "surface-container-low": "#eef1f3",
+                "inverse-on-surface": "#9a9d9f",
+                "tertiary": "#883c93",
+                "secondary-fixed-dim": "#b4c1ff",
+                "primary": "#0058bb",
+                "on-background": "#2c2f31",
+                "inverse-primary": "#4b8eff",
+                "secondary-container": "#c6cfff",
+                "on-tertiary": "#ffeefb",
+                "on-secondary": "#f2f1ff",
+                "secondary": "#3853b7",
+                "background": "#f5f7f9",
+                "on-tertiary-fixed": "#41004d"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "fontFamily": {
+                "headline": ["Space Grotesk"],
+                "body": ["Inter"],
+                "label": ["Inter"],
+                "mono": ["JetBrains Mono"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .brand-font { font-family: 'Space Grotesk', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopNavBar -->
+<nav class="bg-[#f5f7f9] shadow-none border-none docked full-width top-0 sticky z-50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-[1440px] mx-auto">
+<div class="flex items-center gap-12">
+<span class="text-2xl font-bold tracking-tight text-[#2c2f31] font-['Space_Grotesk']">Atelier</span>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-[#2c2f31]/70 font-medium hover:text-[#007AFF] transition-colors" href="#">Tech Blog</a>
+<a class="text-[#0058bb] font-bold border-b-2 border-[#007AFF] pb-1" href="#">Q&amp;A Forum</a>
+<a class="text-[#2c2f31]/70 font-medium hover:text-[#007AFF] transition-colors" href="#">Documentation</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant/15">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-64 p-0" placeholder="Search discussions..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors" data-icon="notifications">notifications</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-5 py-2 rounded-full font-semibold text-sm hover:scale-95 transition-transform">Create Post</button>
+<img class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm" data-alt="Professional developer portrait with neutral background and soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuQnoRzKltiDtMW2KyFCN6_Txv2sC3MDyaBqEfd-zrIwNS0p_YuZKLQmbdSIl6pRil-ui_-f0b2D5gM0VzDpm7RFZD9ggxh17A-MFtDdzzq07d9b-Df58NkTRMEDnXWmAVq0Ez6hdHABUSuaxvUozlqmS-bsOpr6vz0F3VKSgTy8hLPGaIUBvDDnGbcQkYyNrdaHaFnJtOTnk0xa612kjm67OD0BOD4hdkJqT9xtzyaO8sZQM_BadFMuGbTaPbJGCC3Og6Yk-jzpE"/>
+</div>
+</div>
+</div>
+</nav>
+<div class="max-w-[1440px] mx-auto flex">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex h-[calc(100vh-76px)] w-64 sticky top-20 flex-col gap-2 py-6 bg-[#eef1f3] shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)] overflow-y-auto">
+<div class="px-6 mb-8">
+<h3 class="text-xs uppercase tracking-widest text-[#2c2f31]/50 font-bold mb-4">Navigation</h3>
+<div class="flex items-center gap-3 p-3 bg-surface-container-lowest rounded-xl mb-6">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+</div>
+<div>
+<p class="text-sm font-bold">Community Pulse</p>
+<p class="text-[10px] text-on-surface-variant">Browse Categories</p>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-6 py-3 text-[#2c2f31]/60 hover:text-[#007AFF] hover:bg-white/50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span class="text-sm font-medium">Trending</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#2c2f31]/60 hover:text-[#007AFF] hover:bg-white/50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="code">code</span>
+<span class="text-sm font-medium">JavaScript</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#2c2f31]/60 hover:text-[#007AFF] hover:bg-white/50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="text-sm font-medium">Rust</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 bg-white text-[#007AFF] font-semibold rounded-r-full shadow-sm" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="text-sm">Architecture</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#2c2f31]/60 hover:text-[#007AFF] hover:bg-white/50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="memory">memory</span>
+<span class="text-sm font-medium">Systems</span>
+</a>
+</nav>
+<div class="mt-auto px-6 pt-6">
+<button class="w-full py-3 bg-secondary-container text-on-secondary-container text-xs font-bold uppercase tracking-tighter rounded-lg hover:bg-secondary-container/80 transition-colors">Join Community</button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-8 py-10 min-w-0">
+<header class="mb-12">
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold tracking-widest px-2 py-1 rounded uppercase">V8 ENGINE</span>
+<span class="bg-surface-container-high text-on-surface-variant text-[10px] font-bold tracking-widest px-2 py-1 rounded uppercase">PERFORMANCE</span>
+</div>
+<h1 class="text-5xl font-bold tracking-tight text-on-surface leading-[1.1] max-w-4xl">Understanding Hidden Classes in V8</h1>
+<div class="flex items-center gap-6 mt-6 text-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full" data-alt="Close-up profile of a male software engineer with soft indoor lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbGkflQ3Yu3mQhcCDquMrOxinhlMdBBsUY7c2DJyIOoMJ6k9nIsEJJnB5fFrxdyBT5ooicm4S9Q5x9sxcfcB9WmYZFMAhLJwsKQ4osdrLEAE0vnWR4ZOXRww24JieL67YMVQAAfaxD2f5MPtYigWduXHycJjMRytT4w3SCwmBH4hFZaEi7z0zwyyLyAPx0e3xmA9HiOIdPV6U9ZyFFuLgUh9pq9mtOBdCwQoF-mPLBlg5ftYlSAG529yIuNiXFHJ7Z38YknITeXGc"/>
+<span class="font-medium text-on-surface">alex_dev</span>
+</div>
+<span>Asked 4 hours ago</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="visibility">visibility</span>
+<span>1.2k views</span>
+</div>
+</div>
+</header>
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-12">
+<!-- Question Section -->
+<div class="xl:col-span-8">
+<div class="flex gap-8">
+<!-- Voting Column -->
+<div class="flex flex-col items-center gap-4">
+<button class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-primary-container hover:text-on-primary-container transition-all">
+<span class="material-symbols-outlined" data-icon="arrow_upward">arrow_upward</span>
+</button>
+<span class="text-2xl font-headline font-bold text-on-surface">42</span>
+<button class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-all">
+<span class="material-symbols-outlined" data-icon="arrow_downward">arrow_downward</span>
+</button>
+<button class="mt-4 material-symbols-outlined text-outline-variant hover:text-tertiary transition-colors" data-icon="bookmark">bookmark</button>
+<button class="material-symbols-outlined text-outline-variant hover:text-primary transition-colors" data-icon="history">history</button>
+</div>
+<!-- Content Column -->
+<div class="flex-1 space-y-6">
+<p class="text-lg leading-relaxed text-on-surface-variant font-body">
+                                I'm trying to optimize a high-frequency loop in Node.js and came across the concept of <strong>Hidden Classes</strong> (or Shapes). I understand that V8 uses them to optimize property access, but I'm struggling with how adding properties in different orders affects performance.
+                            </p>
+<p class="text-lg leading-relaxed text-on-surface-variant font-body">
+                                For example, why does this cause a de-optimization? Does V8 create a new class for every property addition?
+                            </p>
+<div class="bg-surface-container-highest rounded-lg overflow-hidden border-l-4 border-primary">
+<div class="px-4 py-2 bg-surface-container-high/50 flex justify-between items-center border-b border-outline-variant/10">
+<span class="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest">javascript</span>
+<button class="material-symbols-outlined text-sm text-on-surface-variant hover:text-primary" data-icon="content_copy">content_copy</button>
+</div>
+<pre class="p-6 font-mono text-sm leading-relaxed text-on-surface overflow-x-auto"><code>function Point(x, y) {
+  this.x = x;
+  this.y = y;
+}
+
+const p1 = new Point(1, 2);
+const p2 = new Point(3, 4);
+
+// This is fine, they share the class
+p2.z = 5; 
+
+// Now p1 and p2 have different hidden classes?
+p1.z = 6;</code></pre>
+</div>
+<div class="flex flex-wrap gap-2 pt-4">
+<span class="px-3 py-1 bg-secondary-container/30 text-secondary text-xs font-semibold rounded-md uppercase tracking-wider">v8</span>
+<span class="px-3 py-1 bg-secondary-container/30 text-secondary text-xs font-semibold rounded-md uppercase tracking-wider">compiler</span>
+<span class="px-3 py-1 bg-secondary-container/30 text-secondary text-xs font-semibold rounded-md uppercase tracking-wider">optimization</span>
+</div>
+<!-- Discussion Footer -->
+<div class="pt-8 border-t border-outline-variant/15 flex justify-between items-center">
+<div class="flex gap-4">
+<button class="text-xs font-bold text-primary hover:underline uppercase tracking-widest">Share</button>
+<button class="text-xs font-bold text-on-surface-variant hover:underline uppercase tracking-widest">Edit</button>
+<button class="text-xs font-bold text-on-surface-variant hover:underline uppercase tracking-widest">Follow</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Answers Section -->
+<div class="mt-20 space-y-12">
+<div class="flex items-center justify-between">
+<h2 class="text-3xl font-bold tracking-tight">2 Answers</h2>
+<div class="flex items-center gap-2 bg-surface-container-low p-1 rounded-lg">
+<button class="px-4 py-1.5 text-xs font-bold bg-white shadow-sm rounded-md text-primary">Highest Score</button>
+<button class="px-4 py-1.5 text-xs font-bold text-on-surface-variant hover:text-on-surface transition-colors">Newest</button>
+</div>
+</div>
+<!-- Accepted Answer -->
+<div class="relative bg-surface-container-lowest p-1 rounded-2xl shadow-[0_12px_32px_-8px_rgba(44,47,49,0.06)] ring-1 ring-primary/5">
+<div class="absolute -left-3 top-8 bg-primary text-on-primary w-10 h-10 rounded-full flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined" data-icon="check" data-weight="fill">check</span>
+</div>
+<div class="p-8 flex gap-8">
+<div class="flex flex-col items-center gap-4 pt-2">
+<button class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="keyboard_arrow_up">keyboard_arrow_up</span>
+</button>
+<span class="font-headline font-bold text-xl">128</span>
+<button class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-error transition-all">
+<span class="material-symbols-outlined" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+</div>
+<div class="flex-1 space-y-4">
+<div class="flex items-center gap-3 mb-2">
+<img class="w-8 h-8 rounded-full" data-alt="Close-up of a senior developer with glasses and a thoughtful expression, warm cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXLy92cahgEV5FJI9tC6cq1W5Lu-BtNxcMIQZ7Iji7nI5mJn9t6SByGN6kkYenLb48A2fVWQsSod0BOuna0saKsFiX4G0jWnwCj0vE_xS1ozrd3ebcKwWF-W3NJpBHi1oMyeOhBb9ibtpRYhrRlqzmN6r8cdPydNfNXvUMaMo0KELdQrdKN8gKNqUoaH1mqYZAkeCTB-St9hak4XYkJstdyENqkO0e3YThXQpmScmZUZGP8yL19xtVWFM40OSEmM8gOPfe3KIBxWA"/>
+<div>
+<span class="text-sm font-bold text-primary">engine_wizard</span>
+<span class="text-xs text-on-surface-variant ml-2">V8 Team Contributor</span>
+</div>
+</div>
+<p class="leading-relaxed text-on-surface-variant">
+                                        Yes, you're exactly right. V8 creates what is essentially a state machine of classes. Each property addition acts as a transition between these classes.
+                                    </p>
+<div class="bg-surface-container-high/30 p-6 rounded-xl border-l-2 border-primary/20">
+<p class="text-sm leading-relaxed italic">
+                                            "Objects that share the same hidden class also share the same optimized code for property access."
+                                        </p>
+</div>
+<p class="leading-relaxed text-on-surface-variant">
+                                        In your case, when you add <code class="bg-surface-container-high px-1.5 py-0.5 rounded text-primary-dim font-mono text-sm">z</code> to <code class="bg-surface-container-high px-1.5 py-0.5 rounded text-primary-dim font-mono text-sm">p2</code>, V8 transitions it to a new class. When you later add it to <code class="bg-surface-container-high px-1.5 py-0.5 rounded text-primary-dim font-mono text-sm">p1</code>, it follows the same transition path and ends up on the same hidden class. The problem arises when properties are added in a <strong>different order</strong>.
+                                    </p>
+</div>
+</div>
+</div>
+<!-- Standard Answer -->
+<div class="p-8 flex gap-8 opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex flex-col items-center gap-4">
+<button class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="keyboard_arrow_up">keyboard_arrow_up</span>
+</button>
+<span class="font-headline font-bold text-xl">14</span>
+<button class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+</div>
+<div class="flex-1 space-y-4">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full" data-alt="Close-up profile of a female software architect in a bright office setting with soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaKUB86l9tsA8y8K8SmQXCuaIXneP6Mq6ZUdlosZ_7URUqH2Jn5riXEnj-CI83FmfHShiLCx8z7EaCIMHs784SC8rYuuewBzhp1amrC8wQnr0zPwzXjXhlFgGSHGhqBt5y8YBtbAfeKr1_OlmAO5oY62qz8DvMysMCGfcjeggoNfDykFTMRZVIG7-eiGsEHZhP8CDFyXznF4nd8q7lZc1_zJkwRuuawZWyjpQDK4LlDORyQJ3GlbheGBlvUVccptoZFxmo4nZjJoc"/>
+<span class="text-sm font-bold">sarah_codes</span>
+</div>
+<p class="leading-relaxed text-on-surface-variant">
+                                    To visualize this, you can use the flag <code class="bg-surface-container-high px-1.5 py-0.5 rounded text-on-surface-variant font-mono text-sm">--allow-natives-syntax</code> and the function <code class="bg-surface-container-high px-1.5 py-0.5 rounded text-on-surface-variant font-mono text-sm">%HaveSameMap(p1, p2)</code> in a debug build of V8.
+                                </p>
+</div>
+</div>
+</div>
+<!-- Reply Form -->
+<div class="mt-20 pt-10 border-t border-outline-variant/15">
+<h3 class="text-xl font-bold mb-6">Your Answer</h3>
+<div class="bg-surface-container-low rounded-2xl p-6 ring-1 ring-outline-variant/10">
+<div class="flex items-center gap-1 mb-4 border-b border-outline-variant/15 pb-4">
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="format_bold">format_bold</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="format_italic">format_italic</span>
+</button>
+<div class="w-[1px] h-4 bg-outline-variant/30 mx-2"></div>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="link">link</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="code">code</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="image">image</span>
+</button>
+<div class="w-[1px] h-4 bg-outline-variant/30 mx-2"></div>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="format_list_bulleted">format_list_bulleted</span>
+</button>
+</div>
+<textarea class="w-full bg-transparent border-none focus:ring-0 p-0 text-on-surface placeholder:text-on-surface-variant/40 resize-none" placeholder="Type your detailed explanation here..." rows="8"></textarea>
+</div>
+<div class="mt-6 flex justify-end gap-4">
+<button class="px-8 py-3 text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors">Discard</button>
+<button class="px-10 py-3 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full font-bold shadow-md hover:scale-95 transition-transform">Post Answer</button>
+</div>
+</div>
+</div>
+<!-- Sidebar / Post Info -->
+<div class="xl:col-span-4 space-y-8">
+<!-- Post Stats Bento -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white p-6 rounded-2xl border border-outline-variant/10">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Reputation</p>
+<p class="text-2xl font-headline font-bold text-primary">+1,240</p>
+</div>
+<div class="bg-white p-6 rounded-2xl border border-outline-variant/10">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Solvers</p>
+<p class="text-2xl font-headline font-bold">12</p>
+</div>
+</div>
+<!-- Related Questions -->
+<div class="bg-[#eef1f3] p-8 rounded-3xl space-y-6">
+<h4 class="text-lg font-bold">Related Questions</h4>
+<div class="space-y-6">
+<a class="block group" href="#">
+<h5 class="text-sm font-semibold text-on-surface leading-tight group-hover:text-primary transition-colors">Why is property order important in JS objects?</h5>
+<div class="flex items-center gap-3 mt-2 text-[10px] font-bold text-on-surface-variant/60 uppercase">
+<span>24 Answers</span>
+<span>•</span>
+<span>8k Views</span>
+</div>
+</a>
+<a class="block group" href="#">
+<h5 class="text-sm font-semibold text-on-surface leading-tight group-hover:text-primary transition-colors">V8 Inline Caches and Polymorphism explained</h5>
+<div class="flex items-center gap-3 mt-2 text-[10px] font-bold text-on-surface-variant/60 uppercase">
+<span>15 Answers</span>
+<span>•</span>
+<span>3.2k Views</span>
+</div>
+</a>
+<a class="block group" href="#">
+<h5 class="text-sm font-semibold text-on-surface leading-tight group-hover:text-primary transition-colors">How to use %DebugPrint in Node.js?</h5>
+<div class="flex items-center gap-3 mt-2 text-[10px] font-bold text-on-surface-variant/60 uppercase">
+<span>6 Answers</span>
+<span>•</span>
+<span>1.1k Views</span>
+</div>
+</a>
+</div>
+</div>
+<!-- Author Card -->
+<div class="glass-panel p-8 rounded-3xl border border-white shadow-xl">
+<h4 class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Original Poster</h4>
+<div class="flex items-center gap-4 mb-4">
+<img class="w-12 h-12 rounded-xl object-cover" data-alt="Portrait of software engineer in studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYGrSoxUqeK0MmOwWzNsY7ul5qQ29z2h58FqMm2J63qLHmMVW7H40fx7yHhTWs8MQEwzGODgGrVNzIMkHq_FO-XQRL7PdOE0OjnRJU9XUmm4-zuD2z_NSNzK_gu-uPmnlfVCNnwRv1zvMkuivLcgwLVq02ZTXiwk3E-yZx1OuHI1JntBTBvEqSFA_yyXNCSL3a1RsQVA84eIGs5-9G2Mi2NLBfBumSV_NWQrbjd5CqAe_bndGTKvmMTAWqAt8Iotqkavymc6QO6JA"/>
+<div>
+<p class="font-bold">alex_dev</p>
+<p class="text-xs text-on-surface-variant">Fullstack Lead</p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-outline-variant text-base" data-icon="verified" data-weight="fill" style="color: #0058bb;">verified</span>
+<span class="text-xs font-bold text-on-surface-variant">4,281 points</span>
+</div>
+<button class="w-full mt-6 py-3 border border-primary/20 text-primary text-xs font-bold rounded-xl hover:bg-primary hover:text-white transition-all">View Profile</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-[#f5f7f9] border-t border-[#abadaf]/15 w-full py-12 px-8 mt-20">
+<div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50">© 2024 Kinetic Atelier. Engineered for performance.</p>
+<div class="flex gap-8">
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Changelog</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Security</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">API</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Terms</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Privacy</a>
+</div>
+</div>
+</footer>
+</body></html>

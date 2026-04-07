@@ -1,0 +1,29 @@
+<div class="explore-container">
+  
+  <div class="feed-header explore-mode">
+    <h2 class="feed-title"><i class="fa-solid fa-compass" style="color: #24a0ed; margin-right: 8px;"></i>Khám phá cộng đồng</h2>
+    <p class="feed-subtitle">Tìm kiếm và tham gia vào những chủ đề công nghệ bạn yêu thích dựa trên hàng ngàn cộng đồng hoạt động mỗi ngày.</p>
+  </div>
+
+  <div class="explore-grid">
+    <a routerLink="/" class="community-grid-card" *ngFor="let comm of communities">
+      <div class="community-banner">
+        <img [src]="comm.banner" alt="Banner">
+      </div>
+      <div class="community-card-body">
+        <div class="community-avatar-overlap">
+          <img [src]="comm.icon" [alt]="comm.name">
+        </div>
+        <h3 class="community-card-name">{{ comm.name }}</h3>
+        <p class="community-card-title">{{ comm.title }}</p>
+        <p class="community-card-desc">{{ comm.description }}</p>
+        
+        <div class="community-card-footer">
+          <span class="community-members">{{ comm.members }} thành viên</span>
+          <button class="btn-primary" (click)="$event.preventDefault();"><i class="fa-solid fa-plus me-1"></i> Tham gia</button>
+        </div>
+      </div>
+    </a>
+  </div>
+
+</div>

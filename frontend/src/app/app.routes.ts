@@ -16,6 +16,7 @@ import { Search } from './pages/search/search';
 export const routes: Routes = [
   { path: 'profile', component: Profile },
   { path: 'user/:username', component: Profile },
+  { path: 'profile/:username', component: Profile },
   { path: 'home', component: HomeComponent },
   { path: 'popular', component: Popular },
   { path: 'all', component: HomeComponent },

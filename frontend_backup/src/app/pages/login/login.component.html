@@ -1,0 +1,69 @@
+<div class="auth-container">
+  <div class="auth-box">
+    <button class="close-btn" (click)="close()">✕</button>
+
+    <h2 class="auth-title">Đăng nhập</h2>
+    <p class="auth-disclaimer">
+      Bằng việc tiếp tục, bạn đồng ý với <a href="#">Thỏa thuận người dùng</a> của chúng tôi, đồng thời xác nhận rằng
+      bạn hiểu rõ <a href="#">Chính sách quyền riêng tư</a> của chúng tôi.
+    </p>
+
+    <!-- KHỐI MẠNG XÃ HỘI VÀ ĐĂNG NHẬP NHANH (REDDIT STYLE) -->
+    <div class="auth-social-group">
+      <button type="button" class="btn-social" (click)="loginWithPhone()">
+        <span class="social-icon text-icon" style="font-size: 20px;"></span>
+        Tiếp tục với số điện thoại
+      </button>
+
+      <div class="google-btn-wrapper" style="display: flex; justify-content: center; width: 100%;">
+        <asl-google-signin-button type="standard" size="large" shape="pill" [width]="360"
+          text="continue_with"></asl-google-signin-button>
+      </div>
+
+      <button type="button" class="btn-social" (click)="loginWithApple()">
+        <span class="social-icon text-icon" style="font-size: 20px; margin-bottom: 3px;"></span>
+        Tiếp tục với Apple
+      </button>
+
+      <button type="button" class="btn-social" (click)="loginWithEmailLink()">
+        <span class="social-icon text-icon" style="font-size: 16px;">🔗</span>
+        Gửi cho tôi liên kết một lần qua email
+      </button>
+    </div>
+
+    <div class="auth-divider">
+      <span>HOẶC</span>
+    </div>
+
+    <!-- KHỐI ĐĂNG NHẬP TRUYỀN THỐNG BẰNG USERNAME -->
+    <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+      <div class="form-group reddit-input-group">
+        <input type="text" id="username" name="username" [(ngModel)]="form.username" required #username="ngModel"
+          placeholder="Email hoặc tên người dùng *" [ngClass]="{ 'is-invalid': f.submitted && username.errors }"
+          autocomplete="off" />
+      </div>
+
+      <div class="form-group reddit-input-group">
+        <input type="password" id="password" name="password" [(ngModel)]="form.password" required minlength="6"
+          #password="ngModel" placeholder="Mật khẩu *" [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+          autocomplete="off" />
+      </div>
+
+      <div class="forgot-password">
+        <a href="#">Bạn quên mật khẩu?</a>
+      </div>
+
+      <div class="form-group row-submit">
+        <button class="reddit-submit" [disabled]="!f.form.valid"
+          [ngClass]="{'disabled-btn': !form.username || !form.password}">Đăng nhập</button>
+      </div>
+
+      <div class="form-group">
+        <div *ngIf="f.submitted && isLoginFailed" class="alert-error">
+          {{ errorMessage }}
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>

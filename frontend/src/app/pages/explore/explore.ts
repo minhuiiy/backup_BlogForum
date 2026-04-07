@@ -40,9 +40,9 @@ export class Explore implements OnInit {
           name: c.name,
           title: c.displayName || c.name,
           members: c.members ? c.members.length : 0,
-          description: c.description || 'Chưa có mô tả.',
-          icon: c.imageUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png',
-          banner: 'https://styles.redditmedia.com/t5_2qg6z/styles/bannerBackgroundImage_i51x300w1a7d1.png'
+          description: c.description || 'Chưa có thông tin.',
+          icon: c.imageUrl || '',
+          banner: ''
         }));
       },
       error: err => console.error(err)

@@ -1,0 +1,238 @@
+<div class="profile-container">
+
+  <div class="profile-content">
+
+    <!-- Profile Header Core: Covers Avatar and Tabs -->
+    <div class="profile-main-header">
+      <div class="profile-user-summary">
+        <div class="big-avatar-wrapper" style="position: relative;" (mouseenter)="isHoveringAvatar = true" (mouseleave)="isHoveringAvatar = false">
+          <img [src]="userProfile?.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'" />
+          <div class="big-online-dot"></div>
+          
+          <div *ngIf="isHoveringAvatar && isOwnProfile" class="edit-avatar-btn" (click)="fileInput.click()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.5); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" title="Đổi ảnh đại diện">
+            <i class="fa-solid fa-pen" style="font-size: 14px;"></i>
+          </div>
+          <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
+          <div *ngIf="isUploading" style="position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--primary-color); white-space: nowrap; font-weight: bold;">Đang tải...</div>
+        </div>
+        <div class="user-info-text">
+          <h1 class="user-display" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+            <span *ngIf="!isEditingName">{{ userProfile?.displayName || username }}</span>
+            <input *ngIf="isEditingName" type="text" [(ngModel)]="editData.displayName" class="form-control" style="font-size: 24px; font-weight: bold; padding: 0 8px; width: auto; max-width: 300px; height: 36px; display: inline-block;" (keyup.enter)="saveName()" (blur)="saveName()">
+            
+            <button *ngIf="!isEditingName && isOwnProfile" (click)="startEditName()" style="background: transparent; border: none; color: var(--text-meta); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%; transition: background 0.2s;" title="Đổi tên hiển thị">
+              <i class="fa-solid fa-pen" style="font-size: 14px;"></i>
+            </button>
+          </h1>
+          <p class="user-handle" style="margin-top: 4px;">{{ username }}</p>
+        </div>
+      </div>
+
+      <div class="profile-tabs-wrapper">
+        <button *ngFor="let tab of tabs" class="tab-btn" [class.active]="activeTab === tab.id" (click)="setTab(tab.id)">
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <!-- Content Toolbar (Quick create post) -->
+      <div class="profile-content-toolbar">
+        <div class="filter-btn">
+          <i class="fa-regular fa-eye"></i> Hiển thị tất cả nội dung
+          <i class="fa-solid fa-chevron-right ms-auto"></i>
+        </div>
+        <div class="create-post-quick">
+          <a routerLink="/create-post" class="quick-create-btn">
+            <i class="fa-solid fa-plus"></i> Tạo bài đăng
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!loadingFeed && posts.length === 0 && (activeTab === 'posts' || activeTab === 'overview')">
+      <img src="/Snoo_Expression_NoMouth.png" alt="Sad Snoo" class="snoo-empty" />
+      <h2 class="empty-title">Bạn chưa có bài đăng nào</h2>
+      <p class="empty-subtitle">Khi bạn đăng bài vào một cộng đồng, bài đăng đó sẽ hiển thị ở đây. Nếu bạn muốn ẩn bài
+        đăng của mình, hãy cập nhật phần cài đặt.</p>
+      <a routerLink="/profile" class="btn-primary-rounded mt-4">Cập nhật cài đặt</a>
+    </div>
+
+    <div *ngIf="loadingFeed && (activeTab === 'posts' || activeTab === 'overview')" style="padding: 40px; text-align: center; color: var(--text-meta);">
+      Đang tải bài đăng...
+    </div>
+
+    <div class="posts-list mt-3" *ngIf="!loadingFeed && posts.length > 0 && (activeTab === 'posts' || activeTab === 'overview')">
+      <div class="post-card" *ngFor="let post of posts" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 16px; padding: 12px;">
+        <div class="post-content-area">
+          <div class="post-meta-top" style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px; font-size: 12px; color: var(--text-meta); margin-bottom: 8px;">
+            <ng-container *ngIf="post.category">
+              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
+                <span class="community-icon" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:var(--primary-color); color:#fff; font-size:12px; font-weight:bold;">
+                  {{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name)?.charAt(0) | uppercase}}
+                </span>
+                <span class="community-name">{{ post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name }}</span>
+              </div>
+              <span class="dot-separator">•</span>
+              <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar d-inline-block">
+              <span *ngIf="post.author && !post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right: 4px;">
+                 {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
+              </span>
+              <span class="post-author" *ngIf="post.author">{{ post.author.displayName || post.author.username }}</span>
+            </ng-container>
+
+            <ng-container *ngIf="!post.category">
+              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
+                <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar">
+                <span *ngIf="!post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right:4px;">
+                  {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
+                </span>
+                <span class="community-name">{{ post.author?.displayName || post.author?.username }}</span>
+              </div>
+            </ng-container>
+            
+            <span class="dot-separator" *ngIf="post.author">•</span>
+            <span class="post-date">{{ post.createdAt | timeAgo }}</span>
+          </div>
+          
+          <a [routerLink]="['/post', post.id]" class="post-title-link" style="text-decoration: none;">
+            <h3 class="post-title" style="margin-bottom: 12px; color: var(--text-main); font-size: 18px;">{{ post.title }}</h3>
+          </a>
+          
+          <div class="post-excerpt" style="max-height: 250px; overflow: hidden; position: relative; margin-bottom: 12px; font-size: 14px; color: var(--text-main); line-height: 1.5;">
+            <div [innerHTML]="post.strippedContent | safeHtml" class="clamped-content"></div>
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px; background: linear-gradient(transparent, var(--surface-color));"></div>
+          </div>
+
+          <!-- Carousel -->
+          <div class="post-carousel" *ngIf="post.extractedImages && post.extractedImages.length > 1" style="position: relative; margin-top: 12px; border-radius: 8px; overflow: hidden; background: #000; text-align: center;">
+            <button class="carousel-btn prev-btn" [class.dimmed]="post.currentImageIndex === 0" (click)="prevImage($event, post)" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❮</button>
+            <img [src]="post.extractedImages[post.currentImageIndex]" style="width: 100%; max-height: 400px; object-fit: contain; cursor: zoom-in;" loading="eager" (click)="openImageOverlay(post.extractedImages[post.currentImageIndex])">
+            <button class="carousel-btn next-btn" [class.dimmed]="post.currentImageIndex === post.extractedImages.length - 1" (click)="nextImage($event, post)" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❯</button>
+            
+            <div class="carousel-indicators" style="position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px;">
+              <span *ngFor="let src of post.extractedImages; let i = index" [style.background]="i === post.currentImageIndex ? '#fff' : 'rgba(255,255,255,0.5)'" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+            </div>
+          </div>
+          
+          <div class="post-single-image" *ngIf="post.extractedImages && post.extractedImages.length === 1" style="margin-top: 12px; border-radius: 8px; overflow: hidden; text-align: center; background: #000;">
+             <img [src]="post.extractedImages[0]" style="width: 100%; max-height: 400px; object-fit: contain; cursor: zoom-in;" loading="eager" (click)="openImageOverlay(post.extractedImages[0])">
+          </div>
+          
+          <div class="post-action-bar" style="display: flex; gap: 4px; margin-top: 16px;">
+            <button class="action-btn fb-like-btn" [class.liked]="isPostLiked(post.id)" (click)="votePost(post)" style="background: transparent; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-meta);">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"></path></svg>
+              <span class="action-text">Thích ({{ post.likes }})</span>
+            </button>
+            <a [routerLink]="['/post', post.id]" class="action-btn" style="background: transparent; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-meta); text-decoration: none;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"></path></svg>
+              <span class="action-text">Bình luận {{ post.commentCount > 0 ? '(' + post.commentCount + ')' : '' }}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Sidebar Profile Card -->
+  <div class="profile-sidebar">
+    <div class="profile-card">
+      <div class="card-banner">
+        <button class="settings-gear-btn"><i class="fa-solid fa-gear"></i></button>
+      </div>
+
+      <div class="card-body">
+        <h2 class="card-username">{{ username }}</h2>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          <button class="btn-share" style="flex: 1;"><i class="fa-solid fa-share"></i> Chia sẻ</button>
+          
+          <button *ngIf="isLoggedIn && !isOwnProfile" 
+                  class="btn-follow" style="flex: 1; padding: 8px; border-radius: 20px; font-weight: 600; cursor: pointer; border: 1px solid var(--primary-color);"
+                  [style.backgroundColor]="isFollowing ? 'transparent' : 'var(--primary-color)'"
+                  [style.color]="isFollowing ? 'var(--primary-color)' : 'white'"
+                  (click)="toggleFollow()">
+            <i class="fa-solid" [class.fa-user-check]="isFollowing" [class.fa-user-plus]="!isFollowing"></i> 
+            {{ isFollowing ? 'Đang theo dõi' : 'Theo dõi' }}
+          </button>
+        </div>
+
+        <div class="follower-count" style="display: flex; gap: 16px; margin: 16px 0;">
+          <div><strong>{{ followersCount }}</strong> người theo dõi</div>
+          <div><strong>{{ followingCount }}</strong> đang theo dõi</div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <span class="metric-val">1</span>
+            <span class="metric-label">Điểm karma</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val">0</span>
+            <span class="metric-label">Lượt đóng góp</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val">1 ngày</span>
+            <span class="metric-label">tuổi Reddit</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val">0</span>
+            <span class="metric-label">Đang hoạt động trong</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val">0</span>
+            <span class="metric-label">Lượng vàng kiếm được</span>
+          </div>
+        </div>
+
+
+
+        <div class="achievements-section">
+          <h3>Thành tích</h3>
+          <div class="badges-row">
+            <div class="badge-icon badge-explorer"><i class="fa-solid fa-compass"></i></div>
+            <div class="badge-icon badge-security"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="badge-texts">
+              <span class="badge-title">Nhà khám phá, Gia nhập Reddit...</span>
+              <span class="badge-desc">Tài khoản được bảo mật</span>
+            </div>
+          </div>
+          <div class="badge-footer">
+            <span class="unlock-info">Đã mở khóa 3 cúp</span>
+            <a href="javascript:void(0)" class="view-all-link">Xem tất cả</a>
+          </div>
+        </div>
+
+        <div class="settings-list">
+          <h3 class="settings-header">Cài đặt</h3>
+
+          <div *ngIf="isOwnProfile" class="settings-item">
+            <div class="settings-icon"><i class="fa-solid fa-user-circle"></i></div>
+            <div class="settings-text">
+              <span class="settings-title">Hồ sơ</span>
+              <span class="settings-desc">Tùy chỉnh hồ sơ của bạn</span>
+            </div>
+            <button class="btn-update">Cập nhật</button>
+          </div>
+
+          <div *ngIf="isOwnProfile" class="settings-item">
+            <div class="settings-icon"><i class="fa-solid fa-eye"></i></div>
+            <div class="settings-text">
+              <span class="settings-title">Quản lý hồ sơ của bạn</span>
+              <span class="settings-desc">Quản lý những gì mọi người nhìn thấy khi họ truy cập hồ sơ của bạn</span>
+            </div>
+            <button class="btn-update">Cập nhật</button>
+          </div>
+
+          <div *ngIf="isOwnProfile" class="settings-item">
+            <div class="settings-icon"><i class="fa-solid fa-shirt"></i></div>
+            <div class="settings-text">
+              <span class="settings-title">Avatar</span>
+              <span class="settings-desc">Tạo phong cách cho avatar</span>
+            </div>
+            <button class="btn-update">Cập nhật</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

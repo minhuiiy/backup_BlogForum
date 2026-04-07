@@ -1,0 +1,94 @@
+.explore-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+.feed-header {
+  background: var(--surface-color);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.feed-title { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+.feed-subtitle { font-size: 14px; color: var(--text-meta); }
+
+.explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.community-grid-card {
+  background: var(--surface-color);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-main);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.community-grid-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+  text-decoration: none;
+}
+
+.community-banner {
+  height: 80px;
+  background-color: #eaedef;
+  width: 100%;
+}
+.community-banner img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.community-card-body {
+  padding: 0 16px 16px 16px;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.community-avatar-overlap {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 4px solid var(--surface-color);
+  background-color: #fff;
+  margin-top: -30px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.community-avatar-overlap img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.community-card-name {
+  font-size: 16px; font-weight: 700; color: var(--text-main); line-height: 1.2;
+}
+.community-card-title {
+  font-size: 12px; color: var(--text-meta); margin-bottom: 8px;
+}
+.community-card-desc {
+  font-size: 14px; line-height: 1.4; color: var(--text-main);
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.community-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: auto;
+}
+.community-members {
+  font-size: 12px; color: var(--text-meta); font-weight: 600;
+}
+.me-1 { margin-right: 4px; }

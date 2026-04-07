@@ -1,130 +1,74 @@
-<aside class="sidebar-container" [class.open]="sidebarService.isOpen$ | async">
+<aside class="h-screen w-64 fixed left-0 top-0 pt-24 bg-[#eef1f3] shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)] flex flex-col z-40 transition-transform duration-300 transform font-body"
+       [class.-translate-x-full]="!(sidebarService.isOpen$ | async)"
+       [class.lg:translate-x-0]="true">
   
-  <button class="sidebar-border-toggle" (click)="sidebarService.toggle()">
-    <i class="fa-solid fa-bars"></i>
-  </button>
-
-  <div class="sidebar-scrollable">
-
-    <div class="sidebar-section">
-      <ul class="nav-list">
-        <li>
-          <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
-            <span class="nav-text">Trang chủ</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/popular" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
-            <span class="nav-text">Phổ biến</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/news" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-newspaper"></i></span>
-            <span class="nav-text">Tin tức</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/explore" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-compass"></i></span>
-            <span class="nav-text">Khám phá</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/create-community" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-plus"></i></span>
-            <span class="nav-text">Bắt đầu một cộng đồng</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-
-
-    <div class="sidebar-section">
-      <h3 class="section-title">Cộng đồng của bạn</h3>
-      <ul class="nav-list">
-        <li>
-          <a class="nav-item cursor-pointer" (click)="toggleCommunities = !toggleCommunities">
-            <span class="nav-icon"><i class="fa-solid fa-chevron-{{ toggleCommunities ? 'down' : 'right' }}"
-                style="font-size: 14px;"></i></span>
-            <span class="nav-text">Cộng đồng tham gia</span>
-          </a>
-        </li>
-        <ng-container *ngIf="toggleCommunities">
-          <!-- Tự động đẻ ra các cộng đồng mà User ĐÃ THAM GIA -->
-          <li *ngFor="let comm of joinedCommunities">
-            <a [routerLink]="comm.url" class="nav-item pl-4" routerLinkActive="active">
-              <span class="nav-icon-circle" style="background-color: var(--secondary-color);"></span>
-              <span class="nav-text">{{ comm.name }}</span>
-            </a>
-          </li>
-        </ng-container>
-      </ul>
-    </div>
-
-    <div class="sidebar-separator"></div>
-
-    <div class="sidebar-section">
-      <h3 class="section-title">Tài nguyên</h3>
-      <ul class="nav-list">
-        <li>
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-gamepad"></i></span>
-            <span class="nav-text">Trò chơi</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-baseball"></i></span>
-            <span class="nav-text">Thể thao</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
-            <span class="nav-text">Kinh doanh</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-masks-theater"></i></span>
-            <span class="nav-text">Truyền hình</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-ellipsis"></i></span>
-            <span class="nav-text">Xem tất cả</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Nơi gắn thẻ Footer Links của Reddit -->
-    <div class="sidebar-footer-links">
-      <div class="link-group">
-        <a href="#">Giới thiệu</a>
-        <a href="#">Quảng cáo</a>
-        <a href="#">Ứng dụng BlogForum</a>
-      </div>
-      <div class="link-group">
-        <a href="#">Nghề nghiệp</a>
-        <a href="#">Blog</a>
-        <a href="#">Báo chí</a>
-        <a href="#">Trợ giúp</a>
-      </div>
-      <div class="link-group mt-3">
-        <a href="#">Chính sách nội dung</a>
-        <a href="#">Bảo mật</a>
-        <a href="#">Thỏa thuận sử dụng</a>
-      </div>
-      <div class="copyright-info">
-        BlogForum Inc © 2026. Đã đăng ký bản quyền.
+  <div class="px-6 mb-6 flex justify-between items-center lg:hidden">
+    <!-- For mobile, we want a close button instead of "Navigation" title -->
+    <div class="flex items-center gap-3">
+      <div>
+        <div class="text-lg font-bold text-on-surface font-headline">Navigation</div>
       </div>
     </div>
+    <button class="text-on-surface-variant hover:text-on-surface transition-colors" (click)="sidebarService.toggle()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
 
+  <div class="px-6 mb-8 hidden lg:block">
+    <h3 class="text-lg font-bold font-headline text-on-surface">Navigation</h3>
+    <p class="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant/70 mt-1">Browse Categories</p>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto overflow-x-hidden flex flex-col">
+    <!-- Basic links -->
+    <a routerLink="/" routerLinkActive="bg-white text-primary rounded-r-full shadow-sm font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer">
+      <span class="material-symbols-outlined text-[20px]">home</span>
+      <span class="text-sm font-medium">Home</span>
+    </a>
+    
+    <a routerLink="/popular" routerLinkActive="bg-white text-primary rounded-r-full shadow-sm font-semibold" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer">
+      <span class="material-symbols-outlined text-[20px]">trending_up</span>
+      <span class="text-sm font-medium">Popular</span>
+    </a>
+    
+    <a routerLink="/news" routerLinkActive="bg-white text-primary rounded-r-full shadow-sm font-semibold" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer">
+      <span class="material-symbols-outlined text-[20px]">newspaper</span>
+      <span class="text-sm font-medium">News</span>
+    </a>
+    
+    <a routerLink="/explore" routerLinkActive="bg-white text-primary rounded-r-full shadow-sm font-semibold" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer">
+      <span class="material-symbols-outlined text-[20px]">explore</span>
+      <span class="text-sm font-medium">Explore Forum</span>
+    </a>
+
+    <!-- User Communities -->
+    <div class="mt-8 mb-2">
+      <a class="flex items-center justify-between px-6 py-2 text-primary text-[10px] tracking-widest font-bold uppercase cursor-pointer hover:text-primary-dim transition-colors" (click)="toggleCommunities = !toggleCommunities">
+        <span>Your Communities</span>
+        <span class="material-symbols-outlined text-sm duration-200" [class.rotate-180]="toggleCommunities">expand_more</span>
+      </a>
+      
+      <div *ngIf="toggleCommunities" class="mt-1 flex flex-col">
+        <div *ngFor="let comm of joinedCommunities">
+          <a [routerLink]="comm.url" routerLinkActive="bg-white text-primary rounded-r-full shadow-sm font-semibold" class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:text-primary hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer text-sm font-medium">
+            <span class="w-2 h-2 rounded-full bg-primary/40"></span>
+            <span class="truncate">{{ comm.name }}</span>
+          </a>
+        </div>
+        <div *ngIf="(!joinedCommunities || joinedCommunities.length === 0)" class="px-6 py-3 text-xs text-on-surface-variant/70 font-medium">
+          Not joined any yet.
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mt-auto px-6 py-8 border-t border-outline-variant/10">
+    <button routerLink="/create-community" class="w-full py-3 flex items-center justify-center gap-2 rounded-xl border border-primary/20 text-primary font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm bg-white/50">
+      <span class="material-symbols-outlined text-lg">add</span> Start Community
+    </button>
+    <div class="mt-6 flex flex-col gap-2 text-[10px] font-medium text-on-surface-variant/60 uppercase tracking-widest">
+      <a href="#" class="hover:text-primary transition-colors">About</a>
+      <a href="#" class="hover:text-primary transition-colors">Privacy & Terms</a>
+    </div>
   </div>
 </aside>

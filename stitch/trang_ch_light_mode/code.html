@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#000000",
+                        "on-secondary-container": "#203ea2",
+                        "tertiary-fixed-dim": "#e48fec",
+                        "inverse-surface": "#0b0f10",
+                        "on-primary-fixed-variant": "#002a61",
+                        "on-error": "#ffefee",
+                        "outline": "#747779",
+                        "on-tertiary-fixed-variant": "#6a1f76",
+                        "on-primary": "#f0f2ff",
+                        "tertiary-dim": "#7a2f86",
+                        "on-tertiary-container": "#60136d",
+                        "surface-container-high": "#dfe3e6",
+                        "tertiary-fixed": "#f39cfb",
+                        "surface-variant": "#d9dde0",
+                        "error-container": "#fb5151",
+                        "error-dim": "#9f0519",
+                        "error": "#b31b25",
+                        "on-secondary-fixed-variant": "#2c48ac",
+                        "on-surface": "#2c2f31",
+                        "surface": "#f5f7f9",
+                        "surface-container-highest": "#d9dde0",
+                        "secondary-dim": "#2b47ab",
+                        "outline-variant": "#abadaf",
+                        "primary-fixed": "#6c9fff",
+                        "secondary-fixed": "#c6cfff",
+                        "surface-tint": "#0058bb",
+                        "primary-container": "#6c9fff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#595c5e",
+                        "surface-container": "#e5e9eb",
+                        "on-secondary-fixed": "#00288d",
+                        "primary-fixed-dim": "#5191ff",
+                        "on-error-container": "#570008",
+                        "surface-container-low": "#eef1f3",
+                        "inverse-on-surface": "#9a9d9f",
+                        "tertiary": "#883c93",
+                        "secondary-fixed-dim": "#b4c1ff",
+                        "primary": "#0058bb",
+                        "on-background": "#2c2f31",
+                        "inverse-primary": "#4b8eff",
+                        "secondary-container": "#c6cfff",
+                        "on-tertiary": "#ffeefb",
+                        "on-secondary": "#f2f1ff",
+                        "secondary": "#3853b7",
+                        "background": "#f5f7f9",
+                        "on-tertiary-fixed": "#41004d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(171, 173, 175, 0.15);
+        }
+        .kinetic-glow {
+            background: linear-gradient(135deg, #0058bb 0%, #6c9fff 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .text-kinetic {
+            background: linear-gradient(135deg, #0058bb, #6c9fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="bg-[#f5f7f9] shadow-none border-none docked full-width top-0 sticky z-50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-[1440px] mx-auto">
+<div class="flex items-center gap-12">
+<span class="text-2xl font-bold tracking-tight text-[#2c2f31] font-['Space_Grotesk']">Atelier</span>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#2c2f31]/70 font-medium hover:text-[#007AFF] transition-colors" href="#">Tech Blog</a>
+<a class="text-[#2c2f31]/70 font-medium hover:text-[#007AFF] transition-colors" href="#">Q&amp;A Forum</a>
+<a class="text-[#2c2f31]/70 font-medium hover:text-[#007AFF] transition-colors" href="#">Documentation</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-surface-container-low px-4 py-2 rounded-full outline-variant/15 outline outline-1">
+<span class="material-symbols-outlined text-on-surface-variant text-xl">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 font-medium" placeholder="Search insights..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+<button class="kinetic-glow text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-95 active:scale-100 transition-transform">Create Post</button>
+<img alt="User avatar" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" data-alt="Close-up portrait of a professional developer with a friendly expression in a brightly lit modern office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHBenZLBY6Kd3mzDTZRYLSr9yA0u1rQVWj7SAMkYAiK88MKokUs4jGjlxC1jpnMUpMWXV1rkOcSI8ecUbcogJFcjkD5Yh-Afr8-riZVZGpYuOSEhfAwEBlAo12PkrYIEX1_f8WJ98FJ-RCThRtMm3a6eufhYQcX1A-ivA-xF7T4-23RN2c_6VA9dMoP_Xr9lAW7_zDkDbEeXkvU9keVHnDpoc69Tv6iKyHl4eWdvuudOQglSuESD7LVLC52iuq5rVcJxOlvqcW4dI"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- SideNavBar (Hidden on Mobile) -->
+<aside class="hidden xl:flex h-screen w-64 fixed left-0 top-0 pt-24 bg-[#eef1f3] shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.05)] flex-col gap-2 py-6 z-40">
+<div class="px-6 mb-8">
+<h3 class="text-lg font-bold font-['Space_Grotesk'] text-on-surface">Navigation</h3>
+<p class="text-xs font-['Inter'] tracking-wide text-on-surface/60">Browse Categories</p>
+</div>
+<nav class="flex flex-col">
+<a class="flex items-center gap-3 bg-white text-[#007AFF] font-semibold rounded-r-full shadow-sm px-6 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="text-sm">Trending</span>
+</a>
+<a class="flex items-center gap-3 text-[#2c2f31]/60 hover:text-[#007AFF] hover:bg-white/50 px-6 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">code</span>
+<span class="text-sm">JavaScript</span>
+</a>
+<a class="flex items-center gap-3 text-[#2c2f31]/60 hover:text-[#007AFF] hover:bg-white/50 px-6 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="text-sm">Rust</span>
+</a>
+<a class="flex items-center gap-3 text-[#2c2f31]/60 hover:text-[#007AFF] hover:bg-white/50 px-6 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="text-sm">Architecture</span>
+</a>
+<a class="flex items-center gap-3 text-[#2c2f31]/60 hover:text-[#007AFF] hover:bg-white/50 px-6 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">memory</span>
+<span class="text-sm">Systems</span>
+</a>
+</nav>
+<div class="mt-auto px-6 py-8">
+<button class="w-full py-3 rounded-xl border border-primary/20 text-primary font-bold text-sm hover:bg-primary/5 transition-colors">Join Community</button>
+</div>
+</aside>
+<main class="xl:ml-64 min-h-screen">
+<div class="max-w-[1200px] mx-auto px-8 py-12">
+<!-- Hero Section: Quantum Computing Feature -->
+<section class="mb-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-7">
+<span class="inline-block px-3 py-1 rounded bg-secondary-container text-on-secondary-container text-[10px] font-bold tracking-widest uppercase mb-6">Latest Feature</span>
+<h1 class="text-5xl lg:text-7xl font-bold font-headline leading-[1.1] mb-8 text-on-surface">The Quantum Leap: Architecting the <span class="text-kinetic">Decoherence</span> Barrier.</h1>
+<p class="text-lg text-on-surface-variant font-medium leading-relaxed mb-10 max-w-xl">Exploring the fundamental engineering challenges of maintaining qubit stability in room-temperature environments through novel topological insulators.</p>
+<div class="flex items-center gap-6">
+<button class="kinetic-glow text-white px-8 py-4 rounded-full font-bold text-base shadow-xl shadow-primary/20 hover:scale-105 transition-transform">Read Analysis</button>
+<button class="flex items-center gap-2 text-on-surface font-bold hover:text-primary transition-colors">
+<span class="material-symbols-outlined">play_circle</span>
+                            View Lab Simulation
+                        </button>
+</div>
+</div>
+<div class="lg:col-span-5 relative">
+<div class="aspect-square rounded-3xl overflow-hidden shadow-2xl relative z-10">
+<img alt="Quantum processor" class="w-full h-full object-cover" data-alt="High-tech close-up of a quantum processor with intricate gold wiring and glowing blue circuitry in a sterile laboratory setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUkrGWuoqTAaE1etttst3Ek4up7w_LxxmKMxOzdXbV1l4cQUWrEgVNoCfXIBW4uYfwImkLcjmo3hhwDR-TA7winu7ck0bLgoCnmQqngYzIY0duEFYEEIuIT8dwKY8e4ze_XESahjbofAX2leuMPhW6nk8ZRckwZYtuqZAcbIeJIm_S-zfc_42sJ5RPPzoSM71-CYlOMw-cFXgIhGnXqSXOGyWnXXAOoaXhJWce86tqu_GyFttVQWj8THkbcFf6J78uXW_nXlCkoNA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+</div>
+<div class="absolute -top-6 -right-6 w-full h-full bg-primary/5 rounded-3xl -z-10 border border-primary/10"></div>
+</div>
+</section>
+<!-- Main Content Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Latest Questions Column -->
+<div class="lg:col-span-2 space-y-8">
+<div class="flex justify-between items-end mb-4 px-2">
+<div>
+<h2 class="text-2xl font-bold font-headline text-on-surface">Forum Pulse</h2>
+<p class="text-sm text-on-surface-variant">Real-time technical discourse</p>
+</div>
+<button class="text-sm font-bold text-primary hover:underline transition-all">View All Activity</button>
+</div>
+<div class="space-y-4">
+<!-- Question Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl transition-all duration-200 group hover:shadow-[0_12px_32px_-8px_rgba(44,47,49,0.06)] outline outline-1 outline-variant/15">
+<div class="flex gap-4">
+<div class="flex-shrink-0 flex flex-col items-center justify-center bg-surface-container-low w-14 h-14 rounded-xl">
+<span class="text-lg font-bold text-primary">24</span>
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Votes</span>
+</div>
+<div class="flex-grow">
+<h3 class="text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Implementing zero-copy serialization in distributed Rust systems?</h3>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded">RUST</span>
+<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded">PERFORMANCE</span>
+<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded">DISTRIBUTED</span>
+</div>
+<div class="flex items-center justify-between text-xs text-on-surface-variant">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full" data-alt="Portrait of a young software engineer with glasses and a thoughtful expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAMwqzhJ2ob-sunqyHaqh_NrZ0IX3izfQ8NIEIpWZ3UjSpfDtAKGd9fx_Mj-qvxWztSY5zRCp3dER20o1AdTOsSewLFLtPxGUQDzgShDcioZvH53ve2_alvBsyqSL4SNNbB6AzKjeURitXwmvPvzRkgvwK1gaqXg_AixwB9BGknWrxUKyZlrIfNnEA62CoxB39zalL9bYhR_lacKh7nYN4EdUxyoYXzwzoSlvYVB3GlIgtwn82k4-Vte_dlmtEi2t8WCrn7-gJacs"/>
+<span>asked by <span class="font-semibold text-on-surface">ox_vector</span> 4h ago</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">chat_bubble</span> 12</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">visibility</span> 1.2k</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Question Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl transition-all duration-200 group hover:shadow-[0_12px_32px_-8px_rgba(44,47,49,0.06)] outline outline-1 outline-variant/15">
+<div class="flex gap-4">
+<div class="flex-shrink-0 flex flex-col items-center justify-center bg-surface-container-low w-14 h-14 rounded-xl">
+<span class="text-lg font-bold text-primary">82</span>
+<span class="text-[10px] uppercase font-bold text-on-surface-variant">Votes</span>
+</div>
+<div class="flex-grow">
+<h3 class="text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Why does my WASM module leak memory during high-frequency Canvas updates?</h3>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded">WASM</span>
+<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded">WEBGL</span>
+</div>
+<div class="flex items-center justify-between text-xs text-on-surface-variant">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full" data-alt="Professional woman with curly hair and a confident smile in a bright workspace" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADDsMUJcgfoCxV8XmX_kZ-EMFlZajG8cGKMiBkmQILHc5et8_dfi8srX1qWTzE3ccKuJHGy8MwiMY3w14rV6o7pg99uyYM-YN94XS2qXW_TN1bt6CS2eTPBBPw4OElRm8LW439C_UaYRpyzk02H93u7rfJWTOLjsmHtbBqu_aVgir-vq4jH32mFVRxrGEp_zdAAZnjKg5hWox9mJ1N3r0FuxQWuq4vm3Is5X-e4pq8tsKp5zMNCWoInPMB8BRi-2BV3fFFG7sPNDE"/>
+<span>asked by <span class="font-semibold text-on-surface">eliza_bit</span> 12h ago</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span> 4</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">visibility</span> 3.4k</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Featured Blog Section -->
+<div class="pt-8">
+<h2 class="text-2xl font-bold font-headline text-on-surface mb-8">Architectural Insights</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="group cursor-pointer">
+<div class="aspect-[16/10] rounded-2xl overflow-hidden mb-4 relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Abstract visualization of a complex neural network with interconnected glowing nodes and data streams in shades of blue and violet" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcgcKNetEnjwtwbsfgvaQvlm7aB041eMA7Uy044a8BgjxYVBJXcloW1aSvnudeYWeZjZwkXPH03Wg8tcgmTaZywGMp_FggSChi0s_Ci0G4ZdlcYIJ1qy0EyJSDuVcekd4DmjHIr96MqYRnWFJbh87ZTkH3bHudkzbTrPPI3f233VFnuhehpILmBtlyjvcQPqjplgIg-5zM32lGB8_b0TUTDMkBbQyydMt5aa5fxR3BOj2F9WzFKmxeAV1ggavqyHuJBqRjfcVFt2c"/>
+<div class="absolute top-4 left-4 glass-panel px-3 py-1 rounded-full text-[10px] font-bold tracking-widest text-primary">CASE STUDY</div>
+</div>
+<h4 class="text-xl font-bold text-on-surface group-hover:text-primary transition-colors mb-2 leading-tight">Scaling Linear Algebra on Edge Devices</h4>
+<div class="flex items-center gap-3 text-xs text-on-surface-variant font-medium">
+<img class="w-5 h-5 rounded-full" data-alt="Mid-shot of a senior engineer with graying hair and professional attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMFzJBLv7fNpaI_7YMO7E0Q_vJkaUSh5NCszjC25MCOvLDRtStWboSbW_3p7vMMW_nuOoFpNzghTLKljp0oIxxPhYWR4Ptu8bX1-dDxmuP1fHfguytOuHcPRxidwun9O-I1BzOAtv-62fiPtSpBrVnCuh-_ePGoDhSZuOMQElAdcGCESawccusS614sa65QEsewq7YHVDrb6QiINL7bVLm9PpJCFVL7nt5BAye4iV0oO40Tc1UA2OHLeDoQxBamU-HFjk64xMtqRc"/>
+<span>Dr. Aris Thorne</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span>8 min read</span>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-[16/10] rounded-2xl overflow-hidden mb-4 relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Minimalist top-down view of a modern workstation with multiple monitors displaying lines of clean code in a dark mode editor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdsMsbknHQcASdEIR_IPac83gmcaVLrdtis2V96zWO8ULF5QSWPNgKxPtNiTUyPF8oobE4PyFA8xClhI-UZqHtXeXgWLy6T2p5I1k0H663TzS68jKNKdJCxV-45jOnJwF9FTpAk8sZD9RfueEZPU1y_nKSo0_y3ORjm-aZ5QpP48nOEPa2EWmQqO4BAzAIk9IWACkwulOuHcTtnBI4avMsj9rEmmYJDu7jlVCRL8sVdkSarxi24jB3xnDBK6N687PbY2GVGAxEZL4"/>
+<div class="absolute top-4 left-4 glass-panel px-3 py-1 rounded-full text-[10px] font-bold tracking-widest text-primary">ENGINEERING</div>
+</div>
+<h4 class="text-xl font-bold text-on-surface group-hover:text-primary transition-colors mb-2 leading-tight">The Future of Concurrent Rendering</h4>
+<div class="flex items-center gap-3 text-xs text-on-surface-variant font-medium">
+<img class="w-5 h-5 rounded-full" data-alt="Young developer with vibrant style in a creative studio environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP6FmN2MjJVEmtXGLhMP5fc6MxjyTFA319sSlBkPBB9iBF99S6PfxfpJmQrTzSJOPRj5_lWE1RibZOdUIJ3JZOguxYTmcOIQJH_Q24erdT1l8ObxQtaaOWRKL5h9SBl_l_FTCu_cz29oi1qLjS2-eK8DOzw6_s5lmCtHwImOaiIIxbKUWaRi6gobwFT-leRD7n9LQm1lgR2DYcz_oSp9urpfqnJXGX0YTeQzf3EcE3UUF3N1AZAynBLmXnmR-wfv985jLwNdxRBqM"/>
+<span>Sarah Chen</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span>15 min read</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar: Contributors & Events -->
+<div class="space-y-12">
+<!-- Contributors Leaderboard -->
+<section class="bg-surface-container-low/50 p-8 rounded-3xl outline outline-1 outline-variant/15">
+<h3 class="text-xl font-bold font-headline text-on-surface mb-6">Top Contributors</h3>
+<div class="space-y-6">
+<div class="flex items-center gap-4 group">
+<div class="relative">
+<img class="w-12 h-12 rounded-full border-2 border-primary" data-alt="Portrait of a young tech professional with a warm smile and dark hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGWlD8tq8U5WO_-FhWBrykNUBAG4vOALoXlDNPoFLeQBGm7-p9hlXkHgQwFiioWl_1jls3BPWh4nBnVVQAlGOBeS-QurDCdSszA0ouYiQOQHW1zVjeOG1iqLKZpEwFyxnFV7zFloPRMq-1xz8g9E5PbYWhTf_hBHGe6vrZR5_uzhgjnxIhu8hAv3p16YIQMdulL4x6QBxvjj8p4hpLctcV07LqB8kmngNuJn2m3Uvbx0qDmIsfETExwFEyPG8o4mGBfVwLBHMmW20"/>
+<div class="absolute -bottom-1 -right-1 bg-primary text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-surface">1</div>
+</div>
+<div class="flex-grow">
+<div class="font-bold text-sm text-on-surface group-hover:text-primary transition-colors">Marcus Revo</div>
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Systems Architect</div>
+</div>
+<div class="text-right">
+<div class="font-bold text-primary text-xs">2,480</div>
+<div class="text-[10px] text-on-surface-variant">PTS</div>
+</div>
+</div>
+<div class="flex items-center gap-4 group">
+<div class="relative">
+<img class="w-12 h-12 rounded-full border-2 border-transparent" data-alt="Portrait of a female software engineer with glasses looking directly at the camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDid2VjxbyFhupWIgpP51g7apT3LOw0RjG_O3wgl86JYG2MwJQeRBQr_eAb2_oRvykil5O-_0KxJqA4B8h4uaRyf8KLF54BX9aaeQsKHc-eatNWps6KpKN-mHYuG_IfNwTysgxoGBaM_rkoxAj7Kouyu5bLrni6uT5YL12RLHrQKq16j-frZFxlRZltz1GbDf_VEyxVf7_tcE7SovacXLeSyJD2uDkNftdZVQD1Jn00_SkqOnC3HBd9LxM9NDHc-MYtpKiGADibecg"/>
+<div class="absolute -bottom-1 -right-1 bg-surface-container-highest text-on-surface text-[8px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-surface">2</div>
+</div>
+<div class="flex-grow">
+<div class="font-bold text-sm text-on-surface group-hover:text-primary transition-colors">Yuki Tanaka</div>
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Core Maintainer</div>
+</div>
+<div class="text-right">
+<div class="font-bold text-on-surface text-xs">1,920</div>
+<div class="text-[10px] text-on-surface-variant">PTS</div>
+</div>
+</div>
+<div class="flex items-center gap-4 group">
+<div class="relative">
+<img class="w-12 h-12 rounded-full border-2 border-transparent" data-alt="Portrait of a smiling male developer in a casual grey hoodie" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfL4DRHGidF0XUMiygRCh_Sefy41kRD-lVmd0NsSvJTXQIValZhZdnsCgW4yb_yvu3fnnQruCI0BAIJ25f4f9B68Pvs9q5trCe5cIl99GBTxjt7-VEMjsZGrlQDeAx7vSZRidakap2469keUtofXI3jdFUVYVn21EtQzK_MA60EIcnYYEB4W3enIZ2VkRLhiGDxQel3XAMeTeOKo45Ef7bKPjGBYh1ZsOwT8cz-P39WXjqll-4oDQbXkxE_yKWknoJqnwKpQd7aZM"/>
+<div class="absolute -bottom-1 -right-1 bg-surface-container-highest text-on-surface text-[8px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-surface">3</div>
+</div>
+<div class="flex-grow">
+<div class="font-bold text-sm text-on-surface group-hover:text-primary transition-colors">David Blank</div>
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Rust Specialist</div>
+</div>
+<div class="text-right">
+<div class="font-bold text-on-surface text-xs">1,845</div>
+<div class="text-[10px] text-on-surface-variant">PTS</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-3 text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors border-t border-variant/10">Full Rankings</button>
+</section>
+<!-- Tech Events Calendar -->
+<section>
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold font-headline text-on-surface">Tech Events</h3>
+<span class="material-symbols-outlined text-primary cursor-pointer hover:rotate-90 transition-transform duration-500">calendar_month</span>
+</div>
+<div class="space-y-4">
+<div class="p-4 rounded-2xl bg-surface-container-lowest outline outline-1 outline-variant/15 flex gap-4 hover:shadow-lg transition-all">
+<div class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/5 flex flex-col items-center justify-center border border-primary/10">
+<span class="text-[10px] font-bold text-primary uppercase">Oct</span>
+<span class="text-lg font-bold text-on-surface leading-none">24</span>
+</div>
+<div>
+<h4 class="font-bold text-sm text-on-surface leading-tight mb-1">WebAssembly Summit 2024</h4>
+<p class="text-[10px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span>
+                                        San Francisco / Virtual
+                                    </p>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-surface-container-lowest outline outline-1 outline-variant/15 flex gap-4 hover:shadow-lg transition-all">
+<div class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/5 flex flex-col items-center justify-center border border-primary/10">
+<span class="text-[10px] font-bold text-primary uppercase">Nov</span>
+<span class="text-lg font-bold text-on-surface leading-none">12</span>
+</div>
+<div>
+<h4 class="font-bold text-sm text-on-surface leading-tight mb-1">Architecture &amp; Scale Meetup</h4>
+<p class="text-[10px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span>
+                                        London / Hybrid
+                                    </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter Glass Card -->
+<div class="p-8 rounded-3xl kinetic-glow text-white shadow-2xl shadow-primary/30 relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-xl font-bold font-headline mb-2">Weekly Briefing</h3>
+<p class="text-sm opacity-90 mb-6">No noise. Just high-density technical analysis delivered weekly.</p>
+<div class="flex flex-col gap-3">
+<input class="bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-xl px-4 py-3 text-sm focus:ring-white/30 focus:border-white/30" placeholder="Email address" type="email"/>
+<button class="bg-white text-primary font-bold py-3 rounded-xl hover:bg-opacity-90 transition-all text-sm">Subscribe</button>
+</div>
+</div>
+<span class="material-symbols-outlined absolute -bottom-8 -right-8 text-[160px] opacity-10 rotate-12">terminal</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-[#f5f7f9] w-full py-12 px-8 border-t border-[#abadaf]/15 mt-20">
+<div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="text-center md:text-left">
+<span class="text-xl font-bold font-headline text-kinetic block mb-2">DevLume</span>
+<p class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50">© 2024 Kinetic Atelier. Engineered for performance.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Changelog</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Security</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">API</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Terms</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#2c2f31]/50 hover:text-[#007AFF] underline decoration-[#007AFF]/30 transition-all" href="#">Privacy</a>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">public</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">rss_feed</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">code</span>
+</div>
+</div>
+</footer>
+</body></html>

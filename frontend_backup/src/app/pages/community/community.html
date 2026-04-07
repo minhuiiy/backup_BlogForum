@@ -1,0 +1,189 @@
+<div class="community-page-wrapper">
+  
+  <!-- Kéo Bìa Dài (Banner Section) -->
+  <div class="community-banner" [style.background-color]="communityData?.isAdult ? '#ff4500' : '#24a0ed'">
+    <!-- Hiệu ứng Pattern / Nền tối nhẹ -->
+  </div>
+
+  <div class="community-info-container">
+    <div class="community-info-inner">
+      
+      <div class="avatar-column">
+        <div class="community-avatar" style="overflow: hidden; background: white; padding: 4px; box-sizing: content-box;">
+          <img *ngIf="communityData?.imageUrl" [src]="communityData.imageUrl" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+          <ng-container *ngIf="!communityData?.imageUrl">
+            <i class="fa-solid fa-satellite-dish" *ngIf="communityData?.type === 'public' || !communityData?.type"></i>
+            <i class="fa-solid fa-lock" *ngIf="communityData?.type === 'private'"></i>
+            <i class="fa-solid fa-eye-slash" *ngIf="communityData?.type === 'restricted'"></i>
+          </ng-container>
+        </div>
+      </div>
+      
+      <div class="details-column">
+        <h1 class="community-title" style="display: flex; align-items: center; gap: 8px;">
+          {{ communityData?.displayName || communityData?.name }}
+          <span *ngIf="isModerator" class="mod-badge" style="font-size: 10px; background: #ff4500; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;" title="Bạn là Kiểm duyệt viên của nhóm này"><i class="fa-solid fa-shield-halved"></i> Moderator</span>
+        </h1>
+        <p class="community-sub">{{ communityName }}</p>
+      </div>
+
+      <div class="action-column">
+        <button class="btn-joined" *ngIf="isLoggedIn && commMock.isJoined(communityName, currentUser?.username)" (click)="leaveCommunity($event)" title="Nhấn để rời khỏi nhóm"><i class="fa-solid fa-check"></i> Đã tham gia</button>
+        <button class="btn-join" *ngIf="!isLoggedIn || !commMock.isJoined(communityName, currentUser?.username)" (click)="joinCommunity($event)" style="background: #0045ac; color: white; border-radius: 99px; padding: 8px 16px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-plus"></i> Tham gia</button>
+        <button class="btn-bell" *ngIf="isLoggedIn && commMock.isJoined(communityName, currentUser?.username)"><i class="fa-regular fa-bell"></i></button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="community-content-layout">
+    
+    <!-- Cột Bảng Tin -->
+    <div class="main-feed-col">
+      <div class="feed-header community-mode">
+        <h2 class="feed-title">Bài viết mới nhất</h2>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loadingFeed" class="news-loading" style="padding: 20px; text-align: center;">
+        Đang tải bài viết...
+      </div>
+
+      <!-- Khung thông báo Trống (Empty State) -->
+      <div *ngIf="!loadingFeed && filteredPosts.length === 0" style="background: white; border: 1px solid var(--border-color); padding: 40px 20px; text-align: center; border-radius: 4px; margin-bottom: 24px; color: var(--text-meta);">
+        <i class="fa-solid fa-parachute-box" style="font-size: 32px; margin-bottom: 16px; color: #878a8c;"></i>
+        <h3 style="font-size: 16px; color: #1a1a1b; font-weight: 600; margin-bottom: 8px;">Cộng đồng này đang tĩnh lặng</h3>
+        <p style="font-size: 14px;">Hãy trở thành người đầu tiên chia sẻ một bài viết để thắp sáng nhóm nhé!</p>
+      </div>
+      
+      <!-- Posts list -->
+      <div class="post-card" *ngFor="let post of filteredPosts" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 16px; padding: 12px; cursor: pointer; transition: border-color 0.2s;">
+        <div class="post-content-area">
+          <div class="post-meta-top" style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; font-size: 12px; color: var(--text-meta);">
+            <ng-container *ngIf="post.category">
+              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
+                <span class="community-icon" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:var(--primary-color); color:#fff; font-size:12px; font-weight:bold;">
+                  {{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name)?.charAt(0) | uppercase }}
+                </span>
+                <span class="community-name">{{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name) }}</span>
+              </div>
+              <button class="btn-join-sm" 
+                      *ngIf="!isLoggedIn || !commMock.isJoined(post.category.name, currentUser?.username)" 
+                      (click)="joinCommunityFromPost(post.category.name, $event)"
+                      style="margin-left: 4px; font-weight: 700; font-size: 12px; color: #fff; background-color: #0045ac; border-radius: 99px; padding: 4px 12px; border: none; cursor: pointer;">
+                Tham gia
+              </button>
+              <span class="dot-separator">•</span>
+              <span class="post-author">Đăng bởi {{ post.author?.username }}</span>
+            </ng-container>
+
+            <ng-container *ngIf="!post.category">
+              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
+                <span class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold;">
+                  {{ post.author?.username?.charAt(0) | uppercase }}
+                </span>
+                <span class="community-name">{{ post.author?.username }}</span>
+              </div>
+            </ng-container>
+
+            <span class="dot-separator">•</span>
+            <span class="post-date">{{ post.createdAt | timeAgo }}</span>
+          </div>
+
+          <a [routerLink]="['/post', post.id]" class="post-title-link" style="text-decoration: none;">
+            <h3 class="post-title" style="font-size: 18px; font-weight: 600; color: var(--text-main); margin-top: 0; margin-bottom: 8px;">{{ post.title }}</h3>
+          </a>
+
+          <div class="post-excerpt" style="font-size: 14px; color: var(--text-main); line-height: 1.5; margin-bottom: 12px;">
+            <div [innerHTML]="post.strippedContent | safeHtml" class="clamped-content"></div>
+          </div>
+
+          <!-- Carousel / Images -->
+          <div class="post-carousel" *ngIf="post.extractedImages && post.extractedImages.length > 1" style="position: relative; margin-top: 12px; border-radius: 8px; overflow: hidden; background: #000; text-align: center;">
+            <button class="carousel-btn prev-btn" (click)="prevImage($event, post)" [class.dimmed]="post.currentImageIndex === 0" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❮</button>
+            <img [src]="post.extractedImages[post.currentImageIndex]" class="carousel-img" loading="eager" (click)="openImageOverlay(post.extractedImages[post.currentImageIndex])" style="width: 100%; max-height: 500px; object-fit: contain; cursor: zoom-in;">
+            <button class="carousel-btn next-btn" (click)="nextImage($event, post)" [class.dimmed]="post.currentImageIndex === post.extractedImages.length - 1" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❯</button>
+            
+            <div class="carousel-indicators" style="position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px;">
+              <span class="indicator-dot" *ngFor="let src of post.extractedImages; let i = index" [style.background]="i === post.currentImageIndex ? '#fff' : 'rgba(255,255,255,0.5)'" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+            </div>
+          </div>
+          
+          <div class="post-single-image" *ngIf="post.extractedImages && post.extractedImages.length === 1" style="margin-top: 12px; border-radius: 8px; overflow: hidden; background: #000; text-align: center;">
+             <img [src]="post.extractedImages[0]" class="carousel-img" loading="eager" (click)="openImageOverlay(post.extractedImages[0])" style="width: 100%; max-height: 500px; object-fit: contain; cursor: zoom-in;">
+          </div>
+
+          <div class="post-action-bar" style="display: flex; gap: 4px; margin-top: 12px;">
+            <button class="action-btn fb-like-btn" [class.liked]="isPostLiked(post.id)" (click)="votePost(post)" style="display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: transparent; border: none; border-radius: 4px; cursor: pointer; color: var(--text-meta); transition: background-color 0.2s;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"></path>
+              </svg>
+              <span class="action-text" style="font-size: 13px; font-weight: 600;">Thích ({{ post.likes }})</span>
+            </button>
+            <a [routerLink]="['/post', post.id]" class="action-btn" style="text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: transparent; border: none; border-radius: 4px; cursor: pointer; color: var(--text-meta); transition: background-color 0.2s;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"></path>
+              </svg>
+              <span class="action-text" style="font-size: 13px; font-weight: 600;">Bình luận {{ post.commentCount > 0 ? '(' + post.commentCount + ')' : '' }}</span>
+            </a>
+            <button class="action-btn" style="display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: transparent; border: none; border-radius: 4px; cursor: pointer; color: var(--text-meta); transition: background-color 0.2s;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="m14 2 6 6-6 6V9c-4.5 0-8.1 3.2-8.9 7.5-.1.5-.5.9-1 .8-.5-.1-.8-.5-.8-1C3.3 9.7 8.3 5 14 5V2z"></path>
+              </svg>
+              <span class="action-text" style="font-size: 13px; font-weight: 600;">Chia sẻ</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Cột Bên Phải (Widget mô tả / Luật lệ) -->
+    <div class="sidebar-widget-col">
+      <div class="widget-box">
+        <h3 class="widget-title">Giới thiệu về Cộng đồng</h3>
+        <button *ngIf="isModerator && !isEditing" class="btn btn-outline-primary btn-sm mb-3 w-100" (click)="toggleEdit()"><i class="fa-solid fa-pen"></i> Chỉnh sửa Cộng đồng</button>
+
+        <div *ngIf="isEditing" style="background:#f8f9fa; padding:12px; border-radius:4px; margin-bottom:16px; font-size:14px; text-align: left;">
+          <label class="fw-bold">Tên hiển thị:</label>
+          <input type="text" [(ngModel)]="editData.displayName" class="form-control mb-2" style="font-size:14px;">
+          
+          <label class="fw-bold">Mô tả:</label>
+          <textarea [(ngModel)]="editData.description" class="form-control mb-2" style="font-size:14px;"></textarea>
+          
+          <label class="fw-bold">Ảnh đại diện:</label>
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control mb-2" style="font-size:14px;">
+          <div *ngIf="isUploading" class="text-info mb-2" style="font-size: 13px;">Đang tải lên...</div>
+          
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary btn-sm flex-fill" (click)="saveSettings()" [disabled]="isUploading">Lưu</button>
+            <button class="btn btn-secondary btn-sm flex-fill" (click)="toggleEdit()">Hủy</button>
+          </div>
+        </div>
+
+        <p class="widget-desc" *ngIf="!isEditing">{{ communityData?.description }}</p>
+        
+        <div class="widget-stats">
+          <div class="stat-item">
+            <span class="stat-num">{{ memberCount | number }}</span>
+            <span class="stat-label">Thành viên</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">{{ onlineCount | number }}</span>
+            <span class="stat-label">Online</span>
+          </div>
+        </div>
+        
+        <hr class="widget-divider">
+        
+        <div class="topics-list" *ngIf="communityData?.topics?.length > 0">
+           <span class="mock-pill" *ngFor="let t of communityData.topics">{{ t }}</span>
+        </div>
+
+        <button class="btn-primary w-100" style="margin-top: 16px;" [routerLink]="['/create-post']" [queryParams]="{community: communityName}">Tạo bài viết mới</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>

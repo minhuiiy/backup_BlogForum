@@ -6,18 +6,16 @@
   <button class="toast-close" (click)="toastMessage = null">×</button>
 </div>
 
-<div class="app-layout">
+<div class="min-h-screen flex text-on-surface bg-surface-container">
   <app-sidebar></app-sidebar>
-  <main class="main-content">
+  <main class="flex-1 xl:ml-64 w-full flex flex-col min-h-screen pt-20">
     <router-outlet></router-outlet>
   </main>
 </div>
 
 <app-image-modal></app-image-modal>
-
 <app-onboarding-wizard></app-onboarding-wizard>
-<!-- ĐÂY CHÍNH LÀ REDDIT LOGIN POPUP -->
+<!-- REDDIT LOGIN POPUP (preserved) -->
 <app-login *ngIf="authModalService.isOpen$ | async"></app-login>
-
 <!-- Chat Widget for logged in users -->
 <app-chat-widget *ngIf="isLoggedIn"></app-chat-widget>

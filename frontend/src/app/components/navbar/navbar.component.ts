@@ -1,6 +1,6 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TokenStorageService } from '../../_services/token-storage.service';
 import { AuthModalService } from '../../_services/auth-modal.service';
@@ -15,7 +15,7 @@ import { TimeAgoPipe } from '../../_pipes/time-ago.pipe';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, TimeAgoPipe],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, TimeAgoPipe],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })

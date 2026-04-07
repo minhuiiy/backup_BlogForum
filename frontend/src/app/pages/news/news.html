@@ -1,42 +1,60 @@
-<div class="news-container">
-  <div class="news-main-feed">
-    
-    <div class="feed-header news-mode">
-      <h2 class="feed-title"><i class="fa-regular fa-newspaper" style="color: #0079D3; margin-right: 8px;"></i>Tin tức thế giới</h2>
-      <p class="feed-subtitle">Cập nhật tin tức nhanh và chính xác nhất từ giới Công nghệ - Tài chính</p>
+<div class="max-w-[1440px] mx-auto px-8 py-10 w-full min-h-screen">
+  
+  <div class="mb-12">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="bg-primary/10 text-primary text-[10px] font-bold tracking-widest px-2 py-1 rounded uppercase flex items-center gap-1">
+        <span class="material-symbols-outlined text-[12px]">public</span> Global Feed
+      </span>
     </div>
-
-    <!-- Loading State -->
-    <div *ngIf="loadingNews" class="news-loading-skeleton">
-       <div class="spinner-large"></div>
-       <p>Đang tải tin bài từ vệ tinh...</p>
-    </div>
-
-    <!-- News List -->
-    <div *ngIf="!loadingNews" class="news-list-wrapper">
-      <a [href]="news.url" target="_blank" class="news-card" *ngFor="let news of newsList; let i = index">
-        <div class="news-rank">{{ i + 1 }}</div>
-        
-        <!-- Hình ảnh Thumbnail đại diện cho tin tức bám sát ngữ cảnh Tiêu đề -->
-        <div class="news-thumbnail">
-           <img [src]="'https://loremflickr.com/140/90/' + getKeyword(news.title) + '?lock=' + news.id" [alt]="news.title" loading="lazy">
-        </div>
-
-        <div class="news-content-box">
-          <h3 class="news-headline">{{ news.title }}</h3>
-          <div class="news-meta">
-            <span class="news-score"><i class="fa-solid fa-arrow-up"></i> {{ news.score }} điểm</span>
-            <span class="dot">•</span>
-            <span>viết bởi <strong style="color:var(--text-main)">{{ news.by }}</strong></span>
-            <span class="dot">•</span>
-            <span>💬 {{ news.descendants || 0 }} bình luận</span>
-          </div>
-        </div>
-        <div class="news-action-ic">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </div>
-      </a>
-    </div>
-
+    <h1 class="text-4xl lg:text-5xl font-bold font-headline tracking-tighter text-on-surface leading-[1.1] max-w-2xl mb-4">Tin tức thế giới</h1>
+    <p class="text-lg text-on-surface-variant font-medium max-w-2xl">Cập nhật tin tức nhanh và chính xác nhất từ giới Công nghệ - Tài chính. Các thông tin được tổng hợp theo thời gian thực.</p>
   </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loadingNews" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div *ngFor="let i of [1,2,3,4,5,6]" class="bg-surface-container-lowest p-6 rounded-3xl ghost-border animate-pulse flex flex-col gap-4">
+       <div class="w-full h-40 bg-surface-container-low rounded-xl"></div>
+       <div class="h-6 w-3/4 bg-surface-container-low rounded-md"></div>
+       <div class="h-10 w-full bg-surface-container-low rounded-md mt-2"></div>
+    </div>
+  </div>
+
+  <!-- News Grid -->
+  <div *ngIf="!loadingNews" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
+    
+    <a [href]="news.url" target="_blank" class="group bg-surface-container-lowest rounded-3xl overflow-hidden ghost-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full" *ngFor="let news of newsList; let i = index">
+      
+      <!-- News Image -->
+      <div class="relative h-48 overflow-hidden bg-surface-container-low">
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" [style.background-image]="'url(' + 'https://loremflickr.com/400/250/' + getKeyword(news.title) + '?lock=' + news.id + ')'"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        
+        <!-- Rank badge -->
+        <div class="absolute top-4 left-4 w-8 h-8 rounded-full glass-panel flex items-center justify-center font-bold text-white font-headline text-sm border-white/20">
+          {{ i + 1 }}
+        </div>
+      </div>
+
+      <div class="p-6 flex-1 flex flex-col">
+        <h3 class="text-xl font-bold font-headline text-on-surface group-hover:text-primary transition-colors leading-snug line-clamp-3 mb-4">
+          {{ news.title }}
+        </h3>
+        
+        <div class="mt-auto flex flex-wrap items-center gap-y-2 gap-x-4 text-xs font-bold text-on-surface-variant">
+          <span class="flex items-center gap-1 uppercase tracking-widest text-[#00a843]">
+             <span class="material-symbols-outlined text-[14px]">arrow_upward</span> {{ news.score }} PTS
+          </span>
+          <span class="text-outline-variant/50">•</span>
+          <span class="flex items-center justify-center uppercase tracking-widest">
+            <span class="material-symbols-outlined text-[14px] mr-1">person</span> <span class="truncate max-w-[100px]">{{ news.by }}</span>
+          </span>
+          <span class="text-outline-variant/50">•</span>
+          <span class="flex items-center uppercase tracking-widest">
+             <span class="material-symbols-outlined text-[14px] mr-1">chat_bubble</span> {{ news.descendants || 0 }}
+          </span>
+        </div>
+      </div>
+    </a>
+  </div>
+
 </div>

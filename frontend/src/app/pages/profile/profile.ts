@@ -106,9 +106,15 @@ export class Profile implements OnInit {
           this.editData.avatarUrl = data.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png';
         }
         
-        // Also load follow stats
-        this.followService.getFollowers(this.username).subscribe((f: any[]) => this.followersCount = f.length);
-        this.followService.getFollowing(this.username).subscribe((f: any[]) => this.followingCount = f.length);
+        // Also load follow stats gracefully
+        this.followService.getFollowers(this.username).subscribe({
+          next: (f: any[]) => this.followersCount = f.length,
+          error: () => this.followersCount = 0
+        });
+        this.followService.getFollowing(this.username).subscribe({
+          next: (f: any[]) => this.followingCount = f.length,
+          error: () => this.followingCount = 0
+        });
 
         if (this.isLoggedIn && !this.isOwnProfile) {
           this.followService.isFollowing(this.loggedInUser.username, this.username).subscribe((res: any) => {

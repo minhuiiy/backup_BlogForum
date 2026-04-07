@@ -1,238 +1,235 @@
-<div class="profile-container">
-
-  <div class="profile-content">
-
-    <!-- Profile Header Core: Covers Avatar and Tabs -->
-    <div class="profile-main-header">
-      <div class="profile-user-summary">
-        <div class="big-avatar-wrapper" style="position: relative;" (mouseenter)="isHoveringAvatar = true" (mouseleave)="isHoveringAvatar = false">
-          <img [src]="userProfile?.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'" />
-          <div class="big-online-dot"></div>
-          
-          <div *ngIf="isHoveringAvatar && isOwnProfile" class="edit-avatar-btn" (click)="fileInput.click()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.5); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" title="Đổi ảnh đại diện">
-            <i class="fa-solid fa-pen" style="font-size: 14px;"></i>
-          </div>
-          <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
-          <div *ngIf="isUploading" style="position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--primary-color); white-space: nowrap; font-weight: bold;">Đang tải...</div>
+<div class="max-w-[1440px] mx-auto px-8 py-10 w-full min-h-screen">
+  
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-12">
+    <!-- Main Content Canvas -->
+    <div class="xl:col-span-8 space-y-8">
+      
+      <!-- Profile Header / Banner -->
+      <div class="bg-surface-container-lowest rounded-3xl overflow-hidden ghost-border shadow-sm">
+        <div class="h-32 bg-primary/5 w-full relative">
+          <!-- Optional Banner background -->
+          <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
         </div>
-        <div class="user-info-text">
-          <h1 class="user-display" style="display: flex; align-items: center; gap: 8px; margin: 0;">
-            <span *ngIf="!isEditingName">{{ userProfile?.displayName || username }}</span>
-            <input *ngIf="isEditingName" type="text" [(ngModel)]="editData.displayName" class="form-control" style="font-size: 24px; font-weight: bold; padding: 0 8px; width: auto; max-width: 300px; height: 36px; display: inline-block;" (keyup.enter)="saveName()" (blur)="saveName()">
-            
-            <button *ngIf="!isEditingName && isOwnProfile" (click)="startEditName()" style="background: transparent; border: none; color: var(--text-meta); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%; transition: background 0.2s;" title="Đổi tên hiển thị">
-              <i class="fa-solid fa-pen" style="font-size: 14px;"></i>
-            </button>
-          </h1>
-          <p class="user-handle" style="margin-top: 4px;">{{ username }}</p>
+        
+        <div class="px-8 pb-8 relative -mt-16">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 relative z-10">
+            <div class="flex flex-col gap-3">
+              <div class="w-32 h-32 rounded-3xl bg-surface border-4 border-surface-container-lowest shadow-lg overflow-hidden relative group flex items-center justify-center bg-primary/10" (mouseenter)="isHoveringAvatar = true" (mouseleave)="isHoveringAvatar = false">
+                <img *ngIf="userProfile?.avatarUrl" [src]="userProfile.avatarUrl" class="w-full h-full object-cover">
+                <span *ngIf="!userProfile?.avatarUrl" class="text-4xl font-bold font-headline text-primary uppercase">
+                   {{ (userProfile?.displayName || username)?.charAt(0) }}
+                </span>
+                
+                <div *ngIf="isHoveringAvatar && isOwnProfile" class="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer transition-all" (click)="fileInput.click()">
+                  <span class="material-symbols-outlined text-white text-3xl">add_a_photo</span>
+                </div>
+                <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" />
+                <div *ngIf="isUploading" class="absolute bottom-0 inset-x-0 bg-primary text-white text-[10px] uppercase font-bold tracking-widest text-center py-1">Tải lên...</div>
+              </div>
+              
+              <div>
+                <h1 class="text-3xl font-bold font-headline text-on-surface flex items-center gap-2">
+                  <span *ngIf="!isEditingName">{{ userProfile?.displayName || username }}</span>
+                  <input *ngIf="isEditingName" type="text" [(ngModel)]="editData.displayName" class="bg-surface-container focus:bg-surface-container-high rounded px-2 py-1 outline-none font-bold text-2xl w-48 transition-colors" (keyup.enter)="saveName()" (blur)="saveName()">
+                  
+                  <button *ngIf="!isEditingName && isOwnProfile" (click)="startEditName()" class="w-8 h-8 rounded hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors">
+                    <span class="material-symbols-outlined text-sm">edit</span>
+                  </button>
+                </h1>
+                <p class="text-on-surface-variant font-medium mt-1">&commat;{{ username }}</p>
+              </div>
+            </div>
+
+            <!-- Follow / Action buttons -->
+            <div class="flex items-center gap-4">
+               <button *ngIf="isLoggedIn && !isOwnProfile" class="px-6 py-2 rounded-full font-bold text-sm tracking-wide transition-all shadow-md flex items-center gap-2"
+                       [class.bg-surface-container-high]="isFollowing" [class.text-on-surface]="isFollowing" 
+                       [class.kinetic-gradient]="!isFollowing" [class.text-white]="!isFollowing"
+                       (click)="toggleFollow()">
+                 <span class="material-symbols-outlined text-[18px]">{{ isFollowing ? 'person_check' : 'person_add' }}</span>
+                 {{ isFollowing ? 'Đang Theo dõi' : 'Theo dõi' }}
+               </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="profile-tabs-wrapper">
-        <button *ngFor="let tab of tabs" class="tab-btn" [class.active]="activeTab === tab.id" (click)="setTab(tab.id)">
+      <!-- Content Tabs -->
+      <div class="flex items-center gap-2 border-b border-outline-variant/15 px-2">
+        <button *ngFor="let tab of tabs" 
+                class="px-6 py-4 font-bold text-sm transition-all focus:outline-none relative"
+                [class.text-primary]="activeTab === tab.id"
+                [class.text-on-surface-variant]="activeTab !== tab.id"
+                (click)="setTab(tab.id)">
           {{ tab.label }}
+          <div *ngIf="activeTab === tab.id" class="absolute bottom-0 inset-x-0 h-1 bg-primary rounded-t-full"></div>
         </button>
       </div>
 
-      <!-- Content Toolbar (Quick create post) -->
-      <div class="profile-content-toolbar">
-        <div class="filter-btn">
-          <i class="fa-regular fa-eye"></i> Hiển thị tất cả nội dung
-          <i class="fa-solid fa-chevron-right ms-auto"></i>
-        </div>
-        <div class="create-post-quick">
-          <a routerLink="/create-post" class="quick-create-btn">
-            <i class="fa-solid fa-plus"></i> Tạo bài đăng
-          </a>
-        </div>
+      <!-- Toolbar -->
+      <div class="flex items-center justify-between py-2">
+        <button class="flex items-center gap-2 text-on-surface-variant text-sm font-bold bg-surface-container-low px-4 py-2 rounded-full hover:bg-surface-container transition-colors">
+           <span class="material-symbols-outlined text-[18px]">sort</span> Sắp xếp
+        </button>
+        <a routerLink="/create-post" class="flex items-center gap-2 text-primary font-bold text-sm bg-primary/10 hover:bg-primary/20 transition-colors px-4 py-2 rounded-full">
+          <span class="material-symbols-outlined text-[18px]">edit_document</span> Tạo bài đăng
+        </a>
       </div>
-    </div>
 
-    <div class="empty-state" *ngIf="!loadingFeed && posts.length === 0 && (activeTab === 'posts' || activeTab === 'overview')">
-      <img src="/Snoo_Expression_NoMouth.png" alt="Sad Snoo" class="snoo-empty" />
-      <h2 class="empty-title">Bạn chưa có bài đăng nào</h2>
-      <p class="empty-subtitle">Khi bạn đăng bài vào một cộng đồng, bài đăng đó sẽ hiển thị ở đây. Nếu bạn muốn ẩn bài
-        đăng của mình, hãy cập nhật phần cài đặt.</p>
-      <a routerLink="/profile" class="btn-primary-rounded mt-4">Cập nhật cài đặt</a>
-    </div>
+      <!-- Loading State -->
+      <div *ngIf="loadingFeed && (activeTab === 'posts' || activeTab === 'overview')" class="flex flex-col gap-6 py-8">
+        <div *ngFor="let i of [1,2,3]" class="bg-surface-container-lowest p-6 rounded-3xl ghost-border animate-pulse h-40"></div>
+      </div>
 
-    <div *ngIf="loadingFeed && (activeTab === 'posts' || activeTab === 'overview')" style="padding: 40px; text-align: center; color: var(--text-meta);">
-      Đang tải bài đăng...
-    </div>
+      <!-- Empty State -->
+      <div class="bg-surface-container-lowest p-12 rounded-3xl ghost-border flex flex-col items-center text-center py-20" *ngIf="!loadingFeed && posts.length === 0 && (activeTab === 'posts' || activeTab === 'overview')">
+        <span class="material-symbols-outlined text-6xl text-outline-variant/30 mb-4">post_add</span>
+        <h2 class="text-xl font-bold font-headline text-on-surface mb-2">Chưa có bài đăng nào</h2>
+        <p class="text-on-surface-variant font-medium mb-6 max-w-sm">Mọi hoạt động thảo luận của người dùng này sẽ xuất hiện tại đây.</p>
+        <a *ngIf="isOwnProfile" routerLink="/create-post" class="kinetic-gradient text-white font-bold px-8 py-3 rounded-full shadow-md text-sm hover:scale-95 transition-transform">Tạo bài đăng đầu tiên</a>
+      </div>
 
-    <div class="posts-list mt-3" *ngIf="!loadingFeed && posts.length > 0 && (activeTab === 'posts' || activeTab === 'overview')">
-      <div class="post-card" *ngFor="let post of posts" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 16px; padding: 12px;">
-        <div class="post-content-area">
-          <div class="post-meta-top" style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px; font-size: 12px; color: var(--text-meta); margin-bottom: 8px;">
+      <!-- Posts List -->
+      <div class="space-y-6" *ngIf="!loadingFeed && posts.length > 0 && (activeTab === 'posts' || activeTab === 'overview')">
+        <div class="bg-surface-container-lowest p-6 rounded-3xl ghost-border hover:shadow-md transition-shadow group/post" *ngFor="let post of posts">
+          
+          <div class="flex items-center gap-2 mb-4 text-[10px] uppercase font-bold tracking-widest text-on-surface-variant">
             <ng-container *ngIf="post.category">
-              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
-                <span class="community-icon" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:var(--primary-color); color:#fff; font-size:12px; font-weight:bold;">
-                  {{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name)?.charAt(0) | uppercase}}
-                </span>
-                <span class="community-name">{{ post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name }}</span>
-              </div>
-              <span class="dot-separator">•</span>
-              <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar d-inline-block">
-              <span *ngIf="post.author && !post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right: 4px;">
-                 {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
+              <span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded max-w-[150px] truncate">
+                {{ post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name }}
               </span>
-              <span class="post-author" *ngIf="post.author">{{ post.author.displayName || post.author.username }}</span>
             </ng-container>
-
             <ng-container *ngIf="!post.category">
-              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
-                <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar">
-                <span *ngIf="!post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right:4px;">
-                  {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
-                </span>
-                <span class="community-name">{{ post.author?.displayName || post.author?.username }}</span>
-              </div>
+               <span class="bg-surface-container-high text-on-surface-variant px-2 py-1 rounded">Tường cá nhân</span>
             </ng-container>
-            
-            <span class="dot-separator" *ngIf="post.author">•</span>
-            <span class="post-date">{{ post.createdAt | timeAgo }}</span>
+            <span>•</span>
+            <div class="flex items-center gap-1.5">
+               <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" class="w-4 h-4 rounded-full object-cover border border-outline-variant/10">
+               <span class="lowercase tracking-normal font-medium text-xs">&commat;{{ post.author?.username }}</span>
+            </div>
+            <span>•</span>
+            <span>{{ post.createdAt | timeAgo }}</span>
           </div>
           
-          <a [routerLink]="['/post', post.id]" class="post-title-link" style="text-decoration: none;">
-            <h3 class="post-title" style="margin-bottom: 12px; color: var(--text-main); font-size: 18px;">{{ post.title }}</h3>
+          <a [routerLink]="['/post', post.id]" class="block group-hover/post:text-primary transition-colors">
+            <h3 class="text-xl font-bold font-headline text-on-surface mb-3 line-clamp-2 leading-snug">{{ post.title }}</h3>
           </a>
           
-          <div class="post-excerpt" style="max-height: 250px; overflow: hidden; position: relative; margin-bottom: 12px; font-size: 14px; color: var(--text-main); line-height: 1.5;">
-            <div [innerHTML]="post.strippedContent | safeHtml" class="clamped-content"></div>
-            <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px; background: linear-gradient(transparent, var(--surface-color));"></div>
+          <div class="relative max-h-32 overflow-hidden mb-4">
+            <div [innerHTML]="post.strippedContent | safeHtml" class="prose prose-sm prose-slate max-w-none text-on-surface-variant leading-relaxed"></div>
+            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-surface-container-lowest to-transparent pointer-events-none"></div>
           </div>
 
-          <!-- Carousel -->
-          <div class="post-carousel" *ngIf="post.extractedImages && post.extractedImages.length > 1" style="position: relative; margin-top: 12px; border-radius: 8px; overflow: hidden; background: #000; text-align: center;">
-            <button class="carousel-btn prev-btn" [class.dimmed]="post.currentImageIndex === 0" (click)="prevImage($event, post)" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❮</button>
-            <img [src]="post.extractedImages[post.currentImageIndex]" style="width: 100%; max-height: 400px; object-fit: contain; cursor: zoom-in;" loading="eager" (click)="openImageOverlay(post.extractedImages[post.currentImageIndex])">
-            <button class="carousel-btn next-btn" [class.dimmed]="post.currentImageIndex === post.extractedImages.length - 1" (click)="nextImage($event, post)" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❯</button>
+          <!-- Post Media Section (Carousel & Single Image) -->
+          <div class="relative rounded-xl overflow-hidden mt-4 group/carousel bg-surface-container-low" *ngIf="post.extractedImages && post.extractedImages.length > 1">
+            <button class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all z-10 invisible group-hover/carousel:visible" [class.opacity-30]="post.currentImageIndex === 0" (click)="prevImage($event, post)">
+              <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+            </button>
             
-            <div class="carousel-indicators" style="position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px;">
-              <span *ngFor="let src of post.extractedImages; let i = index" [style.background]="i === post.currentImageIndex ? '#fff' : 'rgba(255,255,255,0.5)'" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+            <div class="w-full flex items-center justify-center bg-black/5" style="height: 300px;">
+              <img [src]="post.extractedImages[post.currentImageIndex]" class="max-w-full max-h-full object-contain cursor-zoom-in" loading="lazy" (click)="openImageOverlay(post.extractedImages[post.currentImageIndex])">
+            </div>
+            
+            <button class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all z-10 invisible group-hover/carousel:visible" [class.opacity-30]="post.currentImageIndex === post.extractedImages.length - 1" (click)="nextImage($event, post)">
+              <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+            
+            <div class="absolute bottom-3 inset-x-0 flex justify-center gap-1.5 z-10">
+              <span *ngFor="let src of post.extractedImages; let idx = index" class="w-1.5 h-1.5 rounded-full transition-colors duration-300" [ngClass]="idx === post.currentImageIndex ? 'bg-white shadow' : 'bg-white/40'"></span>
             </div>
           </div>
           
-          <div class="post-single-image" *ngIf="post.extractedImages && post.extractedImages.length === 1" style="margin-top: 12px; border-radius: 8px; overflow: hidden; text-align: center; background: #000;">
-             <img [src]="post.extractedImages[0]" style="width: 100%; max-height: 400px; object-fit: contain; cursor: zoom-in;" loading="eager" (click)="openImageOverlay(post.extractedImages[0])">
+          <div class="mt-4 rounded-xl overflow-hidden bg-surface-container-low flex items-center justify-center" *ngIf="post.extractedImages && post.extractedImages.length === 1" style="height: 300px;">
+             <img [src]="post.extractedImages[0]" class="max-w-full max-h-full object-contain cursor-zoom-in" loading="lazy" (click)="openImageOverlay(post.extractedImages[0])">
           </div>
           
-          <div class="post-action-bar" style="display: flex; gap: 4px; margin-top: 16px;">
-            <button class="action-btn fb-like-btn" [class.liked]="isPostLiked(post.id)" (click)="votePost(post)" style="background: transparent; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-meta);">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"></path></svg>
-              <span class="action-text">Thích ({{ post.likes }})</span>
+          <!-- Post Footer Actions -->
+          <div class="flex flex-wrap gap-4 pt-6 mt-4 border-t border-outline-variant/10">
+            <button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-primary/10 hover:text-primary text-on-surface-variant transition-colors text-xs font-bold uppercase tracking-widest" [class.bg-primary/10]="isPostLiked(post.id)" [class.text-primary]="isPostLiked(post.id)" (click)="votePost(post)">
+              <span class="material-symbols-outlined text-[16px]">arrow_upward</span> {{ post.likes }}
             </button>
-            <a [routerLink]="['/post', post.id]" class="action-btn" style="background: transparent; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-meta); text-decoration: none;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"></path></svg>
-              <span class="action-text">Bình luận {{ post.commentCount > 0 ? '(' + post.commentCount + ')' : '' }}</span>
+            
+            <a [routerLink]="['/post', post.id]" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors text-xs font-bold uppercase tracking-widest">
+              <span class="material-symbols-outlined text-[16px]">chat_bubble</span> {{ post.commentCount > 0 ? post.commentCount : 'Bình luận' }}
             </a>
+            
+            <button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors text-xs font-bold uppercase tracking-widest">
+              <span class="material-symbols-outlined text-[16px]">share</span> Chia sẻ
+            </button>
           </div>
         </div>
       </div>
+      
     </div>
 
-  </div>
+    <!-- Right Sidebar -->
+    <div class="xl:col-span-4 space-y-8">
+      
+      <!-- Stats Bento Card -->
+      <div class="bg-surface-container-lowest p-8 rounded-3xl ghost-border overflow-hidden relative">
+        <span class="material-symbols-outlined absolute -bottom-8 -right-8 text-[120px] opacity-5 text-primary rotate-12">monitoring</span>
+        
+        <h3 class="text-sm font-bold font-headline text-on-surface mb-6 uppercase tracking-widest">Tóm tắt hoạt động</h3>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="bg-surface-container-low p-4 rounded-2xl text-center">
+             <p class="text-3xl font-bold font-headline text-primary">{{ followersCount }}</p>
+             <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mt-1">Lượt theo dõi</p>
+          </div>
+          <div class="bg-surface-container-low p-4 rounded-2xl text-center">
+             <p class="text-3xl font-bold font-headline text-primary">{{ followingCount }}</p>
+             <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mt-1">Đang theo dõi</p>
+          </div>
+        </div>
 
-  <!-- Right Sidebar Profile Card -->
-  <div class="profile-sidebar">
-    <div class="profile-card">
-      <div class="card-banner">
-        <button class="settings-gear-btn"><i class="fa-solid fa-gear"></i></button>
+        <div class="space-y-4">
+           <div class="flex items-center justify-between border-b border-outline-variant/10 pb-3">
+             <span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Điểm Karma</span>
+             <span class="font-mono font-bold text-on-surface">1</span>
+           </div>
+           <div class="flex items-center justify-between border-b border-outline-variant/10 pb-3">
+             <span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Tuổi Tài Khoản</span>
+             <span class="font-mono font-bold text-on-surface">1 Ngày</span>
+           </div>
+        </div>
       </div>
 
-      <div class="card-body">
-        <h2 class="card-username">{{ username }}</h2>
-        <div style="display: flex; gap: 8px; margin-top: 8px;">
-          <button class="btn-share" style="flex: 1;"><i class="fa-solid fa-share"></i> Chia sẻ</button>
+      <!-- Settings List -->
+      <div class="bg-surface-container-low/50 p-8 rounded-3xl border border-outline-variant/15" *ngIf="isOwnProfile">
+        <h3 class="text-sm font-bold font-headline text-on-surface mb-6 uppercase tracking-widest flex items-center gap-2">
+           <span class="material-symbols-outlined text-[18px] text-primary">settings</span> Cài đặt hồ sơ
+        </h3>
+        
+        <div class="space-y-2">
+          <button class="w-full flex items-center justify-between p-4 bg-surface-container-lowest hover:bg-surface-container transition-colors rounded-2xl ghost-border group">
+             <div class="flex items-center gap-3">
+               <div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                  <span class="material-symbols-outlined text-[20px]">person</span>
+               </div>
+               <div class="text-left">
+                  <p class="text-sm font-bold text-on-surface">Thông tin cơ bản</p>
+                  <p class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-0.5">Cập nhật hồ sơ</p>
+               </div>
+             </div>
+             <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+          </button>
           
-          <button *ngIf="isLoggedIn && !isOwnProfile" 
-                  class="btn-follow" style="flex: 1; padding: 8px; border-radius: 20px; font-weight: 600; cursor: pointer; border: 1px solid var(--primary-color);"
-                  [style.backgroundColor]="isFollowing ? 'transparent' : 'var(--primary-color)'"
-                  [style.color]="isFollowing ? 'var(--primary-color)' : 'white'"
-                  (click)="toggleFollow()">
-            <i class="fa-solid" [class.fa-user-check]="isFollowing" [class.fa-user-plus]="!isFollowing"></i> 
-            {{ isFollowing ? 'Đang theo dõi' : 'Theo dõi' }}
+          <button class="w-full flex items-center justify-between p-4 bg-surface-container-lowest hover:bg-surface-container transition-colors rounded-2xl ghost-border group">
+             <div class="flex items-center gap-3">
+               <div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                  <span class="material-symbols-outlined text-[20px]">palette</span>
+               </div>
+               <div class="text-left">
+                  <p class="text-sm font-bold text-on-surface">Tùy chỉnh giao diện</p>
+                  <p class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-0.5">Quản lý nhận diện</p>
+               </div>
+             </div>
+             <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
           </button>
         </div>
-
-        <div class="follower-count" style="display: flex; gap: 16px; margin: 16px 0;">
-          <div><strong>{{ followersCount }}</strong> người theo dõi</div>
-          <div><strong>{{ followingCount }}</strong> đang theo dõi</div>
-        </div>
-
-        <div class="metrics-grid">
-          <div class="metric-item">
-            <span class="metric-val">1</span>
-            <span class="metric-label">Điểm karma</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-val">0</span>
-            <span class="metric-label">Lượt đóng góp</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-val">1 ngày</span>
-            <span class="metric-label">tuổi Reddit</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-val">0</span>
-            <span class="metric-label">Đang hoạt động trong</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-val">0</span>
-            <span class="metric-label">Lượng vàng kiếm được</span>
-          </div>
-        </div>
-
-
-
-        <div class="achievements-section">
-          <h3>Thành tích</h3>
-          <div class="badges-row">
-            <div class="badge-icon badge-explorer"><i class="fa-solid fa-compass"></i></div>
-            <div class="badge-icon badge-security"><i class="fa-solid fa-shield-halved"></i></div>
-            <div class="badge-texts">
-              <span class="badge-title">Nhà khám phá, Gia nhập Reddit...</span>
-              <span class="badge-desc">Tài khoản được bảo mật</span>
-            </div>
-          </div>
-          <div class="badge-footer">
-            <span class="unlock-info">Đã mở khóa 3 cúp</span>
-            <a href="javascript:void(0)" class="view-all-link">Xem tất cả</a>
-          </div>
-        </div>
-
-        <div class="settings-list">
-          <h3 class="settings-header">Cài đặt</h3>
-
-          <div *ngIf="isOwnProfile" class="settings-item">
-            <div class="settings-icon"><i class="fa-solid fa-user-circle"></i></div>
-            <div class="settings-text">
-              <span class="settings-title">Hồ sơ</span>
-              <span class="settings-desc">Tùy chỉnh hồ sơ của bạn</span>
-            </div>
-            <button class="btn-update">Cập nhật</button>
-          </div>
-
-          <div *ngIf="isOwnProfile" class="settings-item">
-            <div class="settings-icon"><i class="fa-solid fa-eye"></i></div>
-            <div class="settings-text">
-              <span class="settings-title">Quản lý hồ sơ của bạn</span>
-              <span class="settings-desc">Quản lý những gì mọi người nhìn thấy khi họ truy cập hồ sơ của bạn</span>
-            </div>
-            <button class="btn-update">Cập nhật</button>
-          </div>
-
-          <div *ngIf="isOwnProfile" class="settings-item">
-            <div class="settings-icon"><i class="fa-solid fa-shirt"></i></div>
-            <div class="settings-text">
-              <span class="settings-title">Avatar</span>
-              <span class="settings-desc">Tạo phong cách cho avatar</span>
-            </div>
-            <button class="btn-update">Cập nhật</button>
-          </div>
-        </div>
       </div>
+      
     </div>
-  </div>
 
+  </div>
 </div>

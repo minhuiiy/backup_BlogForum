@@ -21,20 +21,30 @@ export class News implements OnInit {
       next: ids => {
         const top20 = ids.slice(0, 20);
         let loaded = 0;
+        let errors = 0;
         top20.forEach(id => {
-          this.http.get<any>(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).subscribe(story => {
-            this.newsList.push(story);
-            loaded++;
-            if (loaded === top20.length) {
-              // Sort lại theo điểm do tải bất đồng bộ
-              this.newsList.sort((a, b) => b.score - a.score);
-              this.loadingNews = false;
+          this.http.get<any>(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).subscribe({
+            next: story => {
+              if (story) this.newsList.push(story);
+              loaded++;
+              this.checkDone(loaded, errors, top20.length);
+            },
+            error: () => {
+              errors++;
+              this.checkDone(loaded, errors, top20.length);
             }
           });
         });
       },
       error: () => this.loadingNews = false
     });
+  }
+
+  checkDone(loaded: number, errors: number, total: number) {
+     if (loaded + errors === total) {
+        this.newsList.sort((a, b) => b.score - a.score);
+        this.loadingNews = false;
+     }
   }
 
   // Thuật toán tách từ khóa chính xác nhất từ Title
