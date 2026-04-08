@@ -82,26 +82,46 @@ export class CreateCommunity {
   createCommunity() {
     if (this.communityName.trim().length < 3 || this.isDuplicate) return;
     
-    // Ở bước 3 nhấn Tạo -> Lưu dữ liệu, sau đó chuyển sang màn hình Success (Bước 4)
-    const generatedUrl = `/r/${this.communityName}`;
-    const newComm = {
+    // Gọi API Backend qua CommunityMockService
+    const categoryData = {
       name: this.communityName,
-      url: generatedUrl,
-      type: this.communityType,
-      isAdult: this.isAdultContent,
-      topics: this.selectedTopics,
-      description: this.communityDesc
+      displayName: this.communityName,
+      description: this.communityDesc || "Cộng đồng mới được tạo"
     };
-    
-    this.commMock.addCommunity(newComm);
-    
-    // Đăng ký quyền Moderator cho người tạo
-    const user = this.tokenStorage.getUser();
-    if (user && user.username) {
-      this.commMock.joinCommunity(this.communityName, user.username, 'moderator');
-    }
 
-    this.currentStep = 4; // Bật màn hình Chúc mừng
+    this.commMock.createNewCategoryRecord(categoryData).subscribe({
+      next: (res) => {
+        // Cập nhật lại UI Local
+        const generatedUrl = `/r/${this.communityName}`;
+        const newComm = {
+          name: this.communityName,
+          url: generatedUrl,
+          type: this.communityType,
+          isAdult: this.isAdultContent,
+          topics: this.selectedTopics,
+          description: this.communityDesc
+        };
+        
+        this.commMock.addCommunity(newComm);
+        
+        // Backend DB đã tự đăng ký moderator thông qua creatorUsername.
+        // Cập nhật lên Context Frontend để UI nhận diện ngay quyền hạn
+        const user = this.tokenStorage.getUser();
+        if (user && user.username) {
+          const currentMap = this.commMock['membersMap'].getValue();
+          let key = this.communityName.toLowerCase();
+          if (!currentMap[key]) currentMap[key] = {};
+          currentMap[key][user.username] = 'moderator';
+          this.commMock['membersMap'].next(currentMap);
+        }
+
+        this.currentStep = 4; // Bật màn hình Chúc mừng
+      },
+      error: (err) => {
+        console.error('Lỗi khi tạo cộng đồng từ API', err);
+        alert('Tên cộng đồng đã tồn tại hoặc có lỗi hệ thống');
+      }
+    });
   }
 
   goToCommunity() {

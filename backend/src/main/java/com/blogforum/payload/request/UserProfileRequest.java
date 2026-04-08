@@ -7,4 +7,5 @@ public class UserProfileRequest {
     private String bio;
     private String displayName;
     private String avatarUrl;
+    private String gender;
 }

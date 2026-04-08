@@ -18,4 +18,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @EntityGraph(attributePaths = {"user"})
     List<Comment> findByParentIsNull(); // Get top-level comments
+
+    @EntityGraph(attributePaths = {"post", "user"})
+    List<Comment> findByUserUsernameOrderByCreatedAtDesc(String username);
 }

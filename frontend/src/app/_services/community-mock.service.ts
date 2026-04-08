@@ -43,6 +43,18 @@ export class CommunityMockService {
     });
   }
 
+  /** Lấy tất cả communities từ API và cập nhật communities$ */
+  fetchAllCommunities() {
+    this.http.get<any[]>(this.apiUrl).subscribe({
+      next: (list) => {
+        // Lưu vào localStorage và BehaviorSubject
+        localStorage.setItem('my_communities', JSON.stringify(list));
+        this.communities.next(list);
+      },
+      error: (err) => console.error('Failed to fetch communities', err)
+    });
+  }
+
   addCommunity(community: any) {
     const currentList = this.communities.getValue();
     currentList.push(community);
@@ -50,11 +62,15 @@ export class CommunityMockService {
     this.communities.next(currentList);
   }
 
+  createNewCategoryRecord(categoryData: any): Observable<any> {
+    return this.http.post(this.apiUrl, categoryData);
+  }
+
   joinCommunity(communityName: string, username: string, role: string = 'member') {
     let key = communityName.toLowerCase();
     if (key.startsWith('r/')) key = key.substring(2);
 
-    this.http.post(`${this.apiUrl}/${key}/join?role=${role}`, {}).subscribe({
+    this.http.post(`${this.apiUrl}/${encodeURIComponent(key)}/join?role=${role}`, {}).subscribe({
       next: () => {
         const currentMap = this.membersMap.getValue();
         if (!currentMap[key]) {
@@ -72,7 +88,7 @@ export class CommunityMockService {
     let key = communityName.toLowerCase();
     if (key.startsWith('r/')) key = key.substring(2);
 
-    this.http.post(`${this.apiUrl}/${key}/leave`, {}).subscribe({
+    this.http.post(`${this.apiUrl}/${encodeURIComponent(key)}/leave`, {}).subscribe({
       next: () => {
         const currentMap = this.membersMap.getValue();
         if (currentMap[key] && currentMap[key][username]) {
@@ -87,7 +103,7 @@ export class CommunityMockService {
   getCategoryStats(communityName: string): Observable<any> {
     let key = communityName.toLowerCase();
     if (key.startsWith('r/')) key = key.substring(2);
-    return this.http.get<any>(`${this.apiUrl}/${key}/stats`);
+    return this.http.get<any>(`${this.apiUrl}/${encodeURIComponent(key)}/stats`);
   }
 
   getRole(communityName: string, username: string): string | null {

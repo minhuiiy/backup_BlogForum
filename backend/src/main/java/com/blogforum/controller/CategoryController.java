@@ -32,9 +32,10 @@ public class CategoryController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.createCategory(category));
+        String username = getUsername();
+        return ResponseEntity.ok(categoryService.createCategory(category, username));
     }
 
     @PutMapping("/{id}")
@@ -50,12 +51,34 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/by-name/{name}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteCategoryByName(@PathVariable String name) {
+        String username = getUsername();
+        if (username == null) return ResponseEntity.status(401).build();
+        try {
+            categoryService.deleteCategoryByName(name, username);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
+    }
+
     @PutMapping("/{name}/settings")
     public ResponseEntity<?> updateCategorySettings(@PathVariable String name, @RequestBody com.blogforum.payload.request.CategorySettingsRequest request) {
         String username = getUsername();
         if (username == null) return ResponseEntity.status(401).build();
         try {
-            Category updated = categoryService.updateCategorySettings(name, username, request.getDisplayName(), request.getDescription(), request.getImageUrl());
+            Category updated = categoryService.updateCategorySettingsFull(
+                name, username,
+                request.getDisplayName(),
+                request.getDescription(),
+                request.getImageUrl(),
+                request.getTelegramChannelId()
+            );
+            // Clear passwords and unneeded relations
+            updated.setMembers(null);
+            updated.setModerators(null);
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
@@ -76,6 +99,27 @@ public class CategoryController {
         if (username == null) return ResponseEntity.status(401).build();
         categoryService.leaveCategory(name, username);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{name}/promote")
+    public ResponseEntity<?> promoteMember(@PathVariable String name, @RequestParam String memberUsername) {
+        String username = getUsername();
+        if (username == null) return ResponseEntity.status(401).build();
+        categoryService.promoteMember(name, memberUsername);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{name}/demote")
+    public ResponseEntity<?> demoteMember(@PathVariable String name, @RequestParam String memberUsername) {
+        String username = getUsername();
+        if (username == null) return ResponseEntity.status(401).build();
+        categoryService.demoteMember(name, memberUsername);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{name}/members")
+    public ResponseEntity<List<java.util.Map<String, Object>>> getCategoryMembers(@PathVariable String name) {
+        return ResponseEntity.ok(categoryService.getCategoryMembers(name));
     }
 
     @GetMapping("/my-memberships")

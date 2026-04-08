@@ -2,13 +2,13 @@
 <div class="max-w-[1440px] mx-auto px-8 py-8 w-full">
 <section class="mb-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center" *ngIf="posts.length > 0">
   <div class="lg:col-span-7">
-    <span class="inline-block px-3 py-1 rounded bg-secondary-container text-on-secondary-container text-[10px] font-bold tracking-widest uppercase mb-6">Featured Insight</span>
+    <span class="inline-block px-3 py-1 rounded bg-secondary-container text-on-secondary-container text-[10px] font-bold tracking-widest uppercase mb-6">Bài nổi bật</span>
     <h1 class="text-5xl lg:text-7xl font-bold font-headline leading-[1.1] mb-8 text-on-surface">
       <a [routerLink]="['/post', posts[0].id]" class="hover:text-primary transition-colors cursor-pointer">{{ posts[0].title }}</a>
     </h1>
-    <p class="text-lg text-on-surface-variant font-medium leading-relaxed mb-10 max-w-xl line-clamp-3" [innerHTML]="posts[0].strippedContent | safeHtml"></p>
+    <p class="text-lg text-on-surface font-medium leading-relaxed mb-10 max-w-xl line-clamp-3" [innerHTML]="posts[0].strippedContent | safeHtml"></p>
     <div class="flex items-center gap-6">
-      <button [routerLink]="['/post', posts[0].id]" class="kinetic-gradient text-white px-8 py-4 rounded-full font-bold text-base shadow-xl shadow-primary/20 hover:scale-105 transition-transform">Read Analysis</button>
+      <button [routerLink]="['/post', posts[0].id]" class="kinetic-gradient text-white px-8 py-4 rounded-full font-bold text-base shadow-xl shadow-primary/20 hover:scale-105 transition-transform">Đọc ngay</button>
       <div class="flex items-center gap-3">
         <img *ngIf="posts[0].author?.avatarUrl" [src]="posts[0].author.avatarUrl" class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover"/>
         <div *ngIf="!posts[0].author?.avatarUrl" class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold">
@@ -40,10 +40,10 @@
   <div class="xl:col-span-2 space-y-8">
     <div class="flex justify-between items-end mb-4 px-2">
       <div>
-        <h2 class="text-2xl font-bold font-headline text-on-surface">Forum Pulse</h2>
-        <p class="text-sm text-on-surface-variant">Real-time technical discourse</p>
+        <h2 class="text-2xl font-bold font-headline text-on-surface">Hoạt động diễn đàn</h2>
+        <p class="text-sm text-on-surface-variant">Thảo luận mới nhất</p>
       </div>
-      <a routerLink="/popular" class="text-sm font-bold text-primary hover:underline transition-all">View All Activity</a>
+      <a routerLink="/popular" class="text-sm font-bold text-primary hover:underline transition-all">Xem tất cả</a>
     </div>
 
     <div *ngIf="posts.length === 0" class="empty-state text-on-surface-variant py-10 font-medium">Chưa có bài viết nào! Hãy tạo bài viết đầu tiên.</div>
@@ -52,7 +52,7 @@
       <article *ngFor="let post of posts; let i=index" [class.hidden]="i === 0" class="bg-surface-container-lowest p-6 rounded-2xl transition-all duration-200 group hover:shadow-[0_12px_32px_-8px_rgba(44,47,49,0.06)] outline outline-1 outline-variant/15 flex gap-4 cursor-pointer" [routerLink]="['/post', post.id]">
         <div class="flex-shrink-0 flex flex-col items-center justify-center bg-surface-container-low w-14 h-14 rounded-xl">
           <span class="text-lg font-bold text-primary">{{ post.likes }}</span>
-          <span class="text-[10px] uppercase font-bold text-on-surface-variant">Votes</span>
+          <span class="text-[10px] uppercase font-bold text-on-surface-variant">Vote</span>
         </div>
         <div class="flex-grow">
           <h3 class="text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">{{ post.title }}</h3>
@@ -68,10 +68,35 @@
               <div *ngIf="!post.author?.avatarUrl" class="w-6 h-6 rounded-full bg-secondary-container flex items-center justify-center font-bold text-[10px] text-on-secondary-container">
                 {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
               </div>
-              <span>asked by <span class="font-semibold text-on-surface">{{ post.author?.username }}</span> {{ post.createdAt | timeAgo }}</span>
+              <span>bởi <span class="font-semibold text-on-surface">{{ post.author?.username }}</span> {{ post.createdAt | timeAgo }}</span>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
               <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">chat_bubble</span> {{ post.commentCount }}</span>
+              <!-- Share -->
+              <button class="flex items-center gap-1 hover:text-primary transition-colors z-20"
+                      (click)="sharePost(post, $event)" title="Chia sẻ">
+                <span class="material-symbols-outlined text-sm">share</span>
+              </button>
+              <!-- Save/Bookmark -->
+              <button class="flex items-center gap-1 transition-colors z-20"
+                      [class.text-primary]="isPostSaved(post.id)"
+                      [class.text-on-surface-variant]="!isPostSaved(post.id)"
+                      (click)="toggleSave(post, $event)"
+                      [title]="isPostSaved(post.id) ? 'Bỏ lưu' : 'Lưu bài viết'">
+                <span class="material-symbols-outlined text-sm" [style.font-variation-settings]="isPostSaved(post.id) ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
+              </button>
+              <!-- Edit -->
+              <button *ngIf="isLoggedIn && currentUser?.username === post.author?.username"
+                      class="flex items-center gap-1 hover:text-primary text-on-surface-variant transition-colors z-20"
+                      [routerLink]="['/create-post']" [queryParams]="{edit: post.id}"
+                      (click)="$event.stopPropagation()" title="Sửa bài viết">
+                <span class="material-symbols-outlined text-sm">edit</span>
+              </button>
+              <button *ngIf="isLoggedIn && (currentUser?.username === post.author?.username || currentUser?.roles?.includes('ROLE_ADMIN'))"
+                      class="flex items-center gap-1 text-error hover:text-error/80 transition-colors z-20"
+                      (click)="deletePost(post, $event)">
+                <span class="material-symbols-outlined text-sm">delete</span> Xóa
+              </button>
             </div>
           </div>
         </div>
@@ -83,11 +108,11 @@
   <div class="space-y-12">
     <!-- Hot Communities (equivalent to Top Contributors visually) -->
     <section class="bg-surface-container-low/50 p-8 rounded-3xl outline outline-1 outline-variant/15">
-      <h3 class="text-xl font-bold font-headline text-on-surface mb-6">Hot Communities</h3>
-      <div *ngIf="hotCommunities.length === 0" class="text-xs text-on-surface-variant">Loading...</div>
+      <h3 class="text-xl font-bold font-headline text-on-surface mb-6">Cộng đồng nổi bật</h3>
+      <div *ngIf="hotCommunities.length === 0" class="text-xs text-on-surface-variant">Đang tải...</div>
       
       <div class="space-y-6">
-        <div class="flex flex-col gap-2 group cursor-pointer" *ngFor="let comm of hotCommunities; let i = index" [routerLink]="['/search']" [queryParams]="{ q: comm.name }">
+        <div class="flex flex-col gap-2 group cursor-pointer" *ngFor="let comm of hotCommunities; let i = index" [routerLink]="['/r', comm.name]">
           <div class="flex items-center gap-3">
             <div class="relative">
               <div class="w-10 h-10 rounded-full border-2 border-primary/20 bg-surface flex items-center justify-center font-headline font-bold text-primary text-xl">
@@ -106,11 +131,11 @@
     <!-- Tech News Events -->
     <section>
       <div class="flex justify-between items-center mb-6 px-1">
-        <h3 class="text-xl font-bold font-headline text-on-surface">Tech Signals</h3>
+        <h3 class="text-xl font-bold font-headline text-on-surface">Tin tức công nghệ</h3>
         <span class="material-symbols-outlined text-primary cursor-pointer hover:rotate-90 transition-transform duration-500">rss_feed</span>
       </div>
       
-      <div *ngIf="loadingNews" class="text-xs text-on-surface-variant mb-6 font-medium">Fetching signals...</div>
+      <div *ngIf="loadingNews" class="text-xs text-on-surface-variant mb-6 font-medium">Đang tải tin tức...</div>
 
       <div class="space-y-4" *ngIf="!loadingNews && techNews.length > 0">
         <a [href]="news.url" target="_blank" class="p-4 rounded-2xl bg-surface-container-lowest outline outline-1 outline-variant/15 flex gap-4 hover:shadow-lg transition-all group" *ngFor="let news of techNews">
@@ -120,7 +145,7 @@
           <div class="flex flex-col justify-center">
             <h4 class="font-bold text-sm text-on-surface leading-tight mb-1 group-hover:text-primary transition-colors line-clamp-2">{{ news.title }}</h4>
             <p class="text-[10px] text-on-surface-variant flex items-center gap-1 font-medium text-uppercase">
-               Score: {{ news.score }}
+               Điểm: {{ news.score }}
             </p>
           </div>
         </a>
@@ -130,11 +155,11 @@
     <!-- Newsletter Glass Card (Optional placeholder) -->
     <div class="p-8 rounded-3xl kinetic-gradient text-white shadow-2xl shadow-primary/30 relative overflow-hidden hidden xl:block">
       <div class="relative z-10">
-        <h3 class="text-xl font-bold font-headline mb-2">Weekly Briefing</h3>
-        <p class="text-xs opacity-90 mb-5 font-medium">No noise. Just high-density technical analysis delivered weekly.</p>
+        <h3 class="text-xl font-bold font-headline mb-2">Bản tin hàng tuần</h3>
+        <p class="text-xs opacity-90 mb-5 font-medium">Tóm tắt các tin tức nổi bật trong tuần.</p>
         <div class="flex flex-col gap-3">
-          <input class="bg-white/10 border-none text-white placeholder:text-white/60 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-white/30" placeholder="Email address" type="email"/>
-          <button class="bg-white text-primary font-bold py-3 rounded-xl hover:bg-opacity-90 transition-all text-sm shadow-lg">Subscribe</button>
+          <input class="bg-white/10 border-none text-white placeholder:text-white/60 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-white/30" placeholder="Địa chỉ email" type="email"/>
+          <button class="bg-white text-primary font-bold py-3 rounded-xl hover:bg-opacity-90 transition-all text-sm shadow-lg">Đăng ký</button>
         </div>
       </div>
       <span class="material-symbols-outlined absolute -bottom-8 -right-8 text-[160px] opacity-10 rotate-12">terminal</span>

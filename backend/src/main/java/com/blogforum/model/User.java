@@ -79,4 +79,26 @@ public class User {
     @Column(name = "tag")
     @Builder.Default
     private java.util.List<String> tags = new java.util.ArrayList<>();
+
+    @Builder.Default
+    private boolean isLocked = false;
+
+    // Telegram Chat ID để nhận thông báo cá nhân
+    private String telegramChatId;
+
+    // Token ngắn hạn cho luồng liên kết tự động (hết hạn sau 10 phút)
+    @JsonIgnore
+    private String telegramLinkToken;
+
+    @JsonIgnore
+    private LocalDateTime telegramLinkTokenExpiry;
+
+    // Bài viết đã lưu (bookmark)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_saved_posts",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "post_id"))
+    @JsonIgnore
+    @Builder.Default
+    private Set<Post> savedPosts = new HashSet<>();
 }

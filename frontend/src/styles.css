@@ -45,3 +45,28 @@ body {
     grid-template-columns: repeat(12, 1fr);
     gap: 2rem;
 }
+
+/* ===== QUILL EDITOR GLOBAL OVERRIDE ===== */
+/* Đảm bảo màu chữ luôn hiển thị rõ trong Quill editor */
+.ql-editor {
+    color: #0f1a1c !important;
+    font-size: 16px !important;
+    line-height: 1.75 !important;
+}
+
+.ql-editor p,
+.ql-editor li,
+.ql-editor h1, .ql-editor h2, .ql-editor h3,
+.ql-editor blockquote,
+.ql-editor pre {
+    color: #0f1a1c !important;
+}
+
+.ql-editor.ql-blank::before {
+    color: #82959b !important;
+    font-style: normal !important;
+}
+
+.ql-container {
+    font-family: 'Inter', sans-serif !important;
+}

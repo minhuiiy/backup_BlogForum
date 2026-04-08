@@ -26,6 +26,9 @@ public class NotificationService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TelegramService telegramService;
+
     @Transactional
     public void createNotification(String recipientUsername, String actorUsername, ENotificationType type, String content, Post post, Comment comment) {
         if (recipientUsername.equals(actorUsername)) {
@@ -56,6 +59,29 @@ public class NotificationService {
                 ",\"actor\":\"" + actorUsername + "\"" +
                 ",\"type\":\"" + type.name() + "\"" +
                 "}");
+
+        // ============ Gửi thông báo Telegram nếu người nhận đã liên kết =============
+        String recipientChatId = recipient.getTelegramChatId();
+        if (recipientChatId != null && !recipientChatId.isBlank()) {
+            switch (type) {
+                case COMMENT -> {
+                    boolean isReply = (comment != null && comment.getParent() != null);
+                    String postTitle = post != null ? post.getTitle() : "bài viết";
+                    Long postId = post != null ? post.getId() : null;
+                    String commentText = comment != null ? comment.getContent() : content;
+                    telegramService.notifyNewComment(recipientChatId, actorUsername, postTitle, postId, commentText, isReply);
+                }
+                case LIKE -> {
+                    String postTitle = post != null ? post.getTitle() : "bài viết";
+                    Long postId = post != null ? post.getId() : null;
+                    telegramService.notifyNewLike(recipientChatId, actorUsername, postTitle, postId);
+                }
+                case FOLLOW -> {
+                    telegramService.notifyNewFollower(recipientChatId, actorUsername);
+                }
+                default -> {} // MESSAGE handled separately in ChatService
+            }
+        }
     }
 
     public List<Notification> getUnreadNotificationsForUser(String username) {

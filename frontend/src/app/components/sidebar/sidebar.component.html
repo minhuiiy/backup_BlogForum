@@ -6,7 +6,7 @@
     <!-- For mobile, we want a close button instead of "Navigation" title -->
     <div class="flex items-center gap-3">
       <div>
-        <div class="text-lg font-bold text-on-surface font-headline">Navigation</div>
+        <div class="text-lg font-bold text-on-surface font-headline">Điều hướng</div>
       </div>
     </div>
     <button class="text-on-surface-variant hover:text-on-surface transition-colors" (click)="sidebarService.toggle()">
@@ -15,36 +15,42 @@
   </div>
 
   <div class="px-6 mb-8 hidden lg:block">
-    <h3 class="text-lg font-bold font-headline text-on-surface">Navigation</h3>
-    <p class="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant/70 mt-1">Browse Categories</p>
+    <h3 class="text-lg font-bold font-headline text-on-surface">Điều hướng</h3>
+    <p class="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant/70 mt-1">Duyệt danh mục</p>
   </div>
 
   <nav class="flex-1 overflow-y-auto overflow-x-hidden flex flex-col">
     <!-- Basic links -->
     <a routerLink="/" routerLinkActive="bg-white text-primary rounded-r-full shadow-sm font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer">
       <span class="material-symbols-outlined text-[20px]">home</span>
-      <span class="text-sm font-medium">Home</span>
+      <span class="text-sm font-medium">Trang chủ</span>
     </a>
     
     <a routerLink="/popular" routerLinkActive="bg-white text-primary rounded-r-full shadow-sm font-semibold" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer">
       <span class="material-symbols-outlined text-[20px]">trending_up</span>
-      <span class="text-sm font-medium">Popular</span>
+      <span class="text-sm font-medium">Nổi bật</span>
     </a>
     
     <a routerLink="/news" routerLinkActive="bg-white text-primary rounded-r-full shadow-sm font-semibold" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer">
       <span class="material-symbols-outlined text-[20px]">newspaper</span>
-      <span class="text-sm font-medium">News</span>
+      <span class="text-sm font-medium">Tin tức</span>
     </a>
     
     <a routerLink="/explore" routerLinkActive="bg-white text-primary rounded-r-full shadow-sm font-semibold" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer">
       <span class="material-symbols-outlined text-[20px]">explore</span>
-      <span class="text-sm font-medium">Explore Forum</span>
+      <span class="text-sm font-medium">Khám phá diễn đàn</span>
+    </a>
+
+    <!-- Admin Link -->
+    <a *ngIf="isAdmin" routerLink="/admin" routerLinkActive="bg-white text-error rounded-r-full shadow-sm font-semibold" class="flex items-center gap-3 px-6 py-3 text-error/80 hover:text-error hover:bg-white/50 rounded-r-full transition-all duration-200 cursor-pointer mt-2">
+      <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+      <span class="text-sm font-bold">Quản trị viên</span>
     </a>
 
     <!-- User Communities -->
     <div class="mt-8 mb-2">
       <a class="flex items-center justify-between px-6 py-2 text-primary text-[10px] tracking-widest font-bold uppercase cursor-pointer hover:text-primary-dim transition-colors" (click)="toggleCommunities = !toggleCommunities">
-        <span>Your Communities</span>
+        <span>Cộng đồng của bạn</span>
         <span class="material-symbols-outlined text-sm duration-200" [class.rotate-180]="toggleCommunities">expand_more</span>
       </a>
       
@@ -56,7 +62,7 @@
           </a>
         </div>
         <div *ngIf="(!joinedCommunities || joinedCommunities.length === 0)" class="px-6 py-3 text-xs text-on-surface-variant/70 font-medium">
-          Not joined any yet.
+          Chưa tham gia cộng đồng nào.
         </div>
       </div>
     </div>
@@ -64,11 +70,11 @@
 
   <div class="mt-auto px-6 py-8 border-t border-outline-variant/10">
     <button routerLink="/create-community" class="w-full py-3 flex items-center justify-center gap-2 rounded-xl border border-primary/20 text-primary font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm bg-white/50">
-      <span class="material-symbols-outlined text-lg">add</span> Start Community
+      <span class="material-symbols-outlined text-lg">add</span> Tạo cộng đồng
     </button>
     <div class="mt-6 flex flex-col gap-2 text-[10px] font-medium text-on-surface-variant/60 uppercase tracking-widest">
-      <a href="#" class="hover:text-primary transition-colors">About</a>
-      <a href="#" class="hover:text-primary transition-colors">Privacy & Terms</a>
+      <a href="#" class="hover:text-primary transition-colors">Giới thiệu</a>
+      <a href="#" class="hover:text-primary transition-colors">Quy định & Điều khoản</a>
     </div>
   </div>
 </aside>

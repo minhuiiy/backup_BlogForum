@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { TokenStorageService } from './token-storage.service';
@@ -13,7 +13,7 @@ export class WebSocketService {
   public notifications = new Subject<string>();
   public chatMessages = new Subject<any>();
 
-  constructor(private tokenStorage: TokenStorageService) {
+  constructor(private tokenStorage: TokenStorageService, private zone: NgZone) {
     this.stompClient = new Client({
       webSocketFactory: () => new SockJS(environment.wsUrl),
       reconnectDelay: 5000,
@@ -27,15 +27,15 @@ export class WebSocketService {
       const user = this.tokenStorage.getUser();
       if (user && user.username) {
         this.stompClient.subscribe(`/topic/notifications/${user.username}`, (message) => {
-          this.notifications.next(message.body);
+          this.zone.run(() => this.notifications.next(message.body));
         });
         this.stompClient.subscribe(`/topic/chat/${user.username}`, (message) => {
-          this.chatMessages.next(JSON.parse(message.body));
+          this.zone.run(() => this.chatMessages.next(JSON.parse(message.body)));
         });
       }
       
       this.stompClient.subscribe('/topic/public', (message) => {
-        this.notifications.next(message.body);
+        this.zone.run(() => this.notifications.next(message.body));
       });
     };
 

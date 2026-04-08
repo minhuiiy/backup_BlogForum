@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import com.blogforum.repository.FollowRepository;
 
 @Service
 public class ChatService {
@@ -22,7 +24,18 @@ public class ChatService {
     private UserRepository userRepository;
 
     @Autowired
+    private FollowRepository followRepository;
+
+    @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private TelegramService telegramService;
+
+    // Anti-spam: lưu thời điểm gửi Telegram notification cuối cùng cho mỗi cặp (sender->receiver)
+    // Key: "senderUsername->receiverUsername", Value: timestamp
+    private final java.util.concurrent.ConcurrentHashMap<String, Long> lastTelegramNotifyTime = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final long TELEGRAM_NOTIFY_COOLDOWN_MS = 5 * 60 * 1000; // 5 phút
 
     @Transactional
     public ChatMessage sendMessage(String senderUsername, ChatRequest request) {
@@ -41,6 +54,19 @@ public class ChatService {
         // STOMP WebSocket broadcast
         messagingTemplate.convertAndSend("/topic/chat/" + receiver.getUsername(), savedMessage);
         messagingTemplate.convertAndSend("/topic/chat/" + sender.getUsername(), savedMessage);
+
+        // ============ Telegram notification khi có tin nhắn mới =============
+        String receiverChatId = receiver.getTelegramChatId();
+        if (receiverChatId != null && !receiverChatId.isBlank()) {
+            // Anti-spam: chỉ gửi Telegram tối đa 1 lần / 5 phút cho cùng 1 sender
+            String spamKey = senderUsername + "->" + receiver.getUsername();
+            long now = System.currentTimeMillis();
+            Long lastNotify = lastTelegramNotifyTime.get(spamKey);
+            if (lastNotify == null || (now - lastNotify) > TELEGRAM_NOTIFY_COOLDOWN_MS) {
+                lastTelegramNotifyTime.put(spamKey, now);
+                telegramService.notifyNewChatMessage(receiverChatId, senderUsername, request.getContent());
+            }
+        }
 
         return savedMessage;
     }
@@ -63,5 +89,14 @@ public class ChatService {
                 chatMessageRepository.save(msg);
             }
         }
+    }
+
+    public List<User> getMessageRequests(String currentUsername) {
+        User receiver = userRepository.findByUsername(currentUsername).orElseThrow();
+        List<User> senders = chatMessageRepository.findDistinctSendersByReceiver(receiver);
+        
+        return senders.stream()
+            .filter(sender -> !followRepository.existsByFollowerAndFollowing(receiver, sender))
+            .collect(Collectors.toList());
     }
 }

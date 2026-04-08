@@ -24,6 +24,14 @@ export class LoginComponent implements OnInit {
   isLoginFailed = false;
   errorMessage = '';
 
+  /** Width của nút Google tự động theo kích thước màn hình */
+  get googleBtnWidth(): number {
+    const w = window.innerWidth;
+    if (w < 380) return 260;
+    if (w < 480) return 300;
+    return 360;
+  }
+
   constructor(
     private authService: AuthService,
     private tokenStorage: TokenStorageService,
@@ -48,7 +56,7 @@ export class LoginComponent implements OnInit {
             this.isLoginFailed = false;
             this.isLoggedIn = true;
             this.close();
-            
+
             if (data.onboardingCompleted === false) {
               this.onboardingModalService.open();
             } else {
@@ -67,6 +75,14 @@ export class LoginComponent implements OnInit {
 
   close(): void {
     this.authModalService.close();
+  }
+
+  closeAndNavigateToRegister(): void {
+    this.authModalService.close();
+    // Use timeout to allow modal animation teardown
+    setTimeout(() => {
+      this.router.navigate(['/register']);
+    }, 50);
   }
 
   onSubmit(): void {

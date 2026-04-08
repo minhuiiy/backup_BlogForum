@@ -27,7 +27,7 @@ public class Post {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String content;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -38,9 +38,8 @@ public class Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "post_tags", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonIgnore
     @Builder.Default
     private Set<Tag> tags = new HashSet<>();
 
@@ -58,6 +57,10 @@ public class Post {
 
     @Formula("(select count(*) from comments c where c.post_id = id)")
     private int commentCount;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private EPostStatus status = EPostStatus.APPROVED;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -18,7 +18,10 @@ export const appConfig: ApplicationConfig = {
         providers: [
           {
             id: GoogleLoginProvider.PROVIDER_ID,
-            provider: new GoogleLoginProvider('131278915848-0l7blp4v8bv7m9fkvs4n89r74767k7ll.apps.googleusercontent.com')
+            provider: new GoogleLoginProvider('131278915848-0l7blp4v8bv7m9fkvs4n89r74767k7ll.apps.googleusercontent.com', {
+              oneTapEnabled: false,
+              prompt: 'consent'
+            })
           }
         ],
         onError: (err) => {

@@ -21,6 +21,22 @@ public class TagController {
         return ResponseEntity.ok(tagService.getAllTags());
     }
 
+    /** Tìm kiếm tag theo từ khóa - dùng cho autocomplete */
+    @GetMapping("/search")
+    public ResponseEntity<List<Tag>> searchTags(@RequestParam String q) {
+        if (q == null || q.trim().length() < 1) return ResponseEntity.ok(List.of());
+        return ResponseEntity.ok(tagService.searchByKeyword(q.trim()));
+    }
+
+    /** Tìm hoặc tạo tag - user thường dùng khi đăng bài */
+    @PostMapping("/find-or-create")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Tag> findOrCreate(@RequestBody java.util.Map<String, String> body) {
+        String name = body.get("name");
+        if (name == null || name.isBlank()) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(tagService.findOrCreateByName(name));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Tag> getTagById(@PathVariable Long id) {
         return tagService.getTagById(id)

@@ -25,9 +25,19 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
+    public Tag findOrCreateByName(String name) {
+        String normalized = name.trim().toLowerCase().replaceAll("\\s+", "-");
+        return tagRepository.findByName(normalized)
+                .orElseGet(() -> tagRepository.save(new Tag(null, normalized)));
+    }
+
+    public List<Tag> searchByKeyword(String keyword) {
+        return tagRepository.findByNameContainingIgnoreCase(keyword);
+    }
+
     public Tag updateTag(Long id, Tag tagDetails) {
         Tag tag = tagRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Tag not found"));
+                .orElseThrow(() -> new RuntimeException("Tag not found"));
         tag.setName(tagDetails.getName());
         return tagRepository.save(tag);
     }

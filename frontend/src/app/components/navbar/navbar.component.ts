@@ -26,6 +26,7 @@ export class NavbarComponent implements OnInit {
   displayName?: string;
   isDropdownOpen = false;
   isNotifDropdownOpen = false;
+  isMobileMenuOpen = false;
   searchQuery: string = '';
   
   notifications: Notification[] = [];
@@ -45,6 +46,13 @@ export class NavbarComponent implements OnInit {
   toggleDropdown(event: Event): void {
     event.stopPropagation();
     this.isDropdownOpen = !this.isDropdownOpen;
+    this.isNotifDropdownOpen = false;
+    this.isMobileMenuOpen = false;
+  }
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    this.isDropdownOpen = false;
     this.isNotifDropdownOpen = false;
   }
 

@@ -30,7 +30,7 @@
               <div>
                 <h1 class="text-3xl font-bold font-headline text-on-surface flex items-center gap-2">
                   <span *ngIf="!isEditingName">{{ userProfile?.displayName || username }}</span>
-                  <input *ngIf="isEditingName" type="text" [(ngModel)]="editData.displayName" class="bg-surface-container focus:bg-surface-container-high rounded px-2 py-1 outline-none font-bold text-2xl w-48 transition-colors" (keyup.enter)="saveName()" (blur)="saveName()">
+                  <input id="displayNameInput" *ngIf="isEditingName" type="text" [(ngModel)]="editData.displayName" class="bg-surface-container focus:bg-surface-container-high rounded px-2 py-1 outline-none font-bold text-2xl w-48 transition-colors border-2 border-primary" (keyup.enter)="saveName()" (blur)="saveName()">
                   
                   <button *ngIf="!isEditingName && isOwnProfile" (click)="startEditName()" class="w-8 h-8 rounded hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors">
                     <span class="material-symbols-outlined text-sm">edit</span>
@@ -76,90 +76,237 @@
         </a>
       </div>
 
-      <!-- Loading State -->
-      <div *ngIf="loadingFeed && (activeTab === 'posts' || activeTab === 'overview')" class="flex flex-col gap-6 py-8">
-        <div *ngFor="let i of [1,2,3]" class="bg-surface-container-lowest p-6 rounded-3xl ghost-border animate-pulse h-40"></div>
+      <!-- ====== TAB CONTENT ====== -->
+
+      <!-- Loading -->
+      <div *ngIf="(loadingFeed && (activeTab === 'posts' || activeTab === 'overview' || activeTab === 'upvoted'))" class="flex flex-col gap-4 py-6">
+        <div *ngFor="let i of [1,2,3]" class="bg-surface-container-lowest p-6 rounded-3xl ghost-border animate-pulse h-36"></div>
       </div>
 
-      <!-- Empty State -->
-      <div class="bg-surface-container-lowest p-12 rounded-3xl ghost-border flex flex-col items-center text-center py-20" *ngIf="!loadingFeed && posts.length === 0 && (activeTab === 'posts' || activeTab === 'overview')">
-        <span class="material-symbols-outlined text-6xl text-outline-variant/30 mb-4">post_add</span>
-        <h2 class="text-xl font-bold font-headline text-on-surface mb-2">Chưa có bài đăng nào</h2>
-        <p class="text-on-surface-variant font-medium mb-6 max-w-sm">Mọi hoạt động thảo luận của người dùng này sẽ xuất hiện tại đây.</p>
-        <a *ngIf="isOwnProfile" routerLink="/create-post" class="kinetic-gradient text-white font-bold px-8 py-3 rounded-full shadow-md text-sm hover:scale-95 transition-transform">Tạo bài đăng đầu tiên</a>
-      </div>
+      <!-- ===== TAB: POSTS / OVERVIEW ===== -->
+      <div class="space-y-6" *ngIf="!loadingFeed && (activeTab === 'posts' || activeTab === 'overview')">
+        <div *ngIf="posts.length === 0" class="bg-surface-container-lowest p-12 rounded-3xl ghost-border flex flex-col items-center text-center py-20">
+          <span class="material-symbols-outlined text-6xl text-outline-variant/30 mb-4">post_add</span>
+          <h2 class="text-xl font-bold font-headline text-on-surface mb-2">Chưa có bài đăng nào</h2>
+          <a *ngIf="isOwnProfile" routerLink="/create-post" class="kinetic-gradient text-white font-bold px-8 py-3 rounded-full shadow-md text-sm">Tạo bài đăng đầu tiên</a>
+        </div>
 
-      <!-- Posts List -->
-      <div class="space-y-6" *ngIf="!loadingFeed && posts.length > 0 && (activeTab === 'posts' || activeTab === 'overview')">
         <div class="bg-surface-container-lowest p-6 rounded-3xl ghost-border hover:shadow-md transition-shadow group/post" *ngFor="let post of posts">
-          
           <div class="flex items-center gap-2 mb-4 text-[10px] uppercase font-bold tracking-widest text-on-surface-variant">
-            <ng-container *ngIf="post.category">
-              <span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded max-w-[150px] truncate">
-                {{ post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name }}
-              </span>
-            </ng-container>
-            <ng-container *ngIf="!post.category">
-               <span class="bg-surface-container-high text-on-surface-variant px-2 py-1 rounded">Tường cá nhân</span>
-            </ng-container>
-            <span>•</span>
-            <div class="flex items-center gap-1.5">
-               <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" class="w-4 h-4 rounded-full object-cover border border-outline-variant/10">
-               <span class="lowercase tracking-normal font-medium text-xs">&commat;{{ post.author?.username }}</span>
-            </div>
-            <span>•</span>
-            <span>{{ post.createdAt | timeAgo }}</span>
+            <span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded" *ngIf="post.category">{{ post.category.name }}</span>
+            <span class="bg-surface-container-high text-on-surface-variant px-2 py-1 rounded" *ngIf="!post.category">Tường cá nhân</span>
+            <span>•</span><span>{{ post.createdAt | timeAgo }}</span>
           </div>
-          
-          <a [routerLink]="['/post', post.id]" class="block group-hover/post:text-primary transition-colors">
-            <h3 class="text-xl font-bold font-headline text-on-surface mb-3 line-clamp-2 leading-snug">{{ post.title }}</h3>
+          <a [routerLink]="['/post', post.id]" class="block hover:text-primary transition-colors">
+            <h3 class="text-xl font-bold font-headline text-on-surface mb-3 line-clamp-2">{{ post.title }}</h3>
           </a>
-          
-          <div class="relative max-h-32 overflow-hidden mb-4">
-            <div [innerHTML]="post.strippedContent | safeHtml" class="prose prose-sm prose-slate max-w-none text-on-surface-variant leading-relaxed"></div>
-            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-surface-container-lowest to-transparent pointer-events-none"></div>
+          <div class="relative max-h-24 overflow-hidden mb-3">
+            <div [innerHTML]="post.strippedContent | safeHtml" class="prose prose-sm max-w-none text-on-surface leading-relaxed"></div>
+            <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-surface-container-lowest to-transparent pointer-events-none"></div>
           </div>
-
-          <!-- Post Media Section (Carousel & Single Image) -->
-          <div class="relative rounded-xl overflow-hidden mt-4 group/carousel bg-surface-container-low" *ngIf="post.extractedImages && post.extractedImages.length > 1">
-            <button class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all z-10 invisible group-hover/carousel:visible" [class.opacity-30]="post.currentImageIndex === 0" (click)="prevImage($event, post)">
-              <span class="material-symbols-outlined text-[18px]">chevron_left</span>
-            </button>
-            
-            <div class="w-full flex items-center justify-center bg-black/5" style="height: 300px;">
-              <img [src]="post.extractedImages[post.currentImageIndex]" class="max-w-full max-h-full object-contain cursor-zoom-in" loading="lazy" (click)="openImageOverlay(post.extractedImages[post.currentImageIndex])">
-            </div>
-            
-            <button class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all z-10 invisible group-hover/carousel:visible" [class.opacity-30]="post.currentImageIndex === post.extractedImages.length - 1" (click)="nextImage($event, post)">
-              <span class="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-            
-            <div class="absolute bottom-3 inset-x-0 flex justify-center gap-1.5 z-10">
-              <span *ngFor="let src of post.extractedImages; let idx = index" class="w-1.5 h-1.5 rounded-full transition-colors duration-300" [ngClass]="idx === post.currentImageIndex ? 'bg-white shadow' : 'bg-white/40'"></span>
-            </div>
-          </div>
-          
-          <div class="mt-4 rounded-xl overflow-hidden bg-surface-container-low flex items-center justify-center" *ngIf="post.extractedImages && post.extractedImages.length === 1" style="height: 300px;">
-             <img [src]="post.extractedImages[0]" class="max-w-full max-h-full object-contain cursor-zoom-in" loading="lazy" (click)="openImageOverlay(post.extractedImages[0])">
-          </div>
-          
-          <!-- Post Footer Actions -->
-          <div class="flex flex-wrap gap-4 pt-6 mt-4 border-t border-outline-variant/10">
-            <button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-primary/10 hover:text-primary text-on-surface-variant transition-colors text-xs font-bold uppercase tracking-widest" [class.bg-primary/10]="isPostLiked(post.id)" [class.text-primary]="isPostLiked(post.id)" (click)="votePost(post)">
+          <div class="flex flex-wrap gap-3 pt-4 mt-2 border-t border-outline-variant/10">
+            <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-primary/10 hover:text-primary text-on-surface-variant text-xs font-bold uppercase tracking-widest transition-colors" [class.text-primary]="isPostLiked(post.id)" (click)="votePost(post)">
               <span class="material-symbols-outlined text-[16px]">arrow_upward</span> {{ post.likes }}
             </button>
-            
-            <a [routerLink]="['/post', post.id]" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors text-xs font-bold uppercase tracking-widest">
-              <span class="material-symbols-outlined text-[16px]">chat_bubble</span> {{ post.commentCount > 0 ? post.commentCount : 'Bình luận' }}
+            <a [routerLink]="['/post', post.id]" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant text-xs font-bold uppercase tracking-widest">
+              <span class="material-symbols-outlined text-[16px]">chat_bubble</span> {{ post.commentCount || 0 }}
             </a>
-            
-            <button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors text-xs font-bold uppercase tracking-widest">
-              <span class="material-symbols-outlined text-[16px]">share</span> Chia sẻ
+            <button *ngIf="isOwnProfile" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-error/10 hover:bg-error/20 text-error text-xs font-bold uppercase tracking-widest ml-auto" (click)="deletePost(post, $event)">
+              <span class="material-symbols-outlined text-[16px]">delete</span>
             </button>
           </div>
         </div>
       </div>
-      
+
+      <!-- ===== TAB: COMMENTS ===== -->
+      <div *ngIf="activeTab === 'comments'" class="space-y-4">
+        <div *ngIf="loadingComments" class="flex flex-col gap-4">
+          <div *ngFor="let i of [1,2,3]" class="bg-surface-container-lowest p-5 rounded-2xl animate-pulse h-24"></div>
+        </div>
+        <div *ngIf="!loadingComments && userComments.length === 0" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">chat_bubble</span>
+          <p class="font-bold">Chưa có bình luận nào</p>
+        </div>
+        <a *ngFor="let c of userComments" [routerLink]="['/post', c.post?.id]" [fragment]="'comment-' + c.id"
+           class="flex gap-4 p-5 bg-surface-container-lowest rounded-2xl ghost-border hover:shadow-md transition-shadow cursor-pointer">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-[18px]">chat_bubble</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-widest">
+              Bình luận trong: <span class="text-primary">{{ c.post?.title }}</span>
+            </p>
+            <p class="text-sm text-on-surface leading-relaxed line-clamp-3">{{ c.content }}</p>
+            <p class="text-[10px] text-on-surface-variant font-medium mt-2">{{ c.createdAt | timeAgo }}</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- ===== TAB: SAVED ===== -->
+      <div *ngIf="activeTab === 'saved'" class="space-y-4">
+        <div *ngIf="!isOwnProfile" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">lock</span>
+          <p class="font-bold">Chỉ chủ nhân mới xem được bài đã lưu</p>
+        </div>
+        <div *ngIf="isOwnProfile && loadingSaved" class="flex flex-col gap-4">
+          <div *ngFor="let i of [1,2]" class="bg-surface-container-lowest p-5 rounded-2xl animate-pulse h-28"></div>
+        </div>
+        <div *ngIf="isOwnProfile && !loadingSaved && savedPosts.length === 0" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">bookmark</span>
+          <p class="font-bold">Bạn chưa lưu bài viết nào</p>
+          <p class="text-sm mt-1">Nhấn icon bookmark trong bài viết để lưu</p>
+        </div>
+        <div *ngFor="let post of savedPosts" class="bg-surface-container-lowest p-5 rounded-2xl ghost-border hover:shadow-md transition-shadow">
+          <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">{{ post.category?.name || 'Tường cá nhân' }}</p>
+          <a [routerLink]="['/post', post.id]" class="text-lg font-bold text-on-surface hover:text-primary transition-colors block mb-2">{{ post.title }}</a>
+          <p class="text-xs text-on-surface-variant">{{ post.createdAt | timeAgo }} • {{ post.likes }} thích</p>
+        </div>
+      </div>
+
+      <!-- ===== TAB: HISTORY ===== -->
+      <div *ngIf="activeTab === 'history'" class="space-y-3">
+        <div class="flex justify-between items-center mb-2">
+          <p class="text-sm text-on-surface-variant font-medium">{{ historyPosts.length }} bài viết đã xem</p>
+          <button *ngIf="historyPosts.length > 0" class="text-xs font-bold text-error hover:underline" (click)="clearHistory()">Xóa lịch sử</button>
+        </div>
+        <div *ngIf="historyPosts.length === 0" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">history</span>
+          <p class="font-bold">Lịch sử trống</p>
+          <p class="text-sm mt-1">Các bài bạn đã xem sẽ xuất hiện tại đây</p>
+        </div>
+        <a *ngFor="let post of historyPosts" [routerLink]="['/post', post.id]"
+           class="flex gap-4 p-4 bg-surface-container-lowest rounded-2xl ghost-border hover:shadow-md transition-shadow items-start">
+          <span class="material-symbols-outlined text-on-surface-variant text-[20px] mt-0.5 flex-shrink-0">history</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold text-on-surface line-clamp-2 hover:text-primary transition-colors">{{ post.title }}</p>
+            <p class="text-[10px] text-on-surface-variant font-medium mt-1">Xem lúc {{ post.viewedAt | timeAgo }}</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- ===== TAB: HIDDEN (BÍ ẨN) ===== -->
+      <div *ngIf="activeTab === 'hidden'" class="p-12 text-center bg-surface-container-lowest rounded-3xl ghost-border">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">visibility_off</span>
+        <h3 class="text-xl font-bold font-headline text-on-surface mb-2">Chế độ Bí ẩn</h3>
+        <p class="text-sm text-on-surface-variant max-w-sm mx-auto mb-6">Khi bạn ẩn một bài viết, nó sẽ không xuất hiện trong feed của bạn nữa. Tính năng này đang được phát triển.</p>
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest">
+          <span class="material-symbols-outlined text-[16px]">construction</span> Sắp ra mắt
+        </div>
+      </div>
+
+      <!-- ===== TAB: UPVOTED (ĐÃ THÍCH) ===== -->
+      <div *ngIf="activeTab === 'upvoted'" class="space-y-4">
+        <div *ngIf="!isOwnProfile" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">lock</span>
+          <p class="font-bold">Thông tin riêng tư</p>
+        </div>
+        <ng-container *ngIf="isOwnProfile">
+          <div *ngIf="loadingFeed" class="flex flex-col gap-4">
+            <div *ngFor="let i of [1,2]" class="bg-surface-container-lowest p-5 rounded-2xl animate-pulse h-20"></div>
+          </div>
+          <div *ngIf="!loadingFeed && posts.filter(p => isPostLiked(p.id)).length === 0" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+            <span class="material-symbols-outlined text-5xl opacity-30 mb-3">thumb_up</span>
+            <p class="font-bold">Bạn chưa thích bài nào</p>
+          </div>
+          <a *ngFor="let post of posts" [routerLink]="['/post', post.id]"
+             [class.hidden]="!isPostLiked(post.id)"
+             class="flex gap-4 p-4 bg-surface-container-lowest rounded-2xl ghost-border hover:shadow-md transition-shadow items-start">
+            <span class="material-symbols-outlined text-primary text-[20px] mt-0.5 flex-shrink-0" style="font-variation-settings:'FILL' 1">thumb_up</span>
+            <div>
+              <p class="text-sm font-bold text-on-surface hover:text-primary transition-colors">{{ post.title }}</p>
+              <p class="text-[10px] text-on-surface-variant mt-1">{{ post.likes }} thích • {{ post.createdAt | timeAgo }}</p>
+            </div>
+          </a>
+        </ng-container>
+      </div>
+
+      <!-- ===== TAB: DOWNVOTED (ĐÃ KHÔNG THÍCH) ===== -->
+      <div *ngIf="activeTab === 'downvoted'" class="p-12 text-center bg-surface-container-lowest rounded-3xl ghost-border">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">thumb_down</span>
+        <h3 class="text-xl font-bold font-headline text-on-surface mb-2">Bài đã không thích</h3>
+        <p class="text-sm text-on-surface-variant max-w-sm mx-auto mb-6">Tính năng downvote đang được xây dựng. Hệ thống sẽ tự động điều chỉnh feed để bạn không thấy nội dung tương tự.</p>
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest">
+          <span class="material-symbols-outlined text-[16px]">construction</span> Sắp ra mắt
+        </div>
+      </div>
+
+      <!-- ===== TAB: SETTINGS (CÀI ĐẶT HỒ SƠ) ===== -->
+      <div *ngIf="activeTab === 'settings' && isOwnProfile" class="space-y-6">
+        <div class="bg-surface-container-lowest p-8 rounded-3xl ghost-border">
+          <h3 class="text-lg font-bold font-headline text-on-surface mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[22px]">manage_accounts</span> Chỉnh sửa hồ sơ
+          </h3>
+
+          <div class="space-y-5">
+            <!-- Avatar -->
+            <div class="flex items-center gap-6 pb-5 border-b border-outline-variant/15">
+              <div class="w-20 h-20 rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center flex-shrink-0 relative group cursor-pointer" (click)="fileInput2.click()">
+                <img *ngIf="userProfile?.avatarUrl" [src]="userProfile.avatarUrl" class="w-full h-full object-cover">
+                <span *ngIf="!userProfile?.avatarUrl" class="text-2xl font-bold text-primary uppercase">{{ username.charAt(0) }}</span>
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="material-symbols-outlined text-white">add_a_photo</span>
+                </div>
+              </div>
+              <input #fileInput2 type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+              <div>
+                <p class="font-bold text-on-surface mb-1">Ảnh đại diện</p>
+                <p class="text-xs text-on-surface-variant mb-2">JPG, PNG, GIF — tối đa 5MB</p>
+                <button class="text-xs font-bold text-primary hover:underline" (click)="fileInput2.click()">Thay đổi ảnh</button>
+                <span *ngIf="isUploading" class="ml-3 text-xs text-on-surface-variant">Đang tải...</span>
+              </div>
+            </div>
+
+            <!-- Display Name -->
+            <div>
+              <label class="block text-xs font-bold text-on-surface uppercase tracking-widest mb-2">Tên hiển thị</label>
+              <input type="text" [(ngModel)]="settingsData.displayName"
+                     class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-bold text-on-surface outline-none transition-all"
+                     placeholder="Tên của bạn...">
+            </div>
+
+            <!-- Bio -->
+            <div>
+              <label class="block text-xs font-bold text-on-surface uppercase tracking-widest mb-2">Giới thiệu bản thân</label>
+              <textarea [(ngModel)]="settingsData.bio" rows="4"
+                        class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-medium text-on-surface outline-none transition-all resize-none"
+                        placeholder="Viết vài dòng về bản thân..."></textarea>
+              <p class="text-xs text-on-surface-variant mt-1">{{ settingsData.bio.length || 0 }}/200 ký tự</p>
+            </div>
+
+            <!-- Gender -->
+            <div>
+              <label class="block text-xs font-bold text-on-surface uppercase tracking-widest mb-2">Giới tính</label>
+              <select [(ngModel)]="settingsData.gender"
+                      class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-medium text-on-surface outline-none transition-all">
+                <option value="">Không tiết lộ</option>
+                <option value="male">Nam</option>
+                <option value="female">Nữ</option>
+                <option value="other">Khác</option>
+              </select>
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex items-center gap-4 pt-2">
+              <button class="kinetic-gradient text-white px-8 py-3 rounded-full font-bold text-sm tracking-widest hover:scale-[0.98] transition-transform disabled:opacity-50"
+                      [disabled]="settingsSaving"
+                      (click)="saveSettings()">
+                {{ settingsSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+              </button>
+              <div *ngIf="settingsSaved" class="flex items-center gap-2 text-green-600 text-sm font-bold animate-fade-in">
+                <span class="material-symbols-outlined text-[18px]">check_circle</span> Đã lưu!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings: không phải own profile -->
+      <div *ngIf="activeTab === 'settings' && !isOwnProfile" class="p-12 text-center bg-surface-container-lowest rounded-3xl ghost-border">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">lock</span>
+        <p class="font-bold">Bạn không có quyền xem phần này</p>
+      </div>
+
+
     </div>
 
     <!-- Right Sidebar -->
@@ -226,6 +373,113 @@
              </div>
              <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Telegram Connection Card -->
+      <div *ngIf="isOwnProfile" class="bg-surface-container-lowest rounded-3xl ghost-border overflow-hidden shadow-sm">
+        <!-- Header -->
+        <div class="p-6 flex items-center justify-between cursor-pointer select-none" (click)="showTelegramPanel = !showTelegramPanel">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-md"
+                 [style.background]="'linear-gradient(135deg, #229ED9, #31aee6)'">
+              ✈️
+            </div>
+            <div>
+              <p class="text-sm font-bold text-on-surface">Telegram Thông báo</p>
+              <p class="text-[10px] font-bold uppercase tracking-widest mt-0.5" [ngClass]="telegramLinked ? 'text-green-600' : 'text-on-surface-variant'">
+                {{ telegramLinked ? '● Đã kết nối' : '○ Chưa kết nối' }}
+              </p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-outline-variant transition-transform duration-300" [class.rotate-180]="showTelegramPanel">expand_more</span>
+        </div>
+
+        <!-- Panel Content -->
+        <div *ngIf="showTelegramPanel" class="px-6 pb-6 space-y-4 border-t border-outline-variant/10 pt-5 animate-fade-in">
+
+          <!-- Đã liên kết -->
+          <div *ngIf="telegramLinked" class="space-y-3">
+            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30 rounded-2xl p-4 flex items-start gap-3">
+              <span class="text-green-500 text-xl mt-0.5">✅</span>
+              <div>
+                <p class="text-sm font-bold text-green-700 dark:text-green-400">Đã kết nối thành công!</p>
+                <p class="text-xs text-green-600/80 mt-0.5">Chat ID: <code class="font-mono bg-green-100 dark:bg-green-900/40 px-1 rounded">{{ telegramChatId }}</code></p>
+              </div>
+            </div>
+
+            <!-- Danh sách loại thông báo -->
+            <div class="bg-surface-container rounded-2xl p-3 space-y-2">
+              <p class="text-[10px] font-bold text-on-surface uppercase tracking-widest mb-2">Bạn sẽ nhận thông báo khi:</p>
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">✅</span> Bài viết được duyệt / từ chối
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">💬</span> Có bình luận mới vào bài của bạn
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">↩️</span> Có người trả lời bình luận của bạn
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">❤️</span> Bài viết của bạn được thích
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">🔔</span> Có người theo dõi bạn
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">✉️</span> Có tin nhắn mới (giới hạn 5 phút/lần)
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-2">
+              <button class="flex-1 py-2 bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-1.5" (click)="testTelegramNotification()">
+                <span class="material-symbols-outlined text-[14px]">notifications</span> Gửi Test
+              </button>
+              <button class="flex-1 py-2 bg-error/10 text-error hover:bg-error/20 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors" (click)="unlinkTelegram()">
+                Hủy liên kết
+              </button>
+            </div>
+          </div>
+
+          <!-- Chưa liên kết -->
+          <div *ngIf="!telegramLinked" class="space-y-4">
+
+            <!-- Trạng thái đang chờ liên kết -->
+            <div *ngIf="telegramLinking" class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3 animate-pulse">
+              <span class="text-blue-500 text-xl mt-0.5">🔄</span>
+              <div>
+                <p class="text-sm font-bold text-blue-800">Đang chờ bạn xác nhận trên Telegram...</p>
+                <p class="text-xs text-blue-700 mt-0.5">Hãy nhấn <strong>START</strong> trong cửa sổ Telegram vừa mở.</p>
+                <a *ngIf="telegramLinkUrl" [href]="telegramLinkUrl" target="_blank"
+                   class="inline-flex items-center gap-1 mt-2 text-xs font-bold text-blue-600 underline">
+                  ✈️ Mở lại Telegram nếu chưa mở
+                </a>
+              </div>
+            </div>
+
+            <!-- Nút liên kết 1 click -->
+            <div *ngIf="!telegramLinking" class="space-y-3">
+              <div class="bg-surface-container rounded-2xl p-4">
+                <p class="text-xs font-bold text-on-surface mb-2">Chỉ cần 1 bước:</p>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Nhấn nút bên dưới → Telegram sẽ mở tự động → Nhấn <strong>START</strong> → Xong! 🎉</p>
+              </div>
+
+              <button class="w-full py-3 rounded-xl text-white text-sm font-bold uppercase tracking-widest transition-all hover:opacity-90 shadow-md flex items-center justify-center gap-2"
+                      [style.background]="'linear-gradient(135deg, #229ED9, #31aee6)'"
+                      (click)="startTelegramLinking()">
+                <span class="text-lg">✈️</span> Liên kết Telegram ngay
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Toast message -->
+          <div *ngIf="telegramMessage" class="p-3 rounded-xl text-xs font-bold animate-fade-in"
+               [ngClass]="telegramSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+            {{ telegramMessage }}
+          </div>
         </div>
       </div>
       

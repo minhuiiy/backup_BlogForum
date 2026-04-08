@@ -1,28 +1,28 @@
 <header class="bg-surface-container-lowest docked full-width top-0 sticky z-50 shadow-sm border-b border-outline-variant/10">
-  <nav class="flex justify-between items-center w-full px-8 py-4 max-w-[1440px] mx-auto">
+  <nav class="flex justify-between items-center w-full px-4 sm:px-8 py-3 sm:py-4 max-w-[1440px] mx-auto">
     <!-- Left Side -->
-    <div class="flex items-center gap-12">
-      <a routerLink="/" class="text-2xl font-bold tracking-tight text-[#2c2f31] font-headline cursor-pointer">
+    <div class="flex items-center gap-4 sm:gap-12">
+      <a routerLink="/" class="text-xl sm:text-2xl font-bold tracking-tight text-[#2c2f31] font-headline cursor-pointer">
         BlogForum
       </a>
       <div class="hidden md:flex items-center gap-8">
-        <a routerLink="/" class="text-[#2c2f31]/70 font-medium hover:text-primary transition-colors cursor-pointer" routerLinkActive="text-primary font-bold border-b-2 border-primary pb-1" [routerLinkActiveOptions]="{exact: true}">Home</a>
-        <a routerLink="/explore" class="text-[#2c2f31]/70 font-medium hover:text-primary transition-colors cursor-pointer" routerLinkActive="text-primary font-bold border-b-2 border-primary pb-1">Forum</a>
-        <a routerLink="/popular" class="text-[#2c2f31]/70 font-medium hover:text-primary transition-colors cursor-pointer" routerLinkActive="text-primary font-bold border-b-2 border-primary pb-1">Popular</a>
+        <a routerLink="/" class="text-[#2c2f31]/70 font-medium hover:text-primary transition-colors cursor-pointer" routerLinkActive="text-primary font-bold border-b-2 border-primary pb-1" [routerLinkActiveOptions]="{exact: true}">Trang chủ</a>
+        <a routerLink="/explore" class="text-[#2c2f31]/70 font-medium hover:text-primary transition-colors cursor-pointer" routerLinkActive="text-primary font-bold border-b-2 border-primary pb-1">Diễn đàn</a>
+        <a routerLink="/popular" class="text-[#2c2f31]/70 font-medium hover:text-primary transition-colors cursor-pointer" routerLinkActive="text-primary font-bold border-b-2 border-primary pb-1">Nổi bật</a>
       </div>
     </div>
 
     <!-- Right Side -->
-    <div class="flex items-center gap-6">
+    <div class="flex items-center gap-2 sm:gap-6">
       <div class="relative hidden lg:block bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant/15 flex items-center gap-2 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
         <span class="material-symbols-outlined text-on-surface-variant text-sm">search</span>
-        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" class="bg-transparent border-none focus:outline-none text-sm text-on-surface w-48 placeholder:text-on-surface-variant/60" placeholder="Search insights..."/>
+        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" class="bg-transparent border-none focus:outline-none text-sm text-on-surface w-48 placeholder:text-on-surface-variant/60" placeholder="Tìm kiếm..."/>
       </div>
 
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2 sm:gap-4">
         <ng-container *ngIf="!isLoggedIn">
-          <a routerLink="/register" class="text-on-surface-variant font-medium hover:text-primary cursor-pointer text-sm hidden md:block transition-colors">Download App</a>
-          <button (click)="openLoginModal()" class="kinetic-gradient text-white px-6 py-2 rounded-full font-semibold text-sm hover:scale-95 transition-transform active:scale-100 shadow-sm">Sign In</button>
+          <a routerLink="/register" class="text-on-surface-variant font-medium hover:text-primary cursor-pointer text-sm hidden md:block transition-colors">Đăng ký</a>
+          <button (click)="openLoginModal()" class="kinetic-gradient text-white px-4 sm:px-6 py-2 rounded-full font-semibold text-sm hover:scale-95 transition-transform active:scale-100 shadow-sm">Đăng nhập</button>
         </ng-container>
 
         <ng-container *ngIf="isLoggedIn">
@@ -38,13 +38,13 @@
             <!-- Notif Dropdown -->
             <div *ngIf="isNotifDropdownOpen" (click)="$event.stopPropagation()" class="absolute top-12 right-0 w-80 bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant/15 overflow-hidden z-[60]">
               <div class="flex justify-between items-center p-4 border-b border-outline-variant/15 bg-surface-container-low/50">
-                <span class="font-bold text-sm text-on-surface">Notifications</span>
-                <a href="javascript:void(0)" (click)="markAllNotificationsAsRead()" class="text-xs text-primary font-medium hover:underline">Mark read</a>
+                <span class="font-bold text-sm text-on-surface">Thông báo</span>
+                <a href="javascript:void(0)" (click)="markAllNotificationsAsRead()" class="text-xs text-primary font-medium hover:underline">Đánh dấu đã đọc</a>
               </div>
               <div class="max-h-80 overflow-y-auto">
                 <div *ngIf="notifications.length === 0" class="p-8 text-center text-on-surface-variant/70">
                   <span class="material-symbols-outlined text-4xl mb-3 opacity-50">notifications_paused</span>
-                  <p class="text-sm font-medium">No new notifications</p>
+                  <p class="text-sm font-medium">Chưa có thông báo nào</p>
                 </div>
                 <div *ngFor="let notif of notifications" (click)="markNotificationAsRead(notif)" class="p-4 border-b border-outline-variant/10 cursor-pointer hover:bg-surface-container-low transition-colors flex gap-3" [class.bg-primary/5]="!notif.read">
                   <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center shrink-0">
@@ -60,8 +60,11 @@
             </div>
           </div>
 
-          <!-- Create Post Button -->
-          <a routerLink="/create-post" class="hidden md:flex kinetic-gradient text-white px-6 py-2 rounded-full font-semibold text-sm hover:scale-95 transition-transform active:scale-100 shadow-md shadow-primary/20 items-center justify-center">Create Post</a>
+          <!-- Create Post Button: ẩn trên mobile (có trong hamburger menu) -->
+          <a routerLink="/create-post" class="hidden md:flex kinetic-gradient text-white px-6 py-2 rounded-full font-semibold text-sm hover:scale-95 transition-transform active:scale-100 shadow-md shadow-primary/20 items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[16px]">edit</span>
+            Tạo bài viết
+          </a>
 
           <!-- User Dropdown -->
           <div class="relative">
@@ -84,16 +87,41 @@
                 </div>
               </a>
               
-              <a routerLink="/profile" class="flex items-center gap-3 px-5 py-3 hover:bg-surface-container-low transition-colors text-sm font-medium text-on-surface mt-2">
-                <span class="material-symbols-outlined text-[20px] text-on-surface-variant">settings</span> Settings
+              <a routerLink="/create-post" class="md:hidden flex items-center gap-3 px-5 py-3 hover:bg-surface-container-low transition-colors text-sm font-medium text-on-surface">
+                <span class="material-symbols-outlined text-[20px] text-primary">edit</span> Tạo bài viết
+              </a>
+              <a routerLink="/profile" class="flex items-center gap-3 px-5 py-3 hover:bg-surface-container-low transition-colors text-sm font-medium text-on-surface">
+                <span class="material-symbols-outlined text-[20px] text-on-surface-variant">settings</span> Cài đặt
               </a>
               <button (click)="logout()" class="w-full flex items-center gap-3 px-5 py-3 hover:bg-error/5 transition-colors text-sm font-bold text-error">
-                <span class="material-symbols-outlined text-[20px]">logout</span> Sign out
+                <span class="material-symbols-outlined text-[20px]">logout</span> Đăng xuất
               </button>
             </div>
           </div>
         </ng-container>
       </div>
+
+      <!-- Hamburger: chỉ hiện mobile khi chưa login -->
+      <button *ngIf="!isLoggedIn" class="md:hidden p-2 rounded-full hover:bg-surface-container transition-colors" (click)="toggleMobileMenu()">
+        <span class="material-symbols-outlined text-on-surface-variant">{{ isMobileMenuOpen ? 'close' : 'menu' }}</span>
+      </button>
     </div>
   </nav>
+
+  <!-- Mobile Menu Dropdown (chưa login) -->
+  <div *ngIf="isMobileMenuOpen && !isLoggedIn" class="md:hidden border-t border-outline-variant/10 bg-surface-container-lowest px-4 py-3 flex flex-col gap-1">
+    <a routerLink="/" (click)="isMobileMenuOpen=false" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-surface-container font-medium text-on-surface transition-colors">
+      <span class="material-symbols-outlined text-[20px] text-on-surface-variant">home</span> Trang chủ
+    </a>
+    <a routerLink="/explore" (click)="isMobileMenuOpen=false" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-surface-container font-medium text-on-surface transition-colors">
+      <span class="material-symbols-outlined text-[20px] text-on-surface-variant">forum</span> Diễn đàn
+    </a>
+    <a routerLink="/popular" (click)="isMobileMenuOpen=false" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-surface-container font-medium text-on-surface transition-colors">
+      <span class="material-symbols-outlined text-[20px] text-on-surface-variant">trending_up</span> Nổi bật
+    </a>
+    <div class="border-t border-outline-variant/10 mt-2 pt-2 flex gap-3">
+      <a routerLink="/register" (click)="isMobileMenuOpen=false" class="flex-1 text-center py-2.5 rounded-full border border-outline-variant/30 font-semibold text-sm text-on-surface hover:bg-surface-container transition-colors">Đăng ký</a>
+      <button (click)="openLoginModal(); isMobileMenuOpen=false" class="flex-1 py-2.5 rounded-full kinetic-gradient text-white font-semibold text-sm hover:scale-95 transition-transform">Đăng nhập</button>
+    </div>
+  </div>
 </header>

@@ -31,19 +31,30 @@
 
     <div class="flex items-center gap-6 text-sm text-on-surface-variant">
       <div class="flex items-center gap-2">
-        <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" class="w-8 h-8 rounded-full border border-outline-variant/20 object-cover">
-        <div *ngIf="!post.author?.avatarUrl" class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-xs uppercase">
+        <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" class="w-8 h-8 rounded-full border border-outline-variant/20 object-cover cursor-pointer hover:opacity-80 transition-opacity" (click)="showUserSummary(post.author?.username, $event)">
+        <div *ngIf="!post.author?.avatarUrl" class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-xs uppercase cursor-pointer hover:opacity-80 transition-opacity" (click)="showUserSummary(post.author?.username, $event)">
           {{ (post.author?.displayName || post.author?.username)?.charAt(0) }}
         </div>
-        <span class="font-bold text-on-surface">{{ post.author?.displayName || post.author?.username }}</span>
+        <span class="font-bold text-on-surface cursor-pointer hover:underline" (click)="showUserSummary(post.author?.username, $event)">{{ post.author?.displayName || post.author?.username }}</span>
       </div>
       <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> {{ post.createdAt | timeAgo }}</span>
       <div class="kebab-menu-wrapper relative ml-auto group/menu cursor-pointer">
         <button class="material-symbols-outlined hover:text-on-surface transition-colors">more_horiz</button>
         <div class="absolute right-0 top-6 w-48 bg-surface-container-lowest border border-outline-variant/15 rounded-xl shadow-xl overflow-hidden invisible group-hover/menu:visible opacity-0 group-hover/menu:opacity-100 transition-all z-50">
-          <button class="w-full text-left px-4 py-2 hover:bg-surface-container-low text-sm font-medium">Lưu bài viết</button>
+          <button class="w-full text-left px-4 py-2 hover:bg-surface-container-low text-sm font-medium flex items-center gap-2"
+                  (click)="toggleSave()">
+            <span class="material-symbols-outlined text-[16px]" [style.font-variation-settings]="isSaved ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
+            {{ isSaved ? 'Đã lưu' : 'Lưu bài viết' }}
+          </button>
+          <button class="w-full text-left px-4 py-2 hover:bg-surface-container-low text-sm font-medium flex items-center gap-2"
+                  *ngIf="currentUser?.username === post.author?.username"
+                  (click)="openEditModal()">
+            <span class="material-symbols-outlined text-[16px]">edit</span> Sửa bài viết
+          </button>
           <button class="w-full text-left px-4 py-2 hover:bg-surface-container-low text-sm font-medium" *ngIf="currentUser?.username !== post.author?.username">Báo cáo vi phạm</button>
-          <button class="w-full text-left px-4 py-2 hover:bg-error/10 text-error text-sm font-bold" *ngIf="currentUser?.username === post.author?.username || currentUser?.roles?.includes('ROLE_ADMIN')">Xóa bài viết</button>
+          <button class="w-full text-left px-4 py-2 hover:bg-error/10 text-error text-sm font-bold flex items-center gap-2" *ngIf="currentUser?.username === post.author?.username || currentUser?.roles?.includes('ROLE_ADMIN')" (click)="deletePost()">
+            <span class="material-symbols-outlined text-[16px]">delete</span> Xóa bài viết
+          </button>
         </div>
       </div>
     </div>
@@ -67,21 +78,34 @@
         </div>
         
         <!-- Post Description & Formatting -->
-        <div class="flex-1 order-1 md:order-2">
-          <div class="prose prose-slate prose-lg max-w-none prose-headings:font-headline font-body text-on-surface-variant leading-relaxed" [innerHTML]="post.content | safeHtml"></div>
+        <div class="flex-1 order-1 md:order-2 post-content-body">
+          <div class="prose prose-slate prose-lg max-w-none prose-headings:font-headline font-body text-on-surface leading-relaxed" [innerHTML]="post.content | safeHtml"></div>
           
           <div class="flex flex-wrap gap-2 pt-8">
              <span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-bold rounded-md uppercase tracking-wider ghost-border" *ngIf="post.category">Discussion</span>
           </div>
 
           <!-- Share / Action Footer -->
-          <div class="mt-8 pt-6 border-t border-outline-variant/15 flex justify-between items-center">
-            <div class="flex gap-6">
-              <button class="text-xs font-bold text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest flex items-center gap-1">
+          <div class="mt-8 pt-6 border-t border-outline-variant/15 flex justify-between items-center flex-wrap gap-3">
+            <div class="flex gap-4 flex-wrap">
+              <!-- Share Button -->
+              <button class="text-xs font-bold text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest flex items-center gap-1"
+                      (click)="sharePost()">
                 <span class="material-symbols-outlined text-[16px]">share</span> Share
               </button>
-              <button class="text-xs font-bold text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest flex items-center gap-1">
-                <span class="material-symbols-outlined text-[16px]">bookmark_add</span> Save
+              <!-- Save / Bookmark Button -->
+              <button class="text-xs font-bold uppercase tracking-widest flex items-center gap-1 transition-colors"
+                      [class.text-primary]="isSaved"
+                      [class.text-on-surface-variant]="!isSaved"
+                      (click)="toggleSave()">
+                <span class="material-symbols-outlined text-[16px]" [style.font-variation-settings]="isSaved ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
+                {{ isSaved ? 'Đã lưu' : 'Save' }}
+              </button>
+              <!-- Edit Button (chỉ hiện với chủ bài) -->
+              <button *ngIf="isLoggedIn && currentUser?.username === post.author?.username"
+                      class="text-xs font-bold text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest flex items-center gap-1"
+                      (click)="openEditModal()">
+                <span class="material-symbols-outlined text-[16px]">edit</span> Sửa bài
               </button>
             </div>
             <button class="text-xs font-bold text-error hover:underline uppercase tracking-widest flex items-center gap-1">
@@ -170,12 +194,12 @@
               
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-3 mb-3">
-                  <img *ngIf="comment.user?.avatarUrl" [src]="comment.user.avatarUrl" class="w-7 h-7 rounded-full object-cover">
-                  <div *ngIf="!comment.user?.avatarUrl" class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[10px] uppercase">
+                  <img *ngIf="comment.user?.avatarUrl" [src]="comment.user.avatarUrl" class="w-7 h-7 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity" (click)="showUserSummary(comment.user?.username, $event)">
+                  <div *ngIf="!comment.user?.avatarUrl" class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[10px] uppercase cursor-pointer hover:opacity-80 transition-opacity" (click)="showUserSummary(comment.user?.username, $event)">
                     {{ (comment.user?.displayName || comment.user?.username)?.charAt(0) }}
                   </div>
                   <div>
-                    <span class="text-sm font-bold text-primary">{{ comment.user?.displayName || comment.user?.username }}</span>
+                    <span class="text-sm font-bold text-primary cursor-pointer hover:underline" (click)="showUserSummary(comment.user?.username, $event)">{{ comment.user?.displayName || comment.user?.username }}</span>
                     <span class="text-xs text-on-surface-variant font-medium ml-2">— {{ comment.createdAt | timeAgo }}</span>
                   </div>
 
@@ -305,7 +329,42 @@
       </div>
 
     </div>
+  </div>
 
+  <!-- User Summary Modal -->
+  <div *ngIf="summaryUser" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" (click)="closeUserSummary($event)">
+    <div class="bg-surface-container-lowest w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl relative p-6 m-4" (click)="$event.stopPropagation()">
+      <button class="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all cursor-pointer focus:outline-none" (click)="closeUserSummary($event)">
+         <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+      
+      <div class="flex flex-col items-center mt-4 text-center">
+         <img *ngIf="summaryUser.avatarUrl" [src]="summaryUser.avatarUrl" class="w-24 h-24 rounded-full object-cover shadow-md border-4 border-surface-container-low mb-4">
+         <div *ngIf="!summaryUser.avatarUrl" class="w-24 h-24 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-3xl uppercase shadow-md border-4 border-surface-container-low mb-4">
+            {{ (summaryUser.displayName || summaryUser.username)?.charAt(0) }}
+         </div>
+         
+         <h3 class="text-xl font-bold font-headline text-on-surface">{{ summaryUser.displayName || summaryUser.username }}</h3>
+         <p class="text-sm font-medium text-on-surface-variant mb-4">&commat;{{ summaryUser.username }}</p>
+         
+         <div class="flex gap-8 mb-8 mt-2">
+            <div class="text-center">
+               <div class="font-bold text-xl text-primary">{{ summaryUser.followersCount || 0 }}</div>
+               <div class="text-[10px] uppercase font-bold text-on-surface-variant tracking-widest mt-1">Lượt theo dõi</div>
+            </div>
+            <div class="text-center">
+               <div class="font-bold text-xl text-primary">{{ summaryUser.followingCount || 0 }}</div>
+               <div class="text-[10px] uppercase font-bold text-on-surface-variant tracking-widest mt-1">Đang theo dõi</div>
+            </div>
+         </div>
+
+         <div class="flex gap-3 w-full">
+             <a [routerLink]="['/profile', summaryUser.username]" class="flex-1 text-center py-3 rounded-full kinetic-gradient text-white font-bold text-sm tracking-widest uppercase hover:scale-[0.98] transition-transform shadow-md block" (click)="closeUserSummary($event)">
+                Xem trang cá nhân
+             </a>
+         </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -314,5 +373,73 @@
   <div class="flex items-center gap-3 text-primary text-xl font-bold font-headline animate-pulse">
     <span class="material-symbols-outlined text-4xl animate-spin text-gradient">sync</span>
     Đang tải bài viết...
+  </div>
+</div>
+
+<!-- === MODAL XÓA BÀI VIẾT === -->
+<div *ngIf="showDeleteModal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in" (click)="cancelDeletePost()">
+  <div class="bg-surface-container-lowest w-full max-w-md rounded-3xl shadow-2xl p-8 m-4 relative" (click)="$event.stopPropagation()">
+    <div class="flex items-center gap-4 mb-6">
+      <div class="w-12 h-12 rounded-2xl bg-error/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-error text-2xl">delete_forever</span>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold font-headline text-on-surface">Xóa bài viết?</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Hành động này không thể hoàn tác.</p>
+      </div>
+    </div>
+    <p class="text-sm text-on-surface-variant mb-8 leading-relaxed">
+      Bạn có chắc chắn muốn xóa bài viết <strong class="text-on-surface">"{{ post?.title }}"</strong> không?
+      Tất cả bình luận liên quan cũng sẽ bị xóa.
+    </p>
+    <div class="flex gap-3">
+      <button class="flex-1 py-3 rounded-2xl border border-outline-variant/30 text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-colors"
+              (click)="cancelDeletePost()">Huỷ bỏ</button>
+      <button class="flex-1 py-3 rounded-2xl bg-error text-white font-bold text-sm hover:bg-error/90 transition-colors"
+              (click)="confirmDeletePost()">Xác nhận xóa</button>
+    </div>
+  </div>
+</div>
+
+<!-- === MODAL SỬa BÀI VIẾT === -->
+<div *ngIf="showEditModal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in" (click)="closeEditModal()">
+  <div class="bg-surface-container-lowest w-full max-w-2xl rounded-3xl shadow-2xl m-4 overflow-hidden" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="px-8 py-6 border-b border-outline-variant/10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary">edit_note</span>
+        <h3 class="text-lg font-bold font-headline text-on-surface">Chỉnh sửa bài viết</h3>
+      </div>
+      <button class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors" (click)="closeEditModal()">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+    <!-- Body -->
+    <div class="px-8 py-6 space-y-5">
+      <!-- Tiêu đề -->
+      <div>
+        <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Tiêu đề bài viết</label>
+        <input type="text" [(ngModel)]="editTitle"
+               class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary rounded-xl px-4 py-3 text-sm font-bold text-on-surface outline-none transition-all"
+               placeholder="Nhập tiêu đề mới...">
+      </div>
+      <!-- Nội dung (plain textarea — simple edit) -->
+      <div>
+        <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Nội dung</label>
+        <textarea [(ngModel)]="editContent" rows="10"
+                  class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary rounded-xl px-4 py-3 text-sm font-medium text-on-surface outline-none transition-all resize-none"
+                  placeholder="Nhập nội dung mới..."></textarea>
+        <p class="text-[10px] text-on-surface-variant mt-1">Hỗ trợ HTML cơ bản (&lt;b&gt;, &lt;i&gt;, &lt;a&gt;, &lt;p&gt;...)</p>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="px-8 py-5 bg-surface-container/30 border-t border-outline-variant/10 flex justify-end gap-3">
+      <button class="px-6 py-2.5 rounded-full border border-outline-variant/30 text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-colors"
+              (click)="closeEditModal()">Huỷ</button>
+      <button class="px-8 py-2.5 rounded-full kinetic-gradient text-white font-bold text-sm hover:opacity-90 transition-all disabled:opacity-50"
+              (click)="submitEditPost()" [disabled]="!editTitle.trim() || editSaving">
+        {{ editSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+      </button>
+    </div>
   </div>
 </div>

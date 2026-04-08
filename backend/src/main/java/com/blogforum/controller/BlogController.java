@@ -31,20 +31,20 @@ public class BlogController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN') or hasRole('EXPERT')")
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
         return ResponseEntity.ok(blogService.createPost(post));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN') or hasRole('EXPERT')")
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Post post) {
         post.setId(id);
         return ResponseEntity.ok(blogService.updatePost(post));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN') or hasRole('EXPERT')")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         blogService.deletePost(id);
         return ResponseEntity.noContent().build();
@@ -55,15 +55,56 @@ public class BlogController {
         return ResponseEntity.ok(blogService.searchPosts(query));
     }
 
+    @GetMapping("/pending/{categoryId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Page<Post>> getPendingPosts(@PathVariable Long categoryId, Pageable pageable) {
+        // Có thể thêm filter kiểm tra quyền admin/moderator tại đây hoặc ở service
+        return ResponseEntity.ok(blogService.getPendingPostsByCategory(categoryId, pageable));
+    }
+
+    @PutMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
+    public ResponseEntity<Post> approvePost(@PathVariable Long id) {
+        return ResponseEntity.ok(blogService.approvePost(id));
+    }
+
+    @DeleteMapping("/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
+    public ResponseEntity<Void> rejectPost(@PathVariable Long id) {
+        blogService.rejectPost(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{id}/vote")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN') or hasRole('EXPERT')")
     public ResponseEntity<Post> likePost(@PathVariable Long id) {
         return ResponseEntity.ok(blogService.likePost(id));
     }
 
     @GetMapping("/liked")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN') or hasRole('EXPERT')")
     public ResponseEntity<List<Long>> getLikedPosts() {
         return ResponseEntity.ok(blogService.getLikedPostIds());
+    }
+
+    // ===== SAVE POST =====
+    @PostMapping("/{id}/save")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> savePost(@PathVariable Long id) {
+        blogService.savePost(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/save")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> unsavePost(@PathVariable Long id) {
+        blogService.unsavePost(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/saved")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<Long>> getSavedPostIds() {
+        return ResponseEntity.ok(blogService.getSavedPostIds());
     }
 }

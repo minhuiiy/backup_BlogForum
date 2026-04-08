@@ -15,6 +15,7 @@ import { TokenStorageService } from '../../_services/token-storage.service';
 export class SidebarComponent implements OnInit {
   toggleCommunities = true;
   joinedCommunities: {name: string, url: string}[] = [];
+  isAdmin = false;
 
   constructor(
     public sidebarService: SidebarService,
@@ -27,6 +28,10 @@ export class SidebarComponent implements OnInit {
     if (!user || Object.keys(user).length === 0 || !user.username) {
       // Not logged in or invalid token
       return;
+    }
+
+    if (user.roles && user.roles.includes('ROLE_ADMIN')) {
+      this.isAdmin = true;
     }
 
     this.commMock.membersMap$.subscribe(map => {
@@ -45,3 +50,4 @@ export class SidebarComponent implements OnInit {
     });
   }
 }
+

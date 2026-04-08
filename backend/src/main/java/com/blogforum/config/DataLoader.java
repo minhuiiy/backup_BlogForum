@@ -4,6 +4,7 @@ import com.blogforum.model.*;
 import com.blogforum.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.util.Set;
@@ -23,6 +24,8 @@ public class DataLoader implements CommandLineRunner {
     private PostRepository postRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public void run(String... args) throws Exception {
@@ -30,7 +33,11 @@ public class DataLoader implements CommandLineRunner {
             roleRepository.save(new Role(null, ERole.ROLE_USER));
             roleRepository.save(new Role(null, ERole.ROLE_MODERATOR));
             roleRepository.save(new Role(null, ERole.ROLE_ADMIN));
+            roleRepository.save(new Role(null, ERole.ROLE_EXPERT));
             System.out.println("Roles have been seeded successfully!");
+        } else if (roleRepository.findByName(ERole.ROLE_EXPERT).isEmpty()) {
+            roleRepository.save(new Role(null, ERole.ROLE_EXPERT));
+            System.out.println("ROLE_EXPERT have been seeded successfully!");
         }
 
         if (userRepository.count() == 0) {
@@ -43,6 +50,21 @@ public class DataLoader implements CommandLineRunner {
                 newUser.setRoles(Set.of(roleRepository.findByName(ERole.ROLE_ADMIN).get()));
                 return userRepository.save(newUser);
             });
+        }
+        
+        // Cưỡng ép Migration kiểu dữ liệu cho bảng cũ
+        try {
+            jdbcTemplate.execute("ALTER TABLE posts MODIFY content LONGTEXT");
+            System.out.println("Modified posts content column to LONGTEXT");
+        } catch (Exception e) {
+            System.out.println("Could not modify posts content column: " + e.getMessage());
+        }
+
+        try {
+            jdbcTemplate.execute("ALTER TABLE comments MODIFY content LONGTEXT");
+            System.out.println("Modified comments content column to LONGTEXT");
+        } catch (Exception e) {
+            System.out.println("Could not modify comments content column: " + e.getMessage());
         }
     }
 }

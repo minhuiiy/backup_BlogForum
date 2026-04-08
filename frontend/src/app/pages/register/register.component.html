@@ -55,7 +55,7 @@
           </div>
           
           <div class="pt-4">
-            <button class="w-full py-3.5 rounded-full font-bold text-sm tracking-widest kinetic-gradient text-white shadow-md hover:scale-[0.98] transition-transform uppercase disabled:opacity-50 disabled:cursor-not-allowed">Đăng ký thành viên</button>
+            <button type="submit" [disabled]="!f.form.valid" class="w-full py-3.5 rounded-full font-bold text-sm tracking-widest kinetic-gradient text-white shadow-md hover:scale-[0.98] transition-transform uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">Đăng ký thành viên</button>
           </div>
           
           <div *ngIf="f.submitted && isSignUpFailed" class="bg-error-container text-on-error-container px-4 py-3 rounded-xl mt-4 font-bold flex items-center gap-2 text-sm">
@@ -65,7 +65,7 @@
       </form>
       
       <div class="mt-8 text-center text-sm font-medium text-on-surface-variant" *ngIf="!isSuccessful">
-        Đã có tài khoản? <a routerLink="/login" class="font-bold text-primary hover:underline">Đăng nhập</a>
+        Đã có tài khoản? <a href="javascript:void(0)" class="font-bold text-primary hover:underline" (click)="authModalService.open()">Đăng nhập</a>
       </div>
     </div>
   </div>

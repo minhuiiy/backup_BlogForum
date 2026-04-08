@@ -3,18 +3,18 @@
   <!-- Main Content (Forum Feed) -->
   <section class="flex-1 min-w-0">
     <header class="mb-12">
-      <h1 class="text-5xl font-bold font-headline tracking-tighter text-on-surface mb-2 mt-4 text-gradient">Knowledge Repository</h1>
-      <p class="text-sm font-medium text-on-surface-variant mb-6 uppercase tracking-widest">Popular Posts</p>
+      <h1 class="text-5xl font-bold font-headline tracking-tighter text-on-surface mb-2 mt-4 text-gradient">Bài viết nổi bật</h1>
+      <p class="text-sm font-medium text-on-surface-variant mb-6 uppercase tracking-widest">Được yêu thích nhất</p>
       
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div class="flex gap-2">
-          <button class="px-5 py-2 rounded-full bg-white text-primary font-bold text-sm shadow-sm ghost-border">Most Voted</button>
-          <button class="px-5 py-2 rounded-full text-on-surface-variant hover:bg-surface-container-low font-medium text-sm transition-colors">Latest</button>
-          <button class="px-5 py-2 rounded-full text-on-surface-variant hover:bg-surface-container-low font-medium text-sm transition-colors">Following</button>
+          <button class="px-5 py-2 rounded-full bg-white text-primary font-bold text-sm shadow-sm ghost-border">Nhiều vote nhất</button>
+          <button class="px-5 py-2 rounded-full text-on-surface-variant hover:bg-surface-container-low font-medium text-sm transition-colors">Mới nhất</button>
+          <button class="px-5 py-2 rounded-full text-on-surface-variant hover:bg-surface-container-low font-medium text-sm transition-colors">Đang theo dõi</button>
         </div>
         <button routerLink="/create-post" class="kinetic-gradient text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">
           <span class="material-symbols-outlined text-[20px]">add_circle</span>
-          Ask a Question
+          Đặt câu hỏi
         </button>
       </div>
     </header>
@@ -25,34 +25,40 @@
       </div>
 
       <!-- Question Cards -->
-      <article *ngFor="let post of posts" class="bg-surface-container-lowest p-8 rounded-2xl ghost-border hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] transition-all duration-300 flex gap-8 group cursor-pointer" [routerLink]="['/post', post.id]">
-        <div class="flex flex-col items-center gap-4 text-center min-w-[64px]">
-          <div class="space-y-1">
-            <p class="text-2xl font-bold font-headline text-primary">{{ post.likes }}</p>
-            <p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Votes</p>
+      <article *ngFor="let post of posts" class="bg-surface-container-lowest p-6 rounded-2xl ghost-border hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] transition-all duration-300 flex gap-6 group cursor-pointer" [routerLink]="['/post', post.id]">
+        <!-- Vote/Reply counters -->
+        <div class="flex flex-col items-center gap-3 text-center flex-shrink-0 w-14">
+          <div class="space-y-0.5">
+            <p class="text-xl font-bold font-headline text-primary">{{ post.likes }}</p>
+            <p class="text-[9px] uppercase tracking-widest font-bold text-on-surface-variant">Vote</p>
           </div>
-          <div class="space-y-1 bg-secondary-container/20 px-3 py-2 rounded-xl text-primary-dim shadow-sm">
-            <p class="text-xl font-bold font-headline">{{ post.commentCount }}</p>
-            <p class="text-[10px] uppercase tracking-widest font-bold">Answers</p>
+          <div class="space-y-0.5 bg-secondary-container/20 px-2 py-1.5 rounded-xl text-primary w-full">
+            <p class="text-lg font-bold font-headline">{{ post.commentCount }}</p>
+            <p class="text-[9px] uppercase tracking-widest font-bold">Trả lời</p>
           </div>
         </div>
 
-        <div class="flex-1">
-          <div class="flex items-center gap-3 mb-3">
-            <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" class="w-6 h-6 rounded-full"/>
-            <div *ngIf="!post.author?.avatarUrl" class="w-6 h-6 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[10px] uppercase">
+        <!-- Content -->
+        <div class="flex-1 min-w-0 overflow-hidden">
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" class="w-5 h-5 rounded-full flex-shrink-0"/>
+            <div *ngIf="!post.author?.avatarUrl" class="w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[9px] uppercase flex-shrink-0">
               {{ (post.author?.displayName || post.author?.username)?.charAt(0) }}
             </div>
-            <span class="text-xs font-semibold text-on-surface-variant">{{ post.author?.displayName || post.author?.username }}</span>
+            <span class="text-xs font-semibold text-on-surface-variant truncate">{{ post.author?.displayName || post.author?.username }}</span>
             <span class="text-[10px] text-outline-variant uppercase tracking-widest">• {{ post.createdAt | timeAgo }}</span>
-            <span class="text-[10px] font-bold text-primary uppercase tracking-widest ml-auto" *ngIf="post.category">in {{ post.category.name }}</span>
+            <span class="text-[10px] font-bold text-primary uppercase tracking-widest ml-auto truncate" *ngIf="post.category">trong {{ post.category.name }}</span>
           </div>
 
-          <h2 class="text-2xl font-bold font-headline text-on-surface mb-3 group-hover:text-primary transition-colors leading-tight">{{ post.title }}</h2>
-          <p class="text-on-surface-variant text-sm line-clamp-2 mb-6 leading-relaxed" [innerHTML]="post.strippedContent | safeHtml"></p>
+          <h2 class="text-lg font-bold font-headline text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight line-clamp-2">{{ post.title }}</h2>
+          <!-- Bọc innerHTML trong div giới hạn chiều cao -->
+          <div class="max-h-12 overflow-hidden relative">
+            <p class="text-on-surface-variant text-sm leading-relaxed line-clamp-2" [innerHTML]="post.strippedContent | safeHtml"></p>
+            <div class="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+          </div>
           
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-[10px] font-bold uppercase tracking-wider rounded border border-outline-variant/10">Discussion</span>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span class="px-2 py-0.5 bg-surface-container-low text-on-surface-variant text-[10px] font-bold uppercase tracking-wider rounded border border-outline-variant/10">Thảo luận</span>
           </div>
         </div>
       </article>
@@ -68,13 +74,13 @@
       <div class="absolute -right-8 -top-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl"></div>
       <h3 class="text-xl font-bold font-headline mb-6 flex items-center gap-2 text-on-surface">
         <span class="material-symbols-outlined text-orange-500" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
-        Hot Communities
+        Cộng đồng nổi bật
       </h3>
       
-      <div *ngIf="hotCommunities.length === 0" class="text-xs text-on-surface-variant">Loading trending hubs...</div>
+      <div *ngIf="hotCommunities.length === 0" class="text-xs text-on-surface-variant">Đang tải cộng đồng...</div>
       <ul class="space-y-6">
         <li *ngFor="let comm of hotCommunities; let i = index">
-          <a [routerLink]="['/search']" [queryParams]="{ q: comm.name }" class="group block">
+          <a [routerLink]="['/r', comm.name]" class="group block">
             <div class="flex items-center gap-3 mb-1">
               <span class="text-[10px] font-bold text-primary uppercase tracking-widest w-4 text-right">#{{ i+1 }}</span>
               <p class="text-xs font-bold bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-widest">{{ comm.name }}</p>
@@ -85,14 +91,13 @@
       </ul>
     </div>
 
-    <!-- Tech News API Component -->
     <div class="bg-surface-container-low/50 p-8 rounded-3xl border border-outline-variant/15 relative overflow-hidden">
       <h3 class="text-xl font-bold font-headline mb-6 flex items-center gap-2 text-on-surface">
         <span class="material-symbols-outlined text-primary">rss_feed</span>
-        Tech Radar
+        Tin tức công nghệ
       </h3>
 
-      <div *ngIf="loadingNews" class="text-xs text-on-surface-variant font-medium">Scanning network for updates...</div>
+      <div *ngIf="loadingNews" class="text-xs text-on-surface-variant font-medium">Đang tải tin tức...</div>
 
       <ul class="space-y-5" *ngIf="!loadingNews && techNews.length > 0">
         <li *ngFor="let news of techNews">
@@ -100,7 +105,7 @@
             <h4 class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors leading-snug line-clamp-2">{{ news.title }}</h4>
             <div class="flex gap-4 mt-2">
               <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest flex items-center gap-1">
-                 <span class="material-symbols-outlined text-[10px]">arrow_upward</span> {{ news.score }} PTS
+                 <span class="material-symbols-outlined text-[10px]">arrow_upward</span> {{ news.score }} điểm
               </span>
             </div>
           </a>
@@ -111,9 +116,9 @@
     <!-- Beta Signup Card -->
     <div class="relative overflow-hidden kinetic-gradient p-8 rounded-3xl text-white shadow-2xl shadow-primary/20">
       <div class="relative z-10">
-        <h3 class="text-xl font-bold font-headline mb-3 leading-tight">Elite Developers Only.</h3>
-        <p class="text-xs text-white/90 mb-6 font-medium leading-relaxed">Join the DevLume Beta program to access private community features and advanced architectural insights.</p>
-        <button class="w-full bg-white text-primary font-bold py-3.5 rounded-xl text-sm hover:bg-surface-container-low transition-all shadow-xl hover:-translate-y-1">Request Invite</button>
+        <h3 class="text-xl font-bold font-headline mb-3 leading-tight">Dành cho lập trình viên.</h3>
+        <p class="text-xs text-white/90 mb-6 font-medium leading-relaxed">Tham gia chương trình Beta để truy cập các tính năng cộng đồng riêng tư và thông tin kiến trúc nâng cao.</p>
+        <button class="w-full bg-white text-primary font-bold py-3.5 rounded-xl text-sm hover:bg-surface-container-low transition-all shadow-xl hover:-translate-y-1">Đăng ký tham gia</button>
       </div>
       <!-- Abstract Elements -->
       <span class="material-symbols-outlined absolute -bottom-8 -right-8 text-[140px] opacity-10 rotate-12">memory</span>

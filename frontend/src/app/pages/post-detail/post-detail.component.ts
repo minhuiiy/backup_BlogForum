@@ -14,6 +14,8 @@ import { Subscription } from 'rxjs';
 import { SafeHtmlPipe } from '../../_pipes/safe-html.pipe';
 import { TimeAgoPipe } from '../../_pipes/time-ago.pipe';
 import { Title } from '@angular/platform-browser';
+import { FollowService } from '../../_services/follow.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-post-detail',
@@ -62,7 +64,20 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   highlightedCommentId: number | null = null;
   sortOption: string = 'newest';
   currentUser: any;
+  summaryUser: any = null;
   wsSubscription!: Subscription;
+
+  // Modal xóa bài viết
+  showDeleteModal = false;
+
+  // Modal sửa bài viết
+  showEditModal = false;
+  editTitle = '';
+  editContent = '';
+  editSaving = false;
+
+  // Save / Bookmark
+  isSaved = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -74,6 +89,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     private authModalService: AuthModalService,
     private imageModalService: ImageModalService,
     private webSocketService: WebSocketService,
+    private followService: FollowService,
     private location: Location,
     private http: HttpClient,
     private titleService: Title
@@ -88,8 +104,15 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn) {
       this.currentUser = this.tokenStorage.getUser();
       this.blogService.getLikedPosts().subscribe({
+        next: ids => { this.likedPosts = new Set(ids); },
+        error: err => console.error(err)
+      });
+      this.blogService.getSavedPosts().subscribe({
         next: ids => {
-          this.likedPosts = new Set(ids);
+          // Sau khi load post, check nếu đã được save
+          this.route.params.subscribe(p => {
+            this.isSaved = ids.includes(+p['id']);
+          });
         },
         error: err => console.error(err)
       });
@@ -127,6 +150,25 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  showUserSummary(username: string, event?: Event): void {
+    if (event) event.stopPropagation();
+    this.http.get(environment.apiUrl + '/users/profile/' + username).subscribe({
+      next: (data: any) => {
+         this.summaryUser = data;
+         this.summaryUser.followersCount = 0;
+         this.summaryUser.followingCount = 0;
+         this.followService.getFollowers(username).subscribe((f: any) => this.summaryUser.followersCount = f.length);
+         this.followService.getFollowing(username).subscribe((f: any) => this.summaryUser.followingCount = f.length);
+      },
+      error: err => console.error(err)
+    });
+  }
+
+  closeUserSummary(event?: Event): void {
+    if (event) event.stopPropagation();
+    this.summaryUser = null;
+  }
+
   scrollToComment(fragment: string): void {
     const targetId = parseInt(fragment.split('-')[1], 10);
     if (!isNaN(targetId)) {
@@ -159,8 +201,61 @@ export class PostDetailComponent implements OnInit, OnDestroy {
       next: data => {
         this.post = data;
         this.titleService.setTitle(`${this.post.title || 'Bài viết'} - blogforum`);
+        // Ghi lịch sử xem
+        try {
+          const raw = localStorage.getItem('post_history');
+          let history: any[] = raw ? JSON.parse(raw) : [];
+          history = history.filter((p: any) => p.id !== data.id);
+          history.unshift({ id: data.id, title: data.title, createdAt: data.createdAt, author: data.author, viewedAt: new Date().toISOString() });
+          if (history.length > 50) history = history.slice(0, 50);
+          localStorage.setItem('post_history', JSON.stringify(history));
+        } catch {}
       },
       error: err => console.error(err)
+    });
+  }
+
+  deletePost(): void {
+    this.showDeleteModal = true;
+  }
+
+  confirmDeletePost(): void {
+    this.showDeleteModal = false;
+    this.blogService.deletePost(this.postId).subscribe({
+      next: () => this.router.navigate(['/']),
+      error: err => console.error(err)
+    });
+  }
+
+  cancelDeletePost(): void {
+    this.showDeleteModal = false;
+  }
+
+  openEditModal(): void {
+    this.editTitle = this.post?.title || '';
+    this.editContent = this.post?.content || '';
+    this.showEditModal = true;
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+  }
+
+  submitEditPost(): void {
+    if (!this.editTitle.trim()) return;
+    this.editSaving = true;
+    const payload = { id: this.postId, title: this.editTitle, content: this.editContent };
+    this.blogService.updatePost(payload).subscribe({
+      next: (updated: any) => {
+        this.post.title = updated.title;
+        this.post.content = updated.content;
+        this.showEditModal = false;
+        this.editSaving = false;
+      },
+      error: err => {
+        console.error(err);
+        this.editSaving = false;
+      }
     });
   }
 
@@ -397,5 +492,39 @@ export class PostDetailComponent implements OnInit, OnDestroy {
 
   openLoginModal(): void {
     this.authModalService.open();
+  }
+
+  // ===== SHARE =====
+  sharePost(): void {
+    const url = `${window.location.origin}/post/${this.postId}`;
+    const title = this.post?.title || 'Bài viết';
+    if (navigator.share) {
+      navigator.share({ title, url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Đã sao chép link bài viết!');
+      }).catch(() => {
+        prompt('Sao chép link bài viết:', url);
+      });
+    }
+  }
+
+  // ===== SAVE / BOOKMARK =====
+  toggleSave(): void {
+    if (!this.isLoggedIn) {
+      this.authModalService.open();
+      return;
+    }
+    const wasSaved = this.isSaved;
+    this.isSaved = !wasSaved; // Optimistic UI
+    if (wasSaved) {
+      this.blogService.unsavePost(this.postId).subscribe({
+        error: () => { this.isSaved = true; } // Revert on error
+      });
+    } else {
+      this.blogService.savePost(this.postId).subscribe({
+        error: () => { this.isSaved = false; } // Revert on error
+      });
+    }
   }
 }

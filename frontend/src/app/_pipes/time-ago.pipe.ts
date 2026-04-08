@@ -9,7 +9,14 @@ export class TimeAgoPipe implements PipeTransform {
   transform(value: string | Date | null | undefined): string {
     if (!value) return '';
 
-    const d = new Date(value);
+    let parsedValue = value;
+    if (typeof value === 'string' && value.indexOf('T') !== -1 && !value.endsWith('Z') && !value.includes('+') && !value.match(/-\d{2}:\d{2}$/)) {
+        // Automatically assume UTC for LocalDateTime from backend
+        // Appending 'Z' tells the browser this date is in UTC
+        parsedValue = value + 'Z';
+    }
+
+    const d = new Date(parsedValue as string | Date);
     const now = new Date();
     const seconds = Math.floor((now.getTime() - d.getTime()) / 1000);
 

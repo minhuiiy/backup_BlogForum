@@ -58,30 +58,102 @@
       <!-- About Section / Edit Mode -->
       <div class="bg-surface-container-lowest rounded-3xl p-6 ghost-border shadow-md mt-6">
         <div class="flex items-center justify-between mb-4">
-           <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface">Giới thiệu</h3>
-           <button *ngIf="isModerator && !isEditing" class="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors flex items-center justify-center" (click)="toggleEdit()" title="Chỉnh sửa">
-              <span class="material-symbols-outlined text-[18px]">edit</span>
+           <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface" *ngIf="!isEditing">Giới thiệu</h3>
+           <h3 class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2" *ngIf="isEditing">
+             <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span> Quản trị
+           </h3>
+           <button *ngIf="isModerator && !isEditing" class="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors flex items-center justify-center gap-2" (click)="toggleEdit()" title="Bảng quản trị">
+              <span class="material-symbols-outlined text-[18px]">settings</span>
            </button>
         </div>
 
-        <!-- Edit Form -->
-        <div *ngIf="isEditing" class="space-y-4 bg-surface-container p-4 rounded-2xl animate-fade-in border border-primary/20">
-          <div>
-             <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Tên hiển thị</label>
-             <input type="text" [(ngModel)]="editData.displayName" class="w-full bg-surface border border-outline-variant/30 focus:border-primary rounded-lg px-3 py-2 text-sm font-bold text-on-surface outline-none transition-all">
+        <!-- Edit Form / Admin Dashboard -->
+        <div *ngIf="isEditing" class="bg-surface-container rounded-2xl animate-fade-in border border-primary/20 overflow-hidden">
+          <!-- Admin Tabs -->
+          <div class="flex border-b border-outline-variant/30 text-[10px] sm:text-xs font-bold uppercase tracking-widest bg-surface-container-high/50">
+             <button class="flex-1 py-3 px-2 text-center transition-colors" [class.text-primary]="adminActiveTab === 'settings'" [class.border-b-2]="adminActiveTab === 'settings'" [class.border-primary]="adminActiveTab === 'settings'" [class.bg-surface]="adminActiveTab === 'settings'" (click)="setAdminTab('settings')">Tính chất</button>
+             <button class="flex-1 py-3 px-2 text-center transition-colors relative" [class.text-primary]="adminActiveTab === 'approve'" [class.border-b-2]="adminActiveTab === 'approve'" [class.border-primary]="adminActiveTab === 'approve'" [class.bg-surface]="adminActiveTab === 'approve'" (click)="setAdminTab('approve')">
+                Xét duyệt
+                <span *ngIf="pendingPosts.length > 0" class="absolute top-1.5 right-1.5 sm:right-4 w-2 h-2 bg-error rounded-full animate-pulse"></span>
+             </button>
+             <button class="flex-1 py-3 px-2 text-center transition-colors" [class.text-primary]="adminActiveTab === 'members'" [class.border-b-2]="adminActiveTab === 'members'" [class.border-primary]="adminActiveTab === 'members'" [class.bg-surface]="adminActiveTab === 'members'" (click)="setAdminTab('members')">Nhân sự</button>
           </div>
-          <div>
-             <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Mô tả chi tiết</label>
-             <textarea [(ngModel)]="editData.description" rows="3" class="w-full bg-surface border border-outline-variant/30 focus:border-primary rounded-lg px-3 py-2 text-sm font-medium text-on-surface outline-none transition-all resize-none"></textarea>
+
+          <div class="p-4 space-y-4 max-h-[400px] overflow-y-auto">
+             <!-- Tab: Settings -->
+             <div *ngIf="adminActiveTab === 'settings'" class="space-y-4">
+               <div>
+                  <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Tên hiển thị</label>
+                  <input type="text" [(ngModel)]="editData.displayName" class="w-full bg-surface border border-outline-variant/30 focus:border-primary rounded-lg px-3 py-2 text-sm font-bold text-on-surface outline-none transition-all">
+               </div>
+               <div>
+                  <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Mô tả chi tiết</label>
+                  <textarea [(ngModel)]="editData.description" rows="3" class="w-full bg-surface border border-outline-variant/30 focus:border-primary rounded-lg px-3 py-2 text-sm font-medium text-on-surface outline-none transition-all resize-none"></textarea>
+               </div>
+               <div>
+                  <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Đổi ảnh đại diện</label>
+                  <input type="file" (change)="onFileSelected($event)" accept="image/*" class="w-full text-xs text-on-surface-variant file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all">
+                  <div *ngIf="isUploading" class="text-[10px] font-bold text-primary mt-2 animate-pulse">Đang tải lên...</div>
+               </div>
+               <div>
+                  <label class="block text-[10px] font-bold text-[#229ED9] uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                    ✈️ Telegram Channel ID <span class="font-normal normal-case tracking-normal text-on-surface-variant">(tuỳ chọn)</span>
+                  </label>
+                  <input type="text" [(ngModel)]="editData.telegramChannelId" placeholder="-1001234567890"
+                         class="w-full bg-surface border border-outline-variant/30 focus:border-[#229ED9] rounded-lg px-3 py-2 text-sm font-bold text-on-surface outline-none transition-all">
+                  <p class="text-[9px] text-on-surface-variant mt-1">Bài được duyệt sẽ tự động đăng lên channel này.</p>
+               </div>
+               <!-- Chỉ creator mới thấy nút xóa -->
+               <div class="pt-2 border-t border-error/20 mt-4" *ngIf="isCreator">
+                  <button class="w-full py-2 bg-error/10 text-error text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-error hover:text-white transition-colors" (click)="deleteCommunity()">Xóa Cộng Đồng Của Tôi</button>
+               </div>
+               <div class="pt-2 border-t border-outline-variant/10 mt-4" *ngIf="!isCreator">
+                  <p class="text-[10px] text-on-surface-variant text-center">Chỉ người tạo cộng đồng mới có quyền xóa.</p>
+               </div>
+             </div>
+
+             <!-- Tab: Approve Posts -->
+             <div *ngIf="adminActiveTab === 'approve'" class="space-y-3">
+               <div *ngIf="pendingPosts.length === 0" class="text-center py-6 text-on-surface-variant text-sm font-medium">
+                  Không có bài viết nào đang chờ duyệt.
+               </div>
+               <div *ngFor="let p of pendingPosts" class="p-3 bg-surface rounded-xl border border-outline-variant/20 shadow-sm flex flex-col gap-2">
+                  <div class="flex justify-between items-start gap-2">
+                     <span class="text-sm font-bold text-on-surface break-words">{{ p.title }}</span>
+                     <span class="text-[10px] text-outline-variant shrink-0">{{ p.createdAt | timeAgo }}</span>
+                  </div>
+                  <div class="flex gap-2 mt-1">
+                     <button class="flex-1 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white text-[10px] font-bold uppercase tracking-widest rounded border border-primary/20 transition-colors" (click)="approvePost(p)">Duyệt</button>
+                     <button class="flex-1 py-1.5 bg-error/10 text-error hover:bg-error hover:text-white text-[10px] font-bold uppercase tracking-widest rounded border border-error/20 transition-colors" (click)="rejectPost(p)">Từ chối</button>
+                  </div>
+               </div>
+             </div>
+
+             <!-- Tab: Members -->
+             <div *ngIf="adminActiveTab === 'members'" class="space-y-3">
+               <div *ngIf="communityMembers.length === 0" class="text-center py-6 text-on-surface-variant text-sm font-medium">Đang tải danh sách...</div>
+               <div *ngFor="let m of communityMembers" class="flex items-center justify-between p-2 hover:bg-surface rounded-lg transition-colors group">
+                  <div class="flex items-center gap-2">
+                     <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs uppercase overflow-hidden">
+                       <img *ngIf="m.imageUrl" [src]="m.imageUrl" class="w-full h-full object-cover">
+                       <span *ngIf="!m.imageUrl">{{ m.username.charAt(0) }}</span>
+                     </div>
+                     <div class="flex flex-col">
+                        <span class="text-sm font-bold text-on-surface">{{ m.username }}</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest" [ngClass]="m.isModerator ? 'text-primary' : 'text-on-surface-variant'">{{ m.isModerator ? 'Quản trị viên' : 'Thành viên' }}</span>
+                     </div>
+                  </div>
+                  <div *ngIf="m.username !== currentUser?.username">
+                     <button *ngIf="!m.isModerator" class="px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded text-[10px] font-bold uppercase tracking-widest transition-colors scale-90 sm:scale-100" (click)="promoteMember(m.username)">Thăng</button>
+                     <button *ngIf="m.isModerator" class="px-3 py-1.5 bg-surface-container-highest hover:bg-outline-variant text-on-surface-variant rounded text-[10px] font-bold uppercase tracking-widest transition-colors scale-90 sm:scale-100" (click)="demoteMember(m.username)">Giáng</button>
+                  </div>
+               </div>
+             </div>
           </div>
-          <div>
-             <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Đổi ảnh đại diện</label>
-             <input type="file" (change)="onFileSelected($event)" accept="image/*" class="w-full text-xs text-on-surface-variant file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all">
-             <div *ngIf="isUploading" class="text-[10px] font-bold text-primary mt-2 animate-pulse">Đang tải lên...</div>
-          </div>
-          <div class="flex gap-2 pt-2">
-            <button class="flex-1 py-2 kinetic-gradient text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-sm" (click)="saveSettings()" [disabled]="isUploading">Lưu thay đổi</button>
-            <button class="flex-1 py-2 bg-surface-container-high text-on-surface-variant text-xs font-bold uppercase tracking-widest rounded-full hover:bg-outline-variant/20 transition-colors" (click)="toggleEdit()">Hủy</button>
+
+          <div class="flex gap-2 p-4 bg-surface-container-high/50 border-t border-outline-variant/20">
+            <button *ngIf="adminActiveTab === 'settings'" class="flex-1 py-2 kinetic-gradient text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-sm" (click)="saveSettings()" [disabled]="isUploading">Lưu thiết lập</button>
+            <button class="flex-1 py-2 bg-surface text-on-surface-variant text-xs font-bold uppercase tracking-widest rounded-full hover:bg-outline-variant/20 border border-outline-variant/20 transition-colors" [class.w-full]="adminActiveTab !== 'settings'" (click)="toggleEdit()">Đóng bảng</button>
           </div>
         </div>
 
@@ -174,5 +246,30 @@
 
     </div>
 
+  </div>
+</div>
+
+<!-- === MODAL RỜI CỘNG ĐỒNG === -->
+<div *ngIf="showLeaveModal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in" (click)="showLeaveModal = false">
+  <div class="bg-surface-container-lowest w-full max-w-md rounded-3xl shadow-2xl p-8 m-4" (click)="$event.stopPropagation()">
+    <div class="flex items-center gap-4 mb-6">
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-amber-500 text-2xl">exit_to_app</span>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold font-headline text-on-surface">Rời cộng đồng?</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Bạn có thể tham gia lại bất cứ lúc nào.</p>
+      </div>
+    </div>
+    <p class="text-sm text-on-surface-variant mb-8 leading-relaxed">
+      Bạn có chắc muốn rời khỏi cộng đồng <strong class="text-on-surface">r/{{ communityName }}</strong> không?
+      Bạn sẽ không thể đăng bài trong cộng đồng này cho đến khi tham gia lại.
+    </p>
+    <div class="flex gap-3">
+      <button class="flex-1 py-3 rounded-2xl border border-outline-variant/30 text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-colors"
+              (click)="showLeaveModal = false">Ở lại</button>
+      <button class="flex-1 py-3 rounded-2xl bg-amber-500 text-white font-bold text-sm hover:bg-amber-600 transition-colors"
+              (click)="confirmLeaveCommunity()">Xác nhận rời</button>
+    </div>
   </div>
 </div>

@@ -296,12 +296,14 @@
   margin-top: 0;
 }
 
-.post-content-body img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  display: block;
-  margin: 16px 0;
+::ng-deep .post-content-body img,
+::ng-deep .prose img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 12px !important;
+  display: block !important;
+  margin: 24px auto !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .post-action-bar {
