@@ -386,12 +386,27 @@
 }
 
 ::ng-deep .ql-editor {
-  padding: 0 16px 16px 16px !important;
+  padding: 16px !important;
+  color: #0f1a1c !important;
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+  min-height: 160px;
 }
 
 ::ng-deep .ql-editor.ql-blank::before {
-  color: #5c6c74 !important;
+  color: #82959b !important;
   font-style: normal !important;
+  font-size: 15px;
+}
+
+/* Đảm bảo các element bên trong Quill cũng có màu rõ */
+::ng-deep .ql-editor p,
+::ng-deep .ql-editor li,
+::ng-deep .ql-editor h1,
+::ng-deep .ql-editor h2,
+::ng-deep .ql-editor h3,
+::ng-deep .ql-editor blockquote {
+  color: #0f1a1c !important;
 }
 
 .p-20 {

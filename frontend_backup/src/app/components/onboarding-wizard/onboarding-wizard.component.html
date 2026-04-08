@@ -1,0 +1,94 @@
+<div class="modal-overlay" *ngIf="onboardingModalService.isOpen$ | async">
+  <div class="modal-container">
+    <div class="modal-header">
+      <button class="back-btn" *ngIf="step > 1 && step < 4" (click)="goBack()">
+        <svg fill="currentColor" viewBox="0 0 20 20" height="20" width="20">
+          <path d="M10 19l-7-7m0 0l7-7m-7 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+      <div class="spacer"></div>
+      <button class="skip-btn" *ngIf="step < 4" (click)="skip()">Bỏ qua</button>
+    </div>
+
+    <!-- Bước 1: Giới tính -->
+    <div class="step-content" *ngIf="step === 1">
+      <h1 class="step-title">Giới thiệu về bạn</h1>
+      <p class="step-subtitle">Cho chúng tôi biết về bạn để giúp cải thiện trải nghiệm của<br>bạn trên Reddit.</p>
+
+      <p class="select-label">Bạn thuộc giới tính nào?</p>
+      <div class="pill-group">
+        <button class="pill-btn" (click)="setGender('Female')">Nữ</button>
+        <button class="pill-btn" (click)="setGender('Male')">Nam</button>
+        <button class="pill-btn" (click)="setGender('Non-binary')">Phi giới tính</button>
+        <button class="pill-btn" (click)="setGender('Secret')">Không muốn tiết lộ</button>
+      </div>
+    </div>
+
+    <!-- Bước 2: Sở thích -->
+    <div class="step-content" *ngIf="step === 2">
+      <h1 class="step-title">Chọn sở thích của bạn</h1>
+      <p class="step-subtitle">Sự lựa chọn của bạn sẽ quyết định những tùy chọn bạn thấy tiếp theo.</p>
+
+      <div class="grid-interests">
+        <div class="interest-item" *ngFor="let item of interestsList"
+          [class.selected]="selectedInterests.includes(item.name)" (click)="toggleInterest(item.name)">
+          <div class="interest-circle">{{ item.icon }}</div>
+          <span class="interest-name">{{ item.name }}</span>
+        </div>
+      </div>
+
+      <button class="continue-btn" [disabled]="selectedInterests.length === 0" (click)="goToNextStep()">Tiếp
+        tục</button>
+    </div>
+
+    <!-- Bước 3: Thẻ Tags -->
+    <div class="step-content" *ngIf="step === 3">
+      <h1 class="step-title">Tùy chỉnh bảng tin của bạn</h1>
+      <p class="step-subtitle">Mỗi lựa chọn bạn thực hiện đều giúp cải thiện bảng<br>tin của bạn.</p>
+
+      <div class="search-fake">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Tìm thêm sở thích của bạn" disabled>
+      </div>
+
+      <div class="tags-container">
+        <button class="tag-btn" *ngFor="let tag of tagsList" [class.selected]="selectedTags.includes(tag)"
+          (click)="toggleTag(tag)">
+          {{ tag }}
+        </button>
+      </div>
+
+      <div class="show-more">
+        <button class="show-more-btn">Hiển thị thêm chủ đề</button>
+      </div>
+
+      <button class="continue-btn" [disabled]="selectedTags.length === 0" (click)="goToNextStep()">Tiếp tục</button>
+    </div>
+
+    <!-- Bước 4: Loading -->
+    <div class="step-content step-loading" *ngIf="step === 4">
+      <div class="loading-icon-layer">
+        <div class="circle-bg">
+          <svg fill="white" viewBox="0 0 24 24" height="60" width="60">
+            <path
+              d="M22 12A10 10 0 1112 2a10 10 0 0110 10zM12 4a8 8 0 108 8 8 8 0 00-8-8zm-1.8 11.2l-3-3a1 1 0 011.4-1.4l1.6 1.6 4.6-4.6a1 1 0 011.4 1.4l-5.3 5.3a1 1 0 01-1.4 0z">
+            </path>
+          </svg>
+        </div>
+      </div>
+      <h1 class="step-title">Xin hãy kiên nhẫn chờ đợi khi chúng tôi xây dựng bảng tin dựa trên sở thích của bạn</h1>
+
+      <div class="loading-status">
+        <svg fill="currentColor" viewBox="0 0 24 24" height="16" width="16">
+          <path d="M20 6L9 17l-5-5"></path>
+        </svg>
+        <span>Lập trình</span>
+      </div>
+    </div>
+
+  </div>
+</div>

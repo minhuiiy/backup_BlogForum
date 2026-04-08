@@ -1,124 +1,236 @@
-<div class="submit-page-container">
-
+<div class="max-w-[1000px] mx-auto px-8 py-10 w-full min-h-screen">
+  
   <!-- Header Section -->
-  <div class="submit-header">
-    <h1 class="page-title">Tạo bài đăng</h1>
-    <button class="btn-draft">Bản nháp <span class="draft-count">0</span></button>
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-3xl font-bold font-headline tracking-tight text-on-surface">
+      {{ isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài đăng mới' }}
+    </h1>
+    <button class="bg-surface-container text-on-surface-variant px-4 py-2 rounded-full font-bold text-sm tracking-widest uppercase hover:bg-surface-container-high transition-colors">
+      Bản nháp <span class="bg-surface-container-highest px-1.5 py-0.5 rounded ml-1">0</span>
+    </button>
   </div>
 
-  <div class="divider"></div>
+  <div class="h-[1px] bg-outline-variant/20 mb-8"></div>
 
   <!-- Real Community Picker -->
-  <div class="community-picker-wrapper" style="position: relative;">
-    <button type="button" class="community-picker-btn" (click)="toggleDropdown()">
-      <span class="reddit-icon" *ngIf="!selectedCommunity"></span>
-      <img *ngIf="selectedCommunity" [src]="'https://loremflickr.com/50/50/technology,startup?lock=' + selectedCommunity.name" style="width: 22px; height: 22px; border-radius: 50%; margin-right: 8px; object-fit: cover;">
-      {{ selectedCommunity ? selectedCommunity.name : 'Chọn cộng đồng' }}
-      <span class="chevron-down">▼</span>
+  <div class="relative w-full max-w-sm mb-6" style="z-index: 50;">
+    <button type="button" class="w-full flex items-center justify-between bg-surface-container-lowest border border-outline-variant/30 hover:border-outline-variant hover:shadow-md transition-all px-4 py-3 rounded-2xl" (click)="toggleDropdown()">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-[20px] text-primary">{{ selectedCommunity ? 'group' : 'person' }}</span>
+        <span class="font-bold text-on-surface text-sm">{{ selectedCommunity ? selectedCommunity.name : 'Tường cá nhân (không cộng đồng)' }}</span>
+      </div>
+      <span class="material-symbols-outlined text-outline-variant transition-transform" [class.rotate-180]="showDropdown">expand_more</span>
     </button>
     
-    <div class="community-dropdown" *ngIf="showDropdown">
-      <div class="dropdown-header">Cộng đồng của bạn</div>
-      <div class="dropdown-list">
-        <button type="button" class="dropdown-item" *ngFor="let comm of communities" (click)="selectCommunity(comm)">
-          <img [src]="'https://loremflickr.com/50/50/technology,startup?lock=' + comm.name" class="comm-avatar-small">
-          <div class="comm-details">
-            <span class="comm-name">{{ comm.name }}</span>
-            <span class="comm-members">{{ comm.type === 'public' ? 'Công khai' : 'Riêng tư' }}</span>
+    <div class="absolute top-14 left-0 w-full bg-surface border border-outline-variant/20 rounded-2xl shadow-xl overflow-hidden" *ngIf="showDropdown">
+      <!-- Option: Không cộng đồng -->
+      <button type="button" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-container transition-colors text-left border-b border-outline-variant/10"
+              (click)="selectedCommunity = null; showDropdown = false">
+        <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-surface-variant text-[18px]">person</span>
+        </div>
+        <div>
+          <div class="font-bold text-on-surface text-sm">Tường cá nhân</div>
+          <div class="text-[10px] text-on-surface-variant mt-0.5">Không thuộc cộng đồng nào</div>
+        </div>
+      </button>
+      <!-- Các cộng đồng -->
+      <div class="px-4 py-2 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/10" *ngIf="communities.length > 0">Cộng đồng đã tham gia</div>
+      <div class="max-h-60 overflow-y-auto">
+        <div *ngIf="communities.length === 0" class="px-4 py-6 text-xs text-on-surface-variant text-center flex flex-col items-center gap-2">
+          <span class="material-symbols-outlined text-2xl text-outline-variant">group_off</span>
+          <p>Bạn chưa tham gia cộng đồng nào</p>
+          <a routerLink="/popular" class="text-primary font-bold text-xs hover:underline">Khám phá cộng đồng →</a>
+        </div>
+        <button type="button" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-container transition-colors text-left" *ngFor="let comm of communities" (click)="selectCommunity(comm)">
+          <div class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-[18px]">group</span>
+          </div>
+          <div>
+            <div class="font-bold text-on-surface text-sm">{{ comm.displayName || comm.name }}</div>
+            <div class="text-[10px] text-on-surface-variant uppercase tracking-wide mt-0.5">r/{{ comm.name }}</div>
           </div>
         </button>
       </div>
     </div>
   </div>
 
+  <!-- Banner: Bài cần duyệt (chỉ hiện khi đã chọn cộng đồng) -->
+  <div *ngIf="selectedCommunity" class="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 mb-6">
+    <span class="material-symbols-outlined text-blue-500 text-xl mt-0.5">pending_actions</span>
+    <div>
+      <p class="text-sm font-bold text-blue-800">Bài đăng sẽ cần được duyệt</p>
+      <p class="text-xs text-blue-700 mt-0.5">Bài của bạn sẽ chờ Moderator hoặc người tạo cộng đồng <strong>{{ selectedCommunity.name }}</strong> phê duyệt.</p>
+    </div>
+  </div>
+
   <!-- Body Content -->
-  <div class="submit-wrapper">
-    <div class="submit-content-area">
-
-      <!-- Alerts -->
-      <div class="alert-success" *ngIf="isSuccessful">
-        🎉 Đăng bài thành công! Đang chuyển hướng...
-      </div>
-      <div class="alert-error" *ngIf="isFailed">
-        ❌ {{ errorMessage }}
-      </div>
-
-      <form name="form" (ngSubmit)="isFormReady() && onSubmit()" #f="ngForm" novalidate *ngIf="!isSuccessful">
-
-        <div class="submit-card">
-          <!-- Post Tabs -->
-          <ul class="submit-tabs">
-            <li class="tab-item" [class.active]="activeTab === 'text'" (click)="selectTab('text')">
-              Văn bản
-            </li>
-            <li class="tab-item" [class.active]="activeTab === 'media'" (click)="selectTab('media')">
-              Hình ảnh và video
-            </li>
-            <li class="tab-item" [class.active]="activeTab === 'link'" (click)="selectTab('link')">
-              Liên kết
-            </li>
-            <li class="tab-item disabled">
-              Cuộc thăm dò ý kiến
-            </li>
-          </ul>
-
-          <div class="submit-inner">
-            <!-- Title Box -->
-            <div class="title-input-wrapper">
-              <input type="text" id="title" name="title" [(ngModel)]="form.title" maxlength="300" required
-                placeholder="Tiêu đề*" class="title-input" />
-              <span class="title-counter">{{ titleLength }}/300</span>
-            </div>
-
-            <div class="tag-actions">
-              <button type="button" class="btn-tag">+ Thêm thẻ (chỉ mô phỏng)</button>
-            </div>
-
-            <!-- Editor Box -->
-            <div class="editor-wrapper" *ngIf="activeTab === 'text'">
-              <quill-editor [(ngModel)]="form.content" name="content" [modules]="quillModules"
-                placeholder="Phần văn bản chính (không bắt buộc)" theme="snow">
-              </quill-editor>
-            </div>
-
-            <!-- Media Drag Drop Tab -->
-            <div class="editor-wrapper media-tab-wrapper" *ngIf="activeTab === 'media'">
-              <div class="drag-drop-zone" [class.drag-over]="isDragOver" (dragover)="onDragOver($event)"
-                (dragleave)="onDragLeave($event)" (drop)="onFileDrop($event)" (click)="fileInput.click()">
-
-                <div class="drag-icon">+</div>
-                <p class="placeholder-text-media">{{ isUploading ? 'Đang tải lên...' : 'Kéo thả phần nội dung đa phương
-                  tiện, hoặc nhấn vào đây để Nạp Tệp' }}</p>
-                <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*,video/*"
-                  multiple />
-              </div>
-
-              <!-- Preview Grid -->
-              <div class="media-preview-container" *ngIf="uploadedMedia.length > 0">
-                <div class="media-preview-item" *ngFor="let m of uploadedMedia; let i = index">
-                  <img [src]="m.url" alt="preview" *ngIf="m.type.startsWith('image/')">
-                  <video [src]="m.url" *ngIf="m.type.startsWith('video/')" controls></video>
-                  <button type="button" class="btn-remove-media" (click)="removeMedia(i)" title="Xoá">✕</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="editor-wrapper p-20" *ngIf="activeTab === 'link'">
-              <input type="url" placeholder="Url" class="title-input mt-2" [(ngModel)]="form.content"
-                name="linkContent" />
-            </div>
-
-            <!-- Footer Buttons -->
-            <div class="submit-actions">
-              <button type="button" class="btn-outline-cancel" routerLink="/">Lưu bản nháp</button>
-              <button type="submit" class="btn-submit" [disabled]="!isFormReady()">Đăng</button>
-            </div>
-          </div>
-        </div>
-      </form>
+  <div class="w-full">
+    <!-- Alerts -->
+    <div class="bg-[#e8f5e9] text-[#00a843] px-4 py-3 rounded-2xl mb-6 font-bold flex items-center gap-2" *ngIf="isSuccessful">
+      <span class="material-symbols-outlined">check_circle</span> Bài đã gửi thành công! Đang chờ Moderator xét duyệt... Đang chuyển hướng về cộng đồng.
+    </div>
+    <div class="bg-error-container text-on-error-container px-4 py-3 rounded-2xl mb-6 font-bold flex items-center gap-2" *ngIf="isFailed">
+       <span class="material-symbols-outlined">error</span> {{ errorMessage }}
     </div>
 
+    <form name="form" (ngSubmit)="isFormReady() && onSubmit()" #f="ngForm" novalidate *ngIf="!isSuccessful">
+
+      <div class="bg-surface-container-lowest rounded-3xl ghost-border overflow-hidden shadow-sm">
+        
+        <!-- Post Tabs -->
+        <div class="flex border-b border-outline-variant/15 bg-surface-container-lowest px-4">
+          <button type="button" class="flex-1 py-4 font-bold text-sm transition-all focus:outline-none relative flex items-center justify-center gap-2" [class.text-primary]="activeTab === 'text'" [class.text-on-surface-variant]="activeTab !== 'text'" (click)="selectTab('text')">
+            <span class="material-symbols-outlined text-[18px]">article</span> Văn bản
+            <div *ngIf="activeTab === 'text'" class="absolute bottom-0 inset-x-4 h-1 bg-primary rounded-t-full"></div>
+          </button>
+          <button type="button" class="flex-1 py-4 font-bold text-sm transition-all focus:outline-none relative flex items-center justify-center gap-2" [class.text-primary]="activeTab === 'media'" [class.text-on-surface-variant]="activeTab !== 'media'" (click)="selectTab('media')">
+            <span class="material-symbols-outlined text-[18px]">imagesmode</span> Đa phương tiện
+            <div *ngIf="activeTab === 'media'" class="absolute bottom-0 inset-x-4 h-1 bg-primary rounded-t-full"></div>
+          </button>
+          <button type="button" class="flex-1 py-4 font-bold text-sm transition-all focus:outline-none relative flex items-center justify-center gap-2" [class.text-primary]="activeTab === 'link'" [class.text-on-surface-variant]="activeTab !== 'link'" (click)="selectTab('link')">
+            <span class="material-symbols-outlined text-[18px]">link</span> Liên kết
+            <div *ngIf="activeTab === 'link'" class="absolute bottom-0 inset-x-4 h-1 bg-primary rounded-t-full"></div>
+          </button>
+        </div>
+
+        <div class="p-6">
+          <!-- Title Box -->
+          <div class="relative mb-4">
+            <input type="text" id="title" name="title" [(ngModel)]="form.title" maxlength="300" required placeholder="Tiêu đề bài viết*" class="w-full bg-surface-container border border-outline-variant/20 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-bold text-on-surface outline-none transition-all pr-16" />
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">{{ titleLength }}/300</span>
+          </div>
 
 
+          <!-- Editor Box -->
+          <div class="rounded-xl overflow-hidden border border-outline-variant/20 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all" *ngIf="activeTab === 'text'">
+            <quill-editor [(ngModel)]="form.content" name="content" [modules]="quillModules" placeholder="Nội dung chi tiết (không bắt buộc)..." theme="snow" class="bg-surface-container-lowest text-on-surface"></quill-editor>
+          </div>
+
+          <!-- Attachment Grid for Text Tab -->
+          <div class="mt-4" *ngIf="activeTab === 'text'">
+            <input type="file" #textTabFileInput (change)="onFileSelected($event)" class="hidden" accept="image/*,video/*" multiple />
+            <button type="button" class="bg-surface-container-high hover:bg-surface-container text-on-surface px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border border-outline-variant/20 mb-4" (click)="textTabFileInput.click()">
+              <span class="material-symbols-outlined text-[18px]">add_photo_alternate</span> Thêm hình ảnh đính kèm
+            </button>
+
+            <!-- Preview Grid inline below editor -->
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3" *ngIf="uploadedMedia.length > 0">
+              <div class="relative rounded-xl overflow-hidden border border-outline-variant/20 shadow-sm group aspect-square bg-surface-container-lowest" *ngFor="let m of uploadedMedia; let i = index">
+                <img [src]="m.url" alt="preview" *ngIf="m.type.startsWith('image/')" class="w-full h-full object-cover">
+                <video [src]="m.url" *ngIf="m.type.startsWith('video/')" class="w-full h-full object-cover" controls></video>
+                 
+                <button type="button" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 hover:bg-error text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all font-bold shadow-md cursor-pointer z-10" (click)="removeMedia(i)" title="Xóa hình ảnh này">
+                  <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              </div>
+            </div>
+            
+            <p class="text-xs text-on-surface-variant font-medium mt-2" *ngIf="isUploading">Đang tải lên, vui lòng chờ...</p>
+          </div>
+
+          <!-- Media Drag Drop Tab -->
+          <div *ngIf="activeTab === 'media'">
+            <div class="border-2 border-dashed border-outline-variant/50 rounded-2xl p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-primary/5 hover:border-primary/50 transition-colors" [class.bg-primary/10]="isDragOver" [class.border-primary]="isDragOver" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onFileDrop($event)" (click)="fileInput.click()">
+              <div class="w-16 h-16 rounded-full bg-surface-container-highest flex items-center justify-center text-primary mb-4 shadow-sm">
+                <span class="material-symbols-outlined text-[32px]">cloud_upload</span>
+              </div>
+              <p class="font-bold text-on-surface">{{ isUploading ? 'Đang tải lên...' : 'Kéo thả phần nội dung đa phương tiện' }}</p>
+              <p class="text-xs text-on-surface-variant font-medium mt-1">hoặc nhấn vào đây để duyệt file</p>
+              <input type="file" #fileInput (change)="onFileSelected($event)" class="hidden" accept="image/*,video/*" multiple />
+            </div>
+
+            <!-- Preview Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6" *ngIf="uploadedMedia.length > 0">
+              <div class="relative rounded-xl overflow-hidden border border-outline-variant/20 group aspect-square bg-surface-container" *ngFor="let m of uploadedMedia; let i = index">
+                <img [src]="m.url" alt="preview" *ngIf="m.type.startsWith('image/')" class="w-full h-full object-cover">
+                <video [src]="m.url" *ngIf="m.type.startsWith('video/')" class="w-full h-full object-cover" controls></video>
+                
+                <button type="button" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" (click)="removeMedia(i)" title="Xoá">
+                  <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Link Tab -->
+          <div *ngIf="activeTab === 'link'">
+            <input type="url" placeholder="Dán liên kết (URL)" class="w-full bg-surface-container border border-outline-variant/20 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-bold text-on-surface outline-none transition-all" [(ngModel)]="form.content" name="linkContent" />
+          </div>
+
+        </div>
+
+        <!-- === TAG PICKER === -->
+        <div class="px-6 py-4 border-t border-outline-variant/10">
+          <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-3 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[14px]">sell</span>
+            Thẻ chủ đề <span class="text-on-surface-variant font-normal normal-case tracking-normal">(tối đa 5, ảnh hưởng đề xuất bài viết)</span>
+          </p>
+
+          <!-- Chips + Input -->
+          <div class="relative">
+            <div class="flex flex-wrap gap-2 items-center p-2 bg-surface-container border border-outline-variant/30 rounded-2xl focus-within:border-primary transition-colors min-h-[44px]">
+              <!-- Selected tag chips -->
+              <span *ngFor="let tag of selectedTags; let i = index"
+                    class="flex items-center gap-1 bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full border border-primary/20">
+                #{{ tag.name }}
+                <button type="button" (click)="removeTag(i)" class="hover:text-error ml-0.5">
+                  <span class="material-symbols-outlined text-[12px]">close</span>
+                </button>
+              </span>
+              <!-- Input -->
+              <input *ngIf="selectedTags.length < 5"
+                     type="text"
+                     [(ngModel)]="tagInput"
+                     name="tagInput"
+                     (input)="onTagInput()"
+                     (keydown)="onTagKeydown($event)"
+                     (blur)="onTagBlur()"
+                     placeholder="{{ selectedTags.length === 0 ? 'Nhập thẻ... (Enter để thêm)' : '+ Thêm thẻ' }}"
+                     class="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-on-surface placeholder:text-on-surface-variant/50 px-1"/>
+              <span *ngIf="selectedTags.length >= 5" class="text-[10px] text-on-surface-variant px-1">Đã đạt tối đa 5 thẻ</span>
+            </div>
+
+            <!-- Autocomplete dropdown -->
+            <div *ngIf="showTagSuggestions && tagSuggestions.length > 0"
+                 class="absolute z-50 top-full left-0 w-full mt-1 bg-surface border border-outline-variant/20 rounded-xl shadow-xl overflow-hidden">
+              <button *ngFor="let sug of tagSuggestions | slice:0:6"
+                      type="button"
+                      (mousedown)="selectSuggestion(sug)"
+                      class="w-full text-left px-4 py-2.5 hover:bg-primary/5 text-sm flex items-center gap-2">
+                <span class="text-primary">#</span>
+                <span class="font-medium text-on-surface">{{ sug.name }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Gợi ý tag phổ biến (hiện khi chưa có tag nào) -->
+          <div *ngIf="selectedTags.length === 0" class="flex flex-wrap gap-2 mt-3">
+            <span class="text-[10px] text-on-surface-variant font-medium mr-1">Gợi ý:</span>
+            <button *ngFor="let t of ['công-nghệ','tin-tức','cuộc-sống','thể-thao','giải-trí','giáo-dục','sức-khỏe']"
+                    type="button"
+                    (click)="addTag(t)"
+                    class="text-[10px] px-2.5 py-1 rounded-full bg-surface-container border border-outline-variant/20 text-on-surface-variant hover:bg-primary/5 hover:text-primary hover:border-primary/30 transition-colors font-medium">
+              #{{ t }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="px-6 py-4 bg-surface-container/30 border-t border-outline-variant/15 flex justify-end gap-4">
+          <button type="button" class="px-6 py-2.5 rounded-full font-bold text-sm tracking-wide text-on-surface-variant hover:bg-surface-container transition-colors uppercase" routerLink="/">Lưu bản nháp</button>
+          <button type="submit"
+            class="px-8 py-2.5 rounded-full font-bold text-sm tracking-wide transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+            [class.kinetic-gradient]="isFormReady()"
+            [class.text-white]="isFormReady()"
+            [class.bg-surface-container-highest]="!isFormReady()"
+            [class.text-on-surface-variant]="!isFormReady()"
+            [disabled]="!isFormReady()">
+            {{ isEditMode ? 'Lưu chỉnh sửa' : (selectedCommunity ? 'Gửi duyệt bài' : 'Đăng bài') }}
+          </button>
+        </div>
+
+      </div>
+    </form>
   </div>
 </div>

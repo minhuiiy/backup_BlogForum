@@ -2,6 +2,7 @@
   <!-- Closed State -->
   <div class="chat-bubble" *ngIf="!isOpen" (click)="toggleWidget()">
     <i class="fas fa-comment-alt"></i> Tin nhắn
+    <span class="unread-badge" *ngIf="unreadTotalCount > 0">{{ unreadTotalCount }}</span>
   </div>
 
   <!-- Opened State -->
@@ -41,14 +42,52 @@
     </div>
 
     <!-- User List Window -->
-    <div class="user-list" *ngIf="!activeChatUser">
-      <div *ngIf="followingList.length === 0" class="empty-list">
-        Bạn chưa theo dõi ai cả. Hãy theo dõi ai đó để chat nhé!
+    <div class="user-list-view flex flex-col h-full overflow-hidden" *ngIf="!activeChatUser">
+      
+      <!-- Tabs -->
+      <div class="chat-tabs">
+         <button class="chat-tab" [class.active]="activeTab === 'inbox'" (click)="activeTab = 'inbox'">
+            Hộp thư <span *ngIf="unreadTotalCount > 0" class="red-count">{{unreadTotalCount}}</span>
+         </button>
+         <button class="chat-tab" [class.active]="activeTab === 'requests'" (click)="activeTab = 'requests'">
+            Chờ <span *ngIf="unreadRequestCount > 0" class="red-count">{{unreadRequestCount}}</span>
+         </button>
       </div>
-      <div class="user-row" *ngFor="let user of followingList" (click)="openChat(user)">
-        <img [src]="user.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'">
-        <span class="user-name">{{ user.displayName || user.username }}</span>
+
+      <!-- Inbox List -->
+      <div class="user-list" *ngIf="activeTab === 'inbox'">
+        <div *ngIf="followingList.length === 0" class="empty-list">
+          Bạn chưa theo dõi ai cả. Hãy theo dõi ai đó để chat nhé!
+        </div>
+        <div class="user-row" *ngFor="let user of followingList" (click)="openChat(user)">
+          <div class="user-avatar-container">
+            <img [src]="user.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'">
+            <div class="unread-dot" *ngIf="user.hasUnread"></div>
+          </div>
+          <div class="user-info-wrapper">
+            <span class="user-name" [class.font-bold]="user.hasUnread">{{ user.displayName || user.username }}</span>
+            <span class="user-preview" [class.unread]="user.hasUnread" *ngIf="user.lastMessagePreview">{{ user.lastMessagePreview }}</span>
+          </div>
+        </div>
       </div>
+      
+      <!-- Requests List -->
+      <div class="user-list" *ngIf="activeTab === 'requests'">
+        <div *ngIf="requestList.length === 0" class="empty-list">
+          Không có tin nhắn chờ nào.
+        </div>
+        <div class="user-row" *ngFor="let user of requestList" (click)="openChat(user)">
+          <div class="user-avatar-container">
+            <img [src]="user.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'">
+            <div class="unread-dot" *ngIf="user.hasUnread"></div>
+          </div>
+          <div class="user-info-wrapper">
+            <span class="user-name" [class.font-bold]="user.hasUnread">{{ user.displayName || user.username }}</span>
+            <span class="user-preview" [class.unread]="user.hasUnread" *ngIf="user.lastMessagePreview">{{ user.lastMessagePreview }}</span>
+          </div>
+        </div>
+      </div>
+      
     </div>
   </div>
 </div>

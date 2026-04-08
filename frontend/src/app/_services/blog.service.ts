@@ -30,11 +30,32 @@ export class BlogService {
     return this.http.post(API_URL, postData);
   }
 
+  deletePost(id: number): Observable<any> {
+    return this.http.delete(`${API_URL}/${id}`);
+  }
+
   votePost(id: number): Observable<any> {
     return this.http.post(`${API_URL}/${id}/vote`, {});
   }
 
   getLikedPosts(): Observable<number[]> {
     return this.http.get<number[]>(`${API_URL}/liked`);
+  }
+
+  updatePost(postData: any): Observable<any> {
+    return this.http.put(`${API_URL}/${postData.id}`, postData);
+  }
+
+  // ===== SAVE / BOOKMARK =====
+  savePost(id: number): Observable<any> {
+    return this.http.post(`${API_URL}/${id}/save`, {});
+  }
+
+  unsavePost(id: number): Observable<any> {
+    return this.http.delete(`${API_URL}/${id}/save`);
+  }
+
+  getSavedPosts(): Observable<number[]> {
+    return this.http.get<number[]>(`${API_URL}/saved`);
   }
 }

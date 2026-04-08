@@ -5,6 +5,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { PostDetailComponent } from './pages/post-detail/post-detail.component';
 import { CreatePostComponent } from './pages/create-post/create-post.component';
 import { AuthGuard } from './_helpers/auth.guard';
+import { AdminGuard } from './_helpers/admin.guard';
 import { Profile } from './pages/profile/profile';
 import { Popular } from './pages/popular/popular';
 import { News } from './pages/news/news';
@@ -12,10 +13,12 @@ import { Explore } from './pages/explore/explore';
 import { CreateCommunity } from './pages/create-community/create-community';
 import { CommunityComponent } from './pages/community/community';
 import { Search } from './pages/search/search';
+import { AdminComponent } from './pages/admin/admin';
 
 export const routes: Routes = [
   { path: 'profile', component: Profile },
   { path: 'user/:username', component: Profile },
+  { path: 'profile/:username', component: Profile },
   { path: 'home', component: HomeComponent },
   { path: 'popular', component: Popular },
   { path: 'all', component: HomeComponent },
@@ -24,9 +27,11 @@ export const routes: Routes = [
   { path: 'search', component: Search },
   { path: 'create-community', component: CreateCommunity, canActivate: [AuthGuard] },
   { path: 'r/:communityName', component: CommunityComponent },
+  { path: 'community/:communityName', component: CommunityComponent },
   { path: 'login', redirectTo: 'home', pathMatch: 'full' },
   { path: 'register', component: RegisterComponent },
   { path: 'create-post', component: CreatePostComponent, canActivate: [AuthGuard] },
   { path: 'post/:id', component: PostDetailComponent },
+  { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];

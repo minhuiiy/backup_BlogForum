@@ -33,6 +33,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   likedPosts: Set<number> = new Set<number>();
   isModerator = false;
+  isCreator = false;
   
   memberCount = 1;
   onlineCount = 1;
@@ -43,7 +44,15 @@ export class CommunityComponent implements OnInit, OnDestroy {
   // Settings state
   isEditing = false;
   isUploading = false;
-  editData = { displayName: '', description: '', imageUrl: '' };
+  editData = { displayName: '', description: '', imageUrl: '', telegramChannelId: '' };
+  
+  // Admin Data
+  adminActiveTab = 'settings';
+  pendingPosts: any[] = [];
+  communityMembers: any[] = [];
+
+  // Modal rời cộng đồng
+  showLeaveModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -69,7 +78,9 @@ export class CommunityComponent implements OnInit, OnDestroy {
 
     // Theo dõi thay đổi URL (Param) realtime
     this.routeSub = this.route.paramMap.subscribe(params => {
-      this.communityName = params.get('communityName') || '';
+      const rawParam = params.get('communityName') || '';
+      // Decode slug: thay gạch ngang → khoảng trắng để match tên gốc trong DB
+      this.communityName = rawParam.replace(/-/g, ' ');
       if (this.communityName) {
         this.titleService.setTitle(`r/${this.communityName} - blogforum`);
         this.loadCommunityInfo();
@@ -103,16 +114,20 @@ export class CommunityComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn) {
       if (this.currentUser?.roles?.includes('ROLE_ADMIN')) {
           this.isModerator = true;
+          this.isCreator = true; // Admin có quyền như creator
           return;
       }
       this.isModerator = this.commMock.getRole(this.communityName, this.currentUser?.username) === 'moderator';
-      
-      // Khắc phục backend join moderator
+
+      // Kiểm tra moderator từ backend
       if (this.communityData?.moderators) {
          if (this.communityData.moderators.find((u: any) => u.username === this.currentUser?.username)) {
             this.isModerator = true;
          }
       }
+
+      // Kiểm tra creator từ backend
+      this.isCreator = this.communityData?.creator?.username === this.currentUser?.username;
     }
   }
 
@@ -145,17 +160,112 @@ export class CommunityComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     event.preventDefault();
     if (!this.isLoggedIn) return;
+    this.showLeaveModal = true;
+  }
+
+  confirmLeaveCommunity() {
+    this.showLeaveModal = false;
     this.commMock.leaveCommunity(this.communityName, this.currentUser.username);
   }
 
   toggleEdit() {
     this.isEditing = !this.isEditing;
     if (this.isEditing) {
+      this.adminActiveTab = 'settings';
       this.editData.displayName = this.communityData?.displayName || this.communityData?.name || '';
       this.editData.description = this.communityData?.description || '';
       this.editData.imageUrl = this.communityData?.imageUrl || '';
+      this.editData.telegramChannelId = this.communityData?.telegramChannelId || '';
+      
+      this.loadPendingPosts();
+      this.loadCommunityMembers();
     }
   }
+
+  setAdminTab(tab: string) {
+    this.adminActiveTab = tab;
+  }
+
+  loadPendingPosts() {
+      if (this.communityData?.id) {
+          this.http.get(`${environment.apiUrl}/posts/pending/${this.communityData.id}`).subscribe({
+              next: (data: any) => {
+                  this.pendingPosts = data.content || data;
+              },
+              error: err => console.error(err)
+          });
+      }
+  }
+
+  loadCommunityMembers() {
+      this.http.get(`${environment.apiUrl}/categories/${encodeURIComponent(this.communityName)}/members`).subscribe({
+          next: (data: any) => {
+              this.communityMembers = data;
+          },
+          error: err => console.error(err)
+      });
+  }
+
+  approvePost(post: any) {
+      this.http.put(`${environment.apiUrl}/posts/${post.id}/approve`, {}).subscribe({
+          next: () => {
+              this.pendingPosts = this.pendingPosts.filter(p => p.id !== post.id);
+              this.loadCommunityFeed(); // Load to main feed
+          },
+          error: err => console.error(err)
+      });
+  }
+
+  rejectPost(post: any) {
+      if (confirm('Bạn có chắc chắn muốn từ chối bài viết này?')) {
+          this.http.delete(`${environment.apiUrl}/posts/${post.id}/reject`).subscribe({
+              next: () => {
+                  this.pendingPosts = this.pendingPosts.filter(p => p.id !== post.id);
+              },
+              error: err => console.error(err)
+          });
+      }
+  }
+
+  promoteMember(memberUsername: string) {
+      if (confirm(`Thăng cấp cho ${memberUsername}?`)) {
+          this.http.post(`${environment.apiUrl}/categories/${encodeURIComponent(this.communityName)}/promote?memberUsername=${memberUsername}`, {}).subscribe({
+              next: () => this.loadCommunityMembers(),
+              error: err => console.error(err)
+          });
+      }
+  }
+
+  demoteMember(memberUsername: string) {
+      if (confirm(`Hủy quyền kiểm duyệt của ${memberUsername}?`)) {
+          this.http.post(`${environment.apiUrl}/categories/${encodeURIComponent(this.communityName)}/demote?memberUsername=${memberUsername}`, {}).subscribe({
+              next: () => this.loadCommunityMembers(),
+              error: err => console.error(err)
+          });
+      }
+  }
+
+  deleteCommunity() {
+      if (!this.isCreator) {
+          alert('Chỉ người tạo cộng đồng mới có quyền xóa!');
+          return;
+      }
+      const communityName = this.communityData?.name || this.communityName;
+      if (confirm('LƯŨ Ý: XÓA CỘNG ĐỒNG SỌ XÓA TOÀN BỘ BÀI VIẾT BÊN TRONG. Bạn có chắc chắn không?')) {
+          this.http.delete(`${environment.apiUrl}/categories/by-name/${encodeURIComponent(communityName)}`).subscribe({
+              next: () => {
+                  window.location.href = '/explore';
+              },
+              error: (err: any) => {
+                  const msg = err.error || 'Xóa thất bại. Bạn không có quyền hoặc có lỗi xảy ra.';
+                  alert(msg);
+                  console.error(err);
+              }
+          });
+      }
+  }
+
+
 
   onFileSelected(event: any) {
     if (event.target.files.length > 0) {

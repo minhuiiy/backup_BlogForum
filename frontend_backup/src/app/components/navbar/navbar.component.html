@@ -1,0 +1,161 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-left">
+
+      <div class="nav-brand">
+        <a routerLink="/" class="brand-link">
+          <span><img src="/assets/logo.png" alt="Logo" height="30"></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="nav-search">
+      <div class="search-input-wrapper">
+        <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+        <input type="text" placeholder="Tìm kiếm trên BlogForum..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+      </div>
+    </div>
+
+    <div class="nav-auth">
+      <ng-container *ngIf="!isLoggedIn">
+        <a routerLink="/register" class="btn-secondary">Tải App</a>
+        <a class="btn-primary" (click)="openLoginModal()" style="cursor: pointer">Đăng Nhập</a>
+      </ng-container>
+
+      <ng-container *ngIf="isLoggedIn">
+        <div class="reddit-action-icons">
+          <a routerLink="#" class="action-icon" title="Quảng cáo">
+            <i class="fa-solid fa-bullhorn"></i>
+          </a>
+          <a routerLink="#" class="action-icon" title="Trò chuyện">
+            <i class="fa-regular fa-message"></i>
+          </a>
+          <a routerLink="/create-post" class="action-create" title="Tạo bài viết">
+            <i class="fa-solid fa-plus"></i> <span class="create-text">Tạo</span>
+          </a>
+          <div class="notif-dropdown-wrapper" style="position: relative; display: flex; align-items: center;">
+            <a class="action-icon" title="Thông báo" (click)="toggleNotifDropdown($event)" style="cursor: pointer; position: relative;">
+              <i class="fa-regular fa-bell"></i>
+              <span class="unread-badge" *ngIf="unreadCount > 0" style="position: absolute; top: 0px; right: -2px; background: #ff4500; color: white; border-radius: 50%; font-size: 9px; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; font-weight: bold; padding-top: 1px;">{{ unreadCount }}</span>
+            </a>
+            
+            <div class="dropdown-menu notif-menu" [class.show]="isNotifDropdownOpen" (click)="$event.stopPropagation()" style="width: 340px; right: 0; left: auto; max-height: 400px; overflow-y: auto; padding: 0;">
+              <div class="dropdown-header" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
+                Thông báo 
+                <a href="javascript:void(0)" (click)="markAllNotificationsAsRead()" style="font-size: 12px; font-weight: normal; color: var(--primary-color); text-decoration: none;"><i class="fa-solid fa-check-double"></i> Đánh dấu đã đọc</a>
+              </div>
+              
+              <div *ngIf="notifications.length === 0" style="padding: 30px 20px; text-align: center; color: var(--text-meta);">
+                <i class="fa-regular fa-bell-slash" style="font-size: 24px; margin-bottom: 12px;"></i>
+                <p>Tạm thời chưa có thông báo mới.</p>
+              </div>
+              
+              <div *ngFor="let notif of notifications" class="notif-item" [style.background]="notif.read ? 'transparent' : '#f0f8ff'" style="padding: 12px 16px; display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s;" (click)="markNotificationAsRead(notif)">
+                <div class="notif-icon" style="background:#eaedef; border-radius: 50%; width: 32px; height: 32px; display:flex; align-items:center; justify-content:center; flex-shrink: 0; font-size: 14px;">
+                   <i class="fa-solid fa-heart" *ngIf="notif.type === 'LIKE'" style="color: #ff4500;"></i>
+                   <i class="fa-solid fa-comment" *ngIf="notif.type === 'COMMENT'" style="color: #0079d3;"></i>
+                </div>
+                <div class="notif-content" style="font-size: 13px; line-height: 1.4; color: var(--text-main); flex: 1;">
+                   {{ notif.content }}
+                   <div class="notif-time" style="font-size: 11px; color: var(--text-meta); margin-top: 4px;">{{ notif.createdAt | timeAgo }}</div>
+                </div>
+                <div *ngIf="!notif.read" style="width: 8px; height: 8px; background: #24a0ed; border-radius: 50%; margin-top: 12px; flex-shrink: 0;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="user-dropdown">
+          <button class="avatar-btn" (click)="toggleDropdown($event)">
+            <div class="avatar-wrapper">
+              <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Avatar" class="reddit-avatar" style="object-fit: cover;" />
+              <div *ngIf="!avatarUrl" class="reddit-avatar" style="background-color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; width: 32px; height: 32px; border-radius: 50%;">
+                {{ (displayName || username)?.charAt(0) | uppercase }}
+              </div>
+              <div class="online-indicator"></div>
+            </div>
+          </button>
+
+          <div class="dropdown-menu" [class.show]="isDropdownOpen" (click)="$event.stopPropagation()">
+            <!-- Header section -->
+            <a routerLink="/profile" class="dropdown-header-item">
+              <div class="dropdown-avatar-wrapper">
+                <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 0 0 1px #e2e2e2;" />
+                <div *ngIf="!avatarUrl" style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; border: 2px solid white; box-shadow: 0 0 0 1px #e2e2e2;">
+                  {{ (displayName || username)?.charAt(0) | uppercase }}
+                </div>
+                <div class="online-indicator-small"></div>
+              </div>
+              <div class="dropdown-header-text">
+                <span class="user-display-name">{{ displayName || 'Xem hồ sơ' }}</span>
+                <span class="user-handle">{{ username }}</span>
+              </div>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <!-- Option Items -->
+            <a routerLink="#" class="dropdown-item">
+              <i class="fa-solid fa-shirt"></i>
+              <span>Sửa avatar</span>
+            </a>
+            <a routerLink="#" class="dropdown-item">
+              <i class="fa-regular fa-file-lines"></i>
+              <span>Bản nháp</span>
+            </a>
+
+            <a routerLink="#" class="dropdown-item">
+              <i class="fa-solid fa-trophy"></i>
+              <div class="item-text-group">
+                <span>Thành tích</span>
+                <span class="item-subtext">Đã mở khóa 3</span>
+              </div>
+            </a>
+
+            <a routerLink="#" class="dropdown-item">
+              <i class="fa-solid fa-coins"></i>
+              <div class="item-text-group">
+                <span>Kiếm tiền</span>
+                <span class="item-subtext">Kiếm tiền trên Blog</span>
+              </div>
+            </a>
+
+            <a routerLink="#" class="dropdown-item">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Premium</span>
+            </a>
+
+            <a routerLink="#" class="dropdown-item">
+              <i class="fa-solid fa-toggle-on"></i>
+              <span>Chế độ hiển thị</span>
+            </a>
+
+            <a href="javascript:void(0)" (click)="logout()" class="dropdown-item">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Đăng xuất</span>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <a routerLink="#" class="dropdown-item">
+              <i class="fa-solid fa-arrow-pointer"></i>
+              <span>Quảng cáo trên BlogForum</span>
+            </a>
+
+            <a routerLink="#" class="dropdown-item">
+              <i class="fa-solid fa-chart-pie"></i>
+              <span>Dùng thử BlogForum Pro <span class="badge-beta">BETA</span></span>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <a routerLink="/profile" class="dropdown-item">
+              <i class="fa-solid fa-gear"></i>
+              <span>Cài đặt</span>
+            </a>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</nav>

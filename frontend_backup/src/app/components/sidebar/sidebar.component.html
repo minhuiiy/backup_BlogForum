@@ -1,0 +1,130 @@
+<aside class="sidebar-container" [class.open]="sidebarService.isOpen$ | async">
+  
+  <button class="sidebar-border-toggle" (click)="sidebarService.toggle()">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+
+  <div class="sidebar-scrollable">
+
+    <div class="sidebar-section">
+      <ul class="nav-list">
+        <li>
+          <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+            <span class="nav-text">Trang chủ</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/popular" routerLinkActive="active" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+            <span class="nav-text">Phổ biến</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/news" routerLinkActive="active" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-newspaper"></i></span>
+            <span class="nav-text">Tin tức</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/explore" routerLinkActive="active" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-compass"></i></span>
+            <span class="nav-text">Khám phá</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/create-community" routerLinkActive="active" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-plus"></i></span>
+            <span class="nav-text">Bắt đầu một cộng đồng</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+
+
+    <div class="sidebar-section">
+      <h3 class="section-title">Cộng đồng của bạn</h3>
+      <ul class="nav-list">
+        <li>
+          <a class="nav-item cursor-pointer" (click)="toggleCommunities = !toggleCommunities">
+            <span class="nav-icon"><i class="fa-solid fa-chevron-{{ toggleCommunities ? 'down' : 'right' }}"
+                style="font-size: 14px;"></i></span>
+            <span class="nav-text">Cộng đồng tham gia</span>
+          </a>
+        </li>
+        <ng-container *ngIf="toggleCommunities">
+          <!-- Tự động đẻ ra các cộng đồng mà User ĐÃ THAM GIA -->
+          <li *ngFor="let comm of joinedCommunities">
+            <a [routerLink]="comm.url" class="nav-item pl-4" routerLinkActive="active">
+              <span class="nav-icon-circle" style="background-color: var(--secondary-color);"></span>
+              <span class="nav-text">{{ comm.name }}</span>
+            </a>
+          </li>
+        </ng-container>
+      </ul>
+    </div>
+
+    <div class="sidebar-separator"></div>
+
+    <div class="sidebar-section">
+      <h3 class="section-title">Tài nguyên</h3>
+      <ul class="nav-list">
+        <li>
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-gamepad"></i></span>
+            <span class="nav-text">Trò chơi</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-baseball"></i></span>
+            <span class="nav-text">Thể thao</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+            <span class="nav-text">Kinh doanh</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-masks-theater"></i></span>
+            <span class="nav-text">Truyền hình</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-ellipsis"></i></span>
+            <span class="nav-text">Xem tất cả</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Nơi gắn thẻ Footer Links của Reddit -->
+    <div class="sidebar-footer-links">
+      <div class="link-group">
+        <a href="#">Giới thiệu</a>
+        <a href="#">Quảng cáo</a>
+        <a href="#">Ứng dụng BlogForum</a>
+      </div>
+      <div class="link-group">
+        <a href="#">Nghề nghiệp</a>
+        <a href="#">Blog</a>
+        <a href="#">Báo chí</a>
+        <a href="#">Trợ giúp</a>
+      </div>
+      <div class="link-group mt-3">
+        <a href="#">Chính sách nội dung</a>
+        <a href="#">Bảo mật</a>
+        <a href="#">Thỏa thuận sử dụng</a>
+      </div>
+      <div class="copyright-info">
+        BlogForum Inc © 2026. Đã đăng ký bản quyền.
+      </div>
+    </div>
+
+  </div>
+</aside>

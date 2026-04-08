@@ -1,190 +1,189 @@
-<div class="community-form-bg">
-  <div class="community-form-container">
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-surface-container-highest/80 backdrop-blur-md">
+  
+  <div class="bg-surface-container-lowest w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col ghost-border h-[80vh] min-h-[600px] relative">
     
-    <div class="form-header">
-      <h1 class="form-title">Tạo một cộng đồng</h1>
-      <button class="close-btn" (click)="cancel()">✕</button>
+    <!-- Form Header -->
+    <div class="px-8 py-6 border-b border-outline-variant/15 flex items-center justify-between shrink-0">
+      <h1 class="text-2xl font-bold font-headline text-on-surface">Khởi tạo Cộng đồng Mới</h1>
+      <button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant" (click)="cancel()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
 
-    <!-- BƯỚC 1: NHẬP THÔNG TIN CƠ BẢN -->
-    <!-- BƯỚC 1: CHỌN CHỦ ĐỀ -->
-    <div class="form-body" *ngIf="currentStep === 1">
-      <h2 class="step2-title">Cộng đồng của bạn đề cập tới chủ đề gì?</h2>
-      <p class="step2-desc">Chọn một chủ đề để giúp redditor khám phá cộng đồng của bạn</p>
+    <!-- Step Content Area -->
+    <div class="flex-1 overflow-y-auto px-8 py-10 relative">
 
-      <div class="topics-grid">
-        <button class="topic-pill" 
-                *ngFor="let topic of availableTopics"
-                [class.selected]="selectedTopics.includes(topic.name)"
-                (click)="toggleTopic(topic.name)">
-          <span class="topic-icon">{{ topic.icon }}</span>
-          <span class="topic-name">{{ topic.name }}</span>
-        </button>
-      </div>
-    </div>
+      <!-- STEP 1 -->
+      <div *ngIf="currentStep === 1" class="max-w-2xl mx-auto animate-fade-in">
+        <h2 class="text-3xl font-bold font-headline text-on-surface mb-3 tracking-tight">Cộng đồng của bạn tập trung vào chủ đề gì?</h2>
+        <p class="text-on-surface-variant font-medium mb-10 text-lg">Lựa chọn các nhãn chủ đề giúp người dùng AI có thể để xuất cộng đồng của bạn chính xác hơn.</p>
 
-    <!-- BƯỚC 2: LOẠI CỘNG ĐỒNG & 18+ -->
-    <div class="form-body" *ngIf="currentStep === 2">
-      <h2 class="step2-title">Đây là cộng đồng như thế nào?</h2>
-      <p class="step2-desc">Quyết định ai có thể xem và đóng góp trong cộng đồng của bạn</p>
-
-      <div class="form-group">
-        
-        <div class="radio-option">
-          <input type="radio" id="type-public" value="public" [(ngModel)]="communityType">
-          <div class="radio-content">
-            <label for="type-public" class="radio-label"><i class="fa-solid fa-user icon"></i> Công khai</label>
-            <p class="radio-desc">Bất kỳ ai cũng có thể xem, đăng bài và bình luận ở cộng đồng này</p>
-          </div>
-        </div>
-
-        <div class="radio-option">
-          <input type="radio" id="type-restricted" value="restricted" [(ngModel)]="communityType">
-          <div class="radio-content">
-            <label for="type-restricted" class="radio-label"><i class="fa-solid fa-eye icon"></i> Hạn chế</label>
-            <p class="radio-desc">Bất kỳ ai cũng có thể xem, nhưng chỉ có thành viên được duyệt mới có thể đăng bài</p>
-          </div>
-        </div>
-
-        <div class="radio-option">
-          <input type="radio" id="type-private" value="private" [(ngModel)]="communityType">
-          <div class="radio-content">
-            <label for="type-private" class="radio-label"><i class="fa-solid fa-lock icon"></i> Riêng tư</label>
-            <p class="radio-desc">Chỉ những thành viên được mời hoặc duyệt mới có thể xem và đóng góp</p>
-          </div>
+        <div class="flex flex-wrap gap-4">
+          <button *ngFor="let topic of availableTopics" class="px-6 py-4 rounded-2xl font-bold text-sm ghost-border transition-all flex items-center gap-3 hover:-translate-y-1"
+                  [class.bg-primary/10]="selectedTopics.includes(topic.name)" [class.border-primary/30]="selectedTopics.includes(topic.name)" [class.text-primary]="selectedTopics.includes(topic.name)"
+                  [class.bg-surface-container]="!selectedTopics.includes(topic.name)" [class.text-on-surface-variant]="!selectedTopics.includes(topic.name)"
+                  (click)="toggleTopic(topic.name)">
+            <span class="text-2xl">{{ topic.icon }}</span>
+            <span>{{ topic.name }}</span>
+          </button>
         </div>
       </div>
 
-      <hr class="form-divider">
+      <!-- STEP 2 -->
+      <div *ngIf="currentStep === 2" class="max-w-2xl mx-auto animate-fade-in">
+        <h2 class="text-3xl font-bold font-headline text-on-surface mb-3 tracking-tight">Cộng đồng của bạn hoạt động như thế nào?</h2>
+        <p class="text-on-surface-variant font-medium mb-10 text-lg">Thiết lập quyền riêng tư để kiểm soát nội dung hiển thị.</p>
 
-      <div class="form-group nsfw-group">
-        <label class="group-label">Nội dung người lớn</label>
-        <div class="checkbox-wrapper">
-          <input type="checkbox" id="nsfw-check" [(ngModel)]="isAdultContent">
-          <label for="nsfw-check" class="checkbox-label">
-            <span class="nsfw-badge">18+</span>
-            Cộng đồng có chứa nội dung không dành cho trẻ em (NSFW)
+        <div class="space-y-4 mb-10">
+          <label class="block cursor-pointer">
+            <input type="radio" name="commType" value="public" [(ngModel)]="communityType" class="peer sr-only">
+            <div class="px-6 py-5 rounded-2xl border-2 transition-all flex gap-4 peer-checked:border-primary peer-checked:bg-primary/5 bg-surface-container-lowest border-outline-variant/20 hover:border-outline-variant/60">
+               <div class="mt-1 text-on-surface-variant peer-checked:text-primary">
+                 <span class="material-symbols-outlined text-[24px]">public</span>
+               </div>
+               <div>
+                  <h3 class="font-bold text-on-surface text-lg">Công khai</h3>
+                  <p class="text-sm font-medium text-on-surface-variant mt-1">Bất kỳ ai cũng có thể xem, đăng bài và bình luận ở cộng đồng này</p>
+               </div>
+            </div>
+          </label>
+          <label class="block cursor-pointer">
+            <input type="radio" name="commType" value="restricted" [(ngModel)]="communityType" class="peer sr-only">
+            <div class="px-6 py-5 rounded-2xl border-2 transition-all flex gap-4 peer-checked:border-primary peer-checked:bg-primary/5 bg-surface-container-lowest border-outline-variant/20 hover:border-outline-variant/60">
+               <div class="mt-1 text-on-surface-variant peer-checked:text-primary">
+                 <span class="material-symbols-outlined text-[24px]">visibility</span>
+               </div>
+               <div>
+                  <h3 class="font-bold text-on-surface text-lg">Hạn chế</h3>
+                  <p class="text-sm font-medium text-on-surface-variant mt-1">Bất kỳ ai cũng có thể xem, nhưng chỉ có thành viên được duyệt mới có thể đăng bài</p>
+               </div>
+            </div>
+          </label>
+          <label class="block cursor-pointer">
+            <input type="radio" name="commType" value="private" [(ngModel)]="communityType" class="peer sr-only">
+            <div class="px-6 py-5 rounded-2xl border-2 transition-all flex gap-4 peer-checked:border-primary peer-checked:bg-primary/5 bg-surface-container-lowest border-outline-variant/20 hover:border-outline-variant/60">
+               <div class="mt-1 text-on-surface-variant peer-checked:text-primary">
+                 <span class="material-symbols-outlined text-[24px]">lock</span>
+               </div>
+               <div>
+                  <h3 class="font-bold text-on-surface text-lg">Riêng tư</h3>
+                  <p class="text-sm font-medium text-on-surface-variant mt-1">Chỉ những thành viên được duyệt mới có thể xem và đóng góp</p>
+               </div>
+            </div>
+          </label>
+        </div>
+
+        <div class="h-[1px] bg-outline-variant/15 mb-8"></div>
+
+        <div>
+          <h3 class="text-sm font-bold font-headline text-on-surface mb-4 uppercase tracking-widest">Nội dung người lớn (18+)</h3>
+          <label class="flex items-center gap-4 cursor-pointer group">
+            <div class="relative w-12 h-6 bg-surface-container-highest rounded-full transition-colors group-hover:bg-outline-variant/50" [class.bg-error]="isAdultContent">
+               <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform" [class.translate-x-6]="isAdultContent"></div>
+               <input type="checkbox" class="sr-only" [(ngModel)]="isAdultContent">
+            </div>
+            <div class="flex items-center gap-2">
+               <span class="bg-error text-white text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded">18+</span>
+               <span class="font-medium text-on-surface">Cộng đồng có chứa nội dung không dành cho trẻ em (NSFW)</span>
+            </div>
           </label>
         </div>
       </div>
-    </div>
 
-    <!-- BƯỚC 3: THÔNG TIN CƠ BẢN (SPLIT PANE) -->
-    <div class="form-body split-pane" *ngIf="currentStep === 3">
-      <div class="left-pane">
-        <h2 class="step2-title">Cho chúng tôi biết về cộng đồng của bạn</h2>
-        <p class="step2-desc">Tên và mô tả giúp mọi người hiểu về cộng đồng của bạn.</p>
-        
-        <div class="form-group input-block">
-          <label class="group-label" [class.error]="isDuplicate">Tên cộng đồng <span style="color:red">*</span></label>
-          <div class="input-wrapper">
-            <span class="static-prefix" [class.error]="isDuplicate"></span>
-            <input type="text" [(ngModel)]="communityName" maxlength="21" class="comm-input" 
-                   [class.is-invalid]="(communityName.length > 0 && communityName.length < 3) || isDuplicate" 
-                   placeholder="Ví dụ: voz_tamsu, code_dao...">
-          </div>
-          <div class="validation-row">
-            <span class="error-msg" *ngIf="isDuplicate">Đã có người sử dụng tên cộng đồng này rồi. Vui lòng chọn tên khác nhé!</span>
-            <div class="char-count" [style.color]="communityName.length === 21 ? 'red' : 'var(--text-meta)'">
-              {{ communityName.length }}/21
+      <!-- STEP 3 -->
+      <div *ngIf="currentStep === 3" class="w-full h-full flex flex-col md:flex-row gap-12 animate-fade-in relative">
+        <div class="flex-1 flex flex-col justify-center">
+          <h2 class="text-3xl font-bold font-headline text-on-surface mb-3 tracking-tight">Chi tiết cộng đồng</h2>
+          <p class="text-on-surface-variant font-medium mb-10 text-lg">Đặt tên và mô tả hấp dẫn để thu hút thành viên mới.</p>
+          
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-bold text-on-surface uppercase tracking-widest mb-3">Tên cộng đồng <span class="text-error">*</span></label>
+              <div class="relative">
+                <input type="text" [(ngModel)]="communityName" maxlength="21"
+                       class="w-full bg-surface-container-low border border-outline-variant/20 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-4 font-bold text-lg text-on-surface outline-none transition-all pr-16" 
+                       [class.border-error]="isDuplicate" [class.focus:border-error]="isDuplicate" [class.focus:ring-error/20]="isDuplicate"
+                       placeholder="Ví dụ: công_nghệ_ai">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold font-mono" [class.text-error]="communityName.length === 21" [class.text-on-surface-variant]="communityName.length < 21">{{ communityName.length }}/21</span>
+              </div>
+              <p class="text-error text-xs font-bold mt-2 flex items-center gap-1" *ngIf="isDuplicate">
+                 <span class="material-symbols-outlined text-[14px]">error</span> Đã có người sử dụng tên cộng đồng này rồi. Vui lòng chọn tên khác nhé!
+              </p>
             </div>
-          </div>
-        </div>
 
-        <div class="form-group input-block" style="margin-top:20px;">
-          <label class="group-label">Mô tả <span style="color:red">*</span></label>
-          <textarea [(ngModel)]="communityDesc" class="comm-input" rows="5" 
-                    placeholder="Viết giới thiệu siêu ngắn về cộng đồng..." maxlength="150" 
-                    style="padding-top:10px; padding-left:12px; resize: none;"></textarea>
-          <div class="validation-row" style="justify-content: flex-end;">
-            <div class="char-count">{{ communityDesc.length }}/150</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="right-pane">
-        <div class="live-preview-box">
-          <div class="lp-banner"></div>
-          <div class="lp-content">
-            <div class="lp-avatar-row">
-              <div class="lp-avatar"></div>
-              <div class="lp-text">
-                <h3>{{ communityName || 'tên_cộng_đồng' }}</h3>
-                <p>1 khách truy cập hằng tuần • 1 người đóng góp hằng tuần</p>
+            <div>
+              <label class="block text-sm font-bold text-on-surface uppercase tracking-widest mb-3">Mô tả ngắn gọn <span class="text-error">*</span></label>
+              <div class="relative">
+                <textarea [(ngModel)]="communityDesc" rows="4" maxlength="150"
+                          class="w-full bg-surface-container-low border border-outline-variant/20 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-4 font-medium text-sm text-on-surface outline-none transition-all resize-none"
+                          placeholder="Mô tả tóm tắt mục tiêu hoạt động của cộng đồng..."></textarea>
+                <span class="absolute bottom-4 right-4 text-xs font-bold font-mono text-on-surface-variant">{{ communityDesc.length }}/150</span>
               </div>
             </div>
-            <p class="lp-desc">{{ communityDesc || 'bình thường' }}</p>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- BƯỚC 4: SUCCESS SCREEN (MÀN HÌNH CHÚC MỪNG) -->
-    <div class="success-screen split-bg" *ngIf="currentStep === 4">
-      <!-- Cơn mưa Confetti trang trí động -->
-      <div class="confetti c-blue" style="top:15%; left:15%;"></div>
-      <div class="confetti c-yellow" style="top:65%; left:30%;"></div>
-      <div class="confetti c-green" style="bottom:20%; left:8%;"></div>
-      <div class="confetti c-red" style="top:25%; right:22%;"></div>
-      <div class="confetti c-orange" style="bottom:30%; right:15%;"></div>
-      <div class="confetti c-blue" style="top:45%; left:45%;"></div>
-      <div class="confetti c-green" style="bottom:10%; right:30%;"></div>
-      
-      <button class="close-btn abs-close" (click)="cancel()">✕</button>
-
-      <div class="success-left">
-        <h1 class="success-title">Bạn đã tạo ra một cộng đồng mới!</h1>
-        <h3 class="success-subtitle">Dưới đây là những gì bạn nên biết</h3>
-        <p class="success-desc">Chúng tôi đã áp dụng một số tùy chọn cài đặt để giúp bạn bắt đầu. Bạn có thể xem và chỉnh sửa những tùy chọn cài đặt này bất cứ lúc nào trong các công cụ kiểm duyệt của mình.</p>
-        
-        <div class="success-links">
-          <div class="link-item"><i class="fa-solid fa-check" style="color:#00a35c"></i> Quy tắc</div>
-          <div class="link-item"><i class="fa-solid fa-book-open-reader" style="color:#ff4500"></i> Hướng dẫn chào mừng</div>
-        </div>
-      </div>
-
-      <div class="success-right">
-        <div class="live-preview-box success-mode">
-          <div class="lp-banner dark-pattern"></div>
-          <div class="lp-content">
-            <div class="lp-avatar-row">
-              <div class="lp-avatar"><i class="fa-solid fa-microphone-lines"></i></div>
-              <div class="lp-text">
-                <h3>{{ communityName }}</h3>
-                <p>1 khách truy cập hằng tuần • 1 người đóng góp hằng tuần</p>
+        <div class="w-[340px] shrink-0 self-center hidden md:block">
+           <div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-lg border border-outline-variant/20 scale-95 origin-center">
+              <div class="h-24 bg-gradient-to-r from-primary/10 to-transparent relative"></div>
+              <div class="px-6 pb-6 relative -mt-8">
+                 <div class="flex gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-surface border-4 border-surface-container-lowest flex items-center justify-center text-primary shadow-sm bg-primary/5">
+                       <span class="material-symbols-outlined text-[32px]">{{ isAdultContent ? 'warning' : 'groups' }}</span>
+                    </div>
+                 </div>
+                 <div class="mt-4">
+                    <h3 class="text-xl font-bold font-headline text-on-surface line-clamp-1">{{ communityName || 'Tên Cộng Đồng' }}</h3>
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mt-1">1 Thành viên • Đang trực tuyến</p>
+                    <p class="text-sm font-medium text-on-surface-variant mt-4 line-clamp-3 leading-relaxed">{{ communityDesc || 'Mô tả tóm tắt cộng đồng sẽ hiển thị ở đây.' }}</p>
+                 </div>
               </div>
-            </div>
-            <p class="lp-desc">{{ communityDesc || 'bình thường' }}</p>
-            <div class="mock-btn-row">
-              <button class="mock-btn"><i class="fa-solid fa-eye"></i> Màu cơ bản</button>
-            </div>
-          </div>
+           </div>
+           <p class="text-center text-xs font-bold text-outline-variant/60 uppercase tracking-widest mt-4">Xem trước hiển thị</p>
         </div>
       </div>
-    </div>
 
-    <!-- Thanh Footer Điều khiển Đa bước -->
-    <div class="form-footer multi-step" *ngIf="currentStep < 4">
-      <div class="step-indicators">
-        <span class="dot" [class.active]="currentStep === 1"></span>
-        <span class="dot" [class.active]="currentStep === 2"></span>
-        <span class="dot" [class.active]="currentStep === 3"></span>
-      </div>
-      
-      <div class="action-buttons">
-        <button class="btn-outline btn-gray" *ngIf="currentStep === 1" (click)="cancel()">Hủy</button>
-        <button class="btn-outline btn-gray" *ngIf="currentStep > 1" (click)="prevStep()">Quay lại</button>
+      <!-- STEP 4 : SUCCESS -->
+      <div *ngIf="currentStep === 4" class="h-full flex flex-col items-center justify-center text-center animate-fade-in">
+        <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-tertiary/5 pointer-events-none rounded-b-3xl"></div>
         
-        <button class="btn-gray-filled" *ngIf="currentStep === 1" [disabled]="selectedTopics.length === 0" (click)="nextStep()">Tiếp</button>
-        <button class="btn-gray-filled" *ngIf="currentStep === 2" (click)="nextStep()">Tiếp tục</button>
-        <button class="btn-primary" *ngIf="currentStep === 3" [disabled]="communityName.length < 3 || isDuplicate" (click)="createCommunity()">Tạo cộng đồng</button>
+        <div class="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/30 mb-8 relative z-10 animate-bounce">
+           <span class="material-symbols-outlined text-[48px]">check</span>
+        </div>
+
+        <h1 class="text-4xl font-bold font-headline text-on-surface mb-4 relative z-10">Cộng đồng đã sẵn sàng!</h1>
+        <p class="text-lg text-on-surface-variant font-medium max-w-lg mb-10 relative z-10">Xin chúc mừng! Ban quản trị hệ thống đã phê duyệt và khởi tạo thành công không gian của bạn. Hãy bắt đầu xây dựng ngay.</p>
+
+        <div class="flex gap-4 relative z-10">
+           <button class="px-8 py-3 rounded-full font-bold text-sm bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface uppercase tracking-widest" (click)="cancel()">Đóng lại</button>
+           <button class="px-8 py-3 rounded-full font-bold text-sm kinetic-gradient text-white shadow-md hover:scale-95 transition-transform uppercase tracking-widest flex items-center gap-2" (click)="goToCommunity()">
+             Chuyển đến trang cộng đồng <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+           </button>
+        </div>
       </div>
+
     </div>
 
-    <div class="form-footer finale-footer" *ngIf="currentStep === 4">
-       <button class="link-forward" (click)="goToCommunity()">
-         Chuyển đến trang cộng đồng <i class="fa-solid fa-chevron-right" style="font-size: 12px; margin-left: 4px;"></i>
-       </button>
+    <!-- Form Footer (Actions & Progress) -->
+    <div class="px-8 py-6 border-t border-outline-variant/15 flex items-center justify-between shrink-0 bg-surface-container-lowest" *ngIf="currentStep < 4">
+      
+      <div class="flex items-center gap-2">
+         <div class="w-10 h-2 rounded-full transition-colors duration-500" [class.bg-primary]="currentStep >= 1" [class.bg-surface-container-high]="currentStep < 1"></div>
+         <div class="w-10 h-2 rounded-full transition-colors duration-500" [class.bg-primary]="currentStep >= 2" [class.bg-surface-container-high]="currentStep < 2"></div>
+         <div class="w-10 h-2 rounded-full transition-colors duration-500" [class.bg-primary]="currentStep >= 3" [class.bg-surface-container-high]="currentStep < 3"></div>
+      </div>
+
+      <div class="flex gap-3">
+        <button class="px-6 py-2.5 rounded-full font-bold text-sm tracking-wide text-on-surface-variant hover:bg-surface-container transition-colors uppercase" *ngIf="currentStep === 1" (click)="cancel()">Hủy</button>
+        <button class="px-6 py-2.5 rounded-full font-bold text-sm tracking-wide text-on-surface-variant hover:bg-surface-container transition-colors uppercase" *ngIf="currentStep > 1" (click)="prevStep()">Quay lại</button>
+        
+        <button class="px-8 py-2.5 rounded-full font-bold text-sm tracking-wide text-white kinetic-gradient hover:opacity-90 transition-opacity uppercase disabled:opacity-50 disabled:cursor-not-allowed shadow-md" *ngIf="currentStep === 1" [disabled]="selectedTopics.length === 0" (click)="nextStep()">Tiếp tục</button>
+        <button class="px-8 py-2.5 rounded-full font-bold text-sm tracking-wide text-white kinetic-gradient hover:opacity-90 transition-opacity uppercase shadow-md" *ngIf="currentStep === 2" (click)="nextStep()">Tiếp tục</button>
+        <button class="px-8 py-2.5 rounded-full font-bold text-sm tracking-wide text-white bg-primary hover:bg-primary/90 transition-opacity uppercase disabled:bg-surface-container-highest disabled:text-on-surface-variant/50 shadow-md flex items-center gap-2" *ngIf="currentStep === 3" [disabled]="communityName.length < 3 || isDuplicate" (click)="createCommunity()">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span> Tạo cộng đồng
+        </button>
+      </div>
+
     </div>
 
   </div>

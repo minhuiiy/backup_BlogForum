@@ -1,69 +1,73 @@
-<div class="auth-container">
-  <div class="auth-box">
-    <button class="close-btn" (click)="close()">✕</button>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-8 bg-surface-container-highest/80 backdrop-blur-md">
+  <div class="bg-surface-container-lowest w-full max-w-md rounded-3xl shadow-2xl flex flex-col ghost-border relative animate-fade-in overflow-y-auto max-h-[95vh]">
+    
+    <button class="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant z-10" (click)="close()">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+    </button>
 
-    <h2 class="auth-title">Đăng nhập</h2>
-    <p class="auth-disclaimer">
-      Bằng việc tiếp tục, bạn đồng ý với <a href="#">Thỏa thuận người dùng</a> của chúng tôi, đồng thời xác nhận rằng
-      bạn hiểu rõ <a href="#">Chính sách quyền riêng tư</a> của chúng tôi.
-    </p>
-
-    <!-- KHỐI MẠNG XÃ HỘI VÀ ĐĂNG NHẬP NHANH (REDDIT STYLE) -->
-    <div class="auth-social-group">
-      <button type="button" class="btn-social" (click)="loginWithPhone()">
-        <span class="social-icon text-icon" style="font-size: 20px;"></span>
-        Tiếp tục với số điện thoại
-      </button>
-
-      <div class="google-btn-wrapper" style="display: flex; justify-content: center; width: 100%;">
-        <asl-google-signin-button type="standard" size="large" shape="pill" [width]="360"
-          text="continue_with"></asl-google-signin-button>
+    <div class="p-6 sm:p-10">
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold font-headline text-on-surface mb-2">Đăng nhập</h2>
+        <p class="text-xs text-on-surface-variant font-medium leading-relaxed">
+          Bằng việc tiếp tục, bạn đồng ý với <a href="#" class="text-primary hover:underline">Thỏa thuận người dùng</a> của chúng tôi, đồng thời xác nhận rằng
+          bạn hiểu rõ <a href="#" class="text-primary hover:underline">Chính sách quyền riêng tư</a> của chúng tôi.
+        </p>
       </div>
 
-      <button type="button" class="btn-social" (click)="loginWithApple()">
-        <span class="social-icon text-icon" style="font-size: 20px; margin-bottom: 3px;"></span>
-        Tiếp tục với Apple
-      </button>
-
-      <button type="button" class="btn-social" (click)="loginWithEmailLink()">
-        <span class="social-icon text-icon" style="font-size: 16px;">🔗</span>
-        Gửi cho tôi liên kết một lần qua email
-      </button>
-    </div>
-
-    <div class="auth-divider">
-      <span>HOẶC</span>
-    </div>
-
-    <!-- KHỐI ĐĂNG NHẬP TRUYỀN THỐNG BẰNG USERNAME -->
-    <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
-      <div class="form-group reddit-input-group">
-        <input type="text" id="username" name="username" [(ngModel)]="form.username" required #username="ngModel"
-          placeholder="Email hoặc tên người dùng *" [ngClass]="{ 'is-invalid': f.submitted && username.errors }"
-          autocomplete="off" />
-      </div>
-
-      <div class="form-group reddit-input-group">
-        <input type="password" id="password" name="password" [(ngModel)]="form.password" required minlength="6"
-          #password="ngModel" placeholder="Mật khẩu *" [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
-          autocomplete="off" />
-      </div>
-
-      <div class="forgot-password">
-        <a href="#">Bạn quên mật khẩu?</a>
-      </div>
-
-      <div class="form-group row-submit">
-        <button class="reddit-submit" [disabled]="!f.form.valid"
-          [ngClass]="{'disabled-btn': !form.username || !form.password}">Đăng nhập</button>
-      </div>
-
-      <div class="form-group">
-        <div *ngIf="f.submitted && isLoginFailed" class="alert-error">
-          {{ errorMessage }}
+      <!-- Social Logins -->
+      <div class="space-y-3 mb-6">
+        <!-- Google Sign-in: width tự động theo màn hình -->
+        <div class="w-full flex justify-center overflow-hidden rounded-full border border-outline-variant/30 bg-surface-container hover:bg-surface-container-high transition-colors py-1">
+          <asl-google-signin-button type="standard" size="large" shape="pill" [width]="googleBtnWidth" text="continue_with"></asl-google-signin-button>
         </div>
       </div>
-    </form>
 
+      <div class="flex items-center gap-4 mb-6">
+        <div class="flex-1 h-[1px] bg-outline-variant/20"></div>
+        <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Hoặc</span>
+        <div class="flex-1 h-[1px] bg-outline-variant/20"></div>
+      </div>
+
+      <!-- Traditional Login -->
+      <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+        <div class="space-y-4">
+          
+          <div>
+            <input type="text" id="username" name="username" [(ngModel)]="form.username" required #username="ngModel"
+                   placeholder="Email hoặc tên người dùng *"
+                   class="w-full bg-surface border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-bold text-on-surface outline-none transition-all"
+                   [ngClass]="{ 'border-error focus:border-error focus:ring-error/20': f.submitted && username.errors }" autocomplete="off" />
+          </div>
+
+          <div>
+            <input type="password" id="password" name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"
+                   placeholder="Mật khẩu *"
+                   class="w-full bg-surface border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-bold text-on-surface outline-none transition-all"
+                   [ngClass]="{ 'border-error focus:border-error focus:ring-error/20': f.submitted && password.errors }" autocomplete="off" />
+          </div>
+
+          <div class="text-right">
+            <a href="#" class="text-xs font-bold text-primary hover:underline tracking-wide">Bạn quên mật khẩu?</a>
+          </div>
+
+          <div class="pt-2">
+            <button class="w-full py-3.5 rounded-full font-bold text-sm tracking-widest kinetic-gradient text-white shadow-md hover:scale-[0.98] transition-transform uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    [disabled]="!f.form.valid || !form.username || !form.password">
+              Đăng nhập
+            </button>
+          </div>
+
+          <div *ngIf="f.submitted && isLoginFailed" class="bg-error-container text-on-error-container px-4 py-3 rounded-xl mt-4 font-bold flex items-center gap-2 text-sm">
+             <span class="material-symbols-outlined text-[18px]">error</span> {{ errorMessage }}
+          </div>
+          
+        </div>
+      </form>
+      
+      <div class="mt-8 text-center text-sm font-medium text-on-surface-variant">
+        Chưa có tài khoản? <a href="javascript:void(0)" class="font-bold text-primary hover:underline" (click)="closeAndNavigateToRegister()">Đăng ký ngay</a>
+      </div>
+
+    </div>
   </div>
 </div>

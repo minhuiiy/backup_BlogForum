@@ -23,4 +23,8 @@ export class ChatService {
   markAsRead(senderUsername: string): Observable<any> {
     return this.http.post(API_URL + 'read/' + senderUsername, {});
   }
+
+  getChatRequests(): Observable<any> {
+    return this.http.get(API_URL + 'requests');
+  }
 }

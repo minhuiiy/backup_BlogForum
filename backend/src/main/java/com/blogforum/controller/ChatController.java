@@ -42,4 +42,11 @@ public class ChatController {
         chatService.markMessagesAsRead(currentUsername, senderUsername);
         return ResponseEntity.ok(Map.of("message", "Messages marked as read"));
     }
+
+    @GetMapping("/requests")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    public ResponseEntity<List<com.blogforum.model.User>> getMessageRequests() {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(chatService.getMessageRequests(currentUsername));
+    }
 }

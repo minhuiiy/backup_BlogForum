@@ -1,232 +1,445 @@
-<div class="reading-container" *ngIf="post">
-  <!-- Post Container -->
-  <div class="post-detail-card">
-    <div class="post-content-area">
-      <div class="post-meta-top">
-        <button class="back-btn" (click)="goBack()">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
+<div class="max-w-[1440px] mx-auto px-8 py-10 w-full" *ngIf="post">
+  <!-- Header -->
+  <header class="mb-12 relative">
+    <div class="flex items-center gap-4 mb-6">
+      <button class="w-10 h-10 rounded-full bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors" (click)="goBack()">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+
+      <div class="flex items-center gap-2" *ngIf="post.category">
+        <span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold tracking-widest px-2 py-1 rounded uppercase flex items-center gap-1">
+          <span class="material-symbols-outlined text-[12px]">{{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name)?.charAt(0) | uppercase}}</span>
+          {{ post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name }}
+        </span>
+        <button class="bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest transition-colors" 
+                *ngIf="!isLoggedIn || !commMock.isJoined(post.category.name, currentUser?.username)" 
+                (click)="joinCommunity(post.category.name, $event)">
+          Tham gia
         </button>
-        <ng-container *ngIf="post.category">
-          <div class="community-info">
-            <span class="community-icon" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:var(--primary-color); color:#fff; font-size:12px; font-weight:bold; margin-right:4px;">
-              {{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name)?.charAt(0) | uppercase}}
-            </span>
-            <span class="community-name" style="font-weight: 600; color: var(--text-main);">{{ post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name }}</span>
-          </div>
-          <button class="btn-join-sm" 
-                  *ngIf="!isLoggedIn || !commMock.isJoined(post.category.name, currentUser?.username)" 
-                  (click)="joinCommunity(post.category.name, $event)"
-                  style="margin-left: 8px; font-weight: 700; font-size: 12px; color: #fff; background-color: #0045ac; border-radius: 99px; padding: 4px 12px; border: none; cursor: pointer;">
-            Tham gia
-          </button>
-          <span class="dot-separator" style="margin-left: 8px;">•</span>
-          <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar d-inline-block">
-          <span *ngIf="post.author && !post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right: 4px;">
-             {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
-          </span>
-          <span class="post-author" *ngIf="post.author">{{ post.author.displayName || post.author.username }}</span>
-        </ng-container>
-
-        <ng-container *ngIf="!post.category">
-          <div class="community-info">
-            <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar">
-            <span *ngIf="!post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right:4px;">
-              {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
-            </span>
-            <span class="community-name" style="font-weight: 600; color: var(--text-main);">{{ post.author?.displayName || post.author?.username }}</span>
-          </div>
-        </ng-container>
-        
-        <span class="dot-separator" *ngIf="post.author && !post.category">•</span>
-        <span class="post-date">{{ post.createdAt | timeAgo }}</span>
-        
-        <div class="kebab-menu-wrapper" style="margin-left: auto;">
-          <button class="kebab-btn">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"></path></svg>
-          </button>
-          <div class="kebab-dropdown">
-            <button class="dropdown-item">Lưu bài viết</button>
-            <button class="dropdown-item" *ngIf="currentUser?.username !== post.author?.username">Báo cáo vi phạm</button>
-            <button class="dropdown-item" *ngIf="currentUser?.username === post.author?.username || currentUser?.roles?.includes('ROLE_ADMIN')" style="color: #ff4444;">Xóa bài viết</button>
-          </div>
-        </div>
-      </div>
-
-      <h1 class="post-title">{{ post.title }}</h1>
-
-      <div class="post-content-body">
-        <div [innerHTML]="post.content | safeHtml"></div>
       </div>
       
-      <div class="post-action-bar">
-        <button class="action-btn fb-like-btn" [class.liked]="isPostLiked()" (click)="votePost()">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"></path></svg>
-          <span class="action-text">Thích ({{ post.likes }})</span>
-        </button>
-        <button class="action-btn">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11.5 8c-4.99 0-9 4.01-9 9 0 1.25.26 2.45.74 3.53.25.56.88.8 1.45.54.56-.25.81-.88.54-1.45-.3-.69-.47-1.45-.47-2.25 0-3.86 3.14-7 7-7v2.79c0 .45.54.67.85.35l3.79-3.79c.2-.2.2-.51 0-.71l-3.79-3.79c-.31-.31-.85-.09-.85.35V8z"></path></svg>
-          <span class="action-text">{{ comments.length }} Bình luận</span>
-        </button>
-        <button class="action-btn">
-           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="m14 2 6 6-6 6V9c-4.5 0-8.1 3.2-8.9 7.5-.1.5-.5.9-1 .8-.5-.1-.8-.5-.8-1C3.3 9.7 8.3 5 14 5V2z"></path></svg>
-          <span class="action-text">Chia sẻ</span>
-        </button>
+      <div class="flex items-center gap-2" *ngIf="!post.category">
+        <span class="bg-surface-container-high text-on-surface-variant text-[10px] font-bold tracking-widest px-2 py-1 rounded uppercase">
+          Tường cá nhân
+        </span>
       </div>
+    </div>
 
-      <!-- Add Comment Form -->
-      <div class="comment-form-section">
-        <p class="comment-as" *ngIf="isLoggedIn">Bình luận dưới tên <span>{{ currentUser?.username }}</span></p>
+    <h1 class="text-4xl lg:text-5xl font-bold font-headline tracking-tighter text-on-surface leading-[1.1] max-w-4xl mb-6">
+      {{ post.title }}
+    </h1>
+
+    <div class="flex items-center gap-6 text-sm text-on-surface-variant">
+      <div class="flex items-center gap-2">
+        <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" class="w-8 h-8 rounded-full border border-outline-variant/20 object-cover cursor-pointer hover:opacity-80 transition-opacity" (click)="showUserSummary(post.author?.username, $event)">
+        <div *ngIf="!post.author?.avatarUrl" class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-xs uppercase cursor-pointer hover:opacity-80 transition-opacity" (click)="showUserSummary(post.author?.username, $event)">
+          {{ (post.author?.displayName || post.author?.username)?.charAt(0) }}
+        </div>
+        <span class="font-bold text-on-surface cursor-pointer hover:underline" (click)="showUserSummary(post.author?.username, $event)">{{ post.author?.displayName || post.author?.username }}</span>
+      </div>
+      <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> {{ post.createdAt | timeAgo }}</span>
+      <div class="kebab-menu-wrapper relative ml-auto group/menu cursor-pointer">
+        <button class="material-symbols-outlined hover:text-on-surface transition-colors">more_horiz</button>
+        <div class="absolute right-0 top-6 w-48 bg-surface-container-lowest border border-outline-variant/15 rounded-xl shadow-xl overflow-hidden invisible group-hover/menu:visible opacity-0 group-hover/menu:opacity-100 transition-all z-50">
+          <button class="w-full text-left px-4 py-2 hover:bg-surface-container-low text-sm font-medium flex items-center gap-2"
+                  (click)="toggleSave()">
+            <span class="material-symbols-outlined text-[16px]" [style.font-variation-settings]="isSaved ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
+            {{ isSaved ? 'Đã lưu' : 'Lưu bài viết' }}
+          </button>
+          <button class="w-full text-left px-4 py-2 hover:bg-surface-container-low text-sm font-medium flex items-center gap-2"
+                  *ngIf="currentUser?.username === post.author?.username"
+                  (click)="openEditModal()">
+            <span class="material-symbols-outlined text-[16px]">edit</span> Sửa bài viết
+          </button>
+          <button class="w-full text-left px-4 py-2 hover:bg-surface-container-low text-sm font-medium" *ngIf="currentUser?.username !== post.author?.username">Báo cáo vi phạm</button>
+          <button class="w-full text-left px-4 py-2 hover:bg-error/10 text-error text-sm font-bold flex items-center gap-2" *ngIf="currentUser?.username === post.author?.username || currentUser?.roles?.includes('ROLE_ADMIN')" (click)="deletePost()">
+            <span class="material-symbols-outlined text-[16px]">delete</span> Xóa bài viết
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-12">
+    <!-- Main Content Column -->
+    <div class="xl:col-span-8">
+      
+      <!-- Post Body -->
+      <div class="flex flex-col md:flex-row gap-8 mb-12">
+        <!-- Voting Area -->
+        <div class="flex md:flex-col items-center gap-4 py-2 order-2 md:order-1 pt-6 border-t md:border-None border-outline-variant/10 w-full md:w-auto mt-6 md:mt-0">
+          <button class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-all" [class.bg-primary]="isPostLiked()" [class.text-white]="isPostLiked()" (click)="votePost()">
+            <span class="material-symbols-outlined" [class.text-white]="isPostLiked()">keyboard_arrow_up</span>
+          </button>
+          <span class="text-2xl font-headline font-bold" [class.text-primary]="isPostLiked()">{{ post.likes }}</span>
+          <button class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-error/10 hover:text-error transition-all">
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </button>
+        </div>
         
-        <div class="comment-form" *ngIf="isLoggedIn; else loginPrompt">
-          <textarea id="main-comment-input" name="main-comment-input" [(ngModel)]="newCommentContent" placeholder="Viết bình luận của bạn..." rows="3"></textarea>
+        <!-- Post Description & Formatting -->
+        <div class="flex-1 order-1 md:order-2 post-content-body">
+          <div class="prose prose-slate prose-lg max-w-none prose-headings:font-headline font-body text-on-surface leading-relaxed" [innerHTML]="post.content | safeHtml"></div>
           
-          <!-- Main Selected GIF Preview -->
-          <div class="attached-gif-preview" *ngIf="selectedMainGif" style="position: relative; display: inline-block; margin: 8px 16px;">
-             <img [src]="selectedMainGif" class="comment-attached-img" style="margin-top:0;" alt="selected-gif" loading="lazy" decoding="async" />
-             <button class="remove-gif-btn" (click)="removeMainGif()" style="position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+          <div class="flex flex-wrap gap-2 pt-8">
+             <span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-bold rounded-md uppercase tracking-wider ghost-border" *ngIf="post.category">Discussion</span>
           </div>
 
-          <div class="form-actions" style="display: flex; gap: 8px; position: relative;">
-            <button class="btn-outline" (click)="toggleMainGifPicker()" style="padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase;">GIF</button>
-            <button class="btn-primary" (click)="submitComment()">Bình luận</button>
-            
-            <!-- Main GIF Picker -->
-            <div class="gif-picker-modal" *ngIf="showMainGifPicker">
-              <div class="gif-grid">
-                <img *ngFor="let gif of availableGifs" [src]="gif" (click)="insertGif(gif, false)" class="gif-option" alt="gif" loading="lazy" decoding="async" />
-              </div>
+          <!-- Share / Action Footer -->
+          <div class="mt-8 pt-6 border-t border-outline-variant/15 flex justify-between items-center flex-wrap gap-3">
+            <div class="flex gap-4 flex-wrap">
+              <!-- Share Button -->
+              <button class="text-xs font-bold text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest flex items-center gap-1"
+                      (click)="sharePost()">
+                <span class="material-symbols-outlined text-[16px]">share</span> Share
+              </button>
+              <!-- Save / Bookmark Button -->
+              <button class="text-xs font-bold uppercase tracking-widest flex items-center gap-1 transition-colors"
+                      [class.text-primary]="isSaved"
+                      [class.text-on-surface-variant]="!isSaved"
+                      (click)="toggleSave()">
+                <span class="material-symbols-outlined text-[16px]" [style.font-variation-settings]="isSaved ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
+                {{ isSaved ? 'Đã lưu' : 'Save' }}
+              </button>
+              <!-- Edit Button (chỉ hiện với chủ bài) -->
+              <button *ngIf="isLoggedIn && currentUser?.username === post.author?.username"
+                      class="text-xs font-bold text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest flex items-center gap-1"
+                      (click)="openEditModal()">
+                <span class="material-symbols-outlined text-[16px]">edit</span> Sửa bài
+              </button>
             </div>
+            <button class="text-xs font-bold text-error hover:underline uppercase tracking-widest flex items-center gap-1">
+               <span class="material-symbols-outlined text-sm">flag</span> Report
+            </button>
           </div>
         </div>
-        
-        <ng-template #loginPrompt>
-          <div class="login-prompt">
-            <h3 class="login-title">Đăng nhập hoặc đăng ký để bình luận</h3>
-            <div class="login-actions">
-              <a (click)="openLoginModal()" class="btn-outline" style="cursor: pointer;">Đăng nhập</a>
-              <a routerLink="/register" class="btn-primary">Đăng ký</a>
-            </div>
-          </div>
-        </ng-template>
       </div>
 
-      <!-- Comments List -->
-      <div class="comments-section" *ngIf="comments.length > 0">
+      <!-- Answers Section / Comments -->
+      <div class="mt-20 space-y-12">
         
-        <!-- Comments Header with Filter -->
-        <div class="comments-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;">
-          <span style="font-weight: 700; color: var(--text-main);">Bình luận ({{comments.length}})</span>
-          <div class="sort-dropdown">
-            <label for="comment-sort" style="font-size: 12px; color: var(--text-meta); margin-right: 8px; font-weight: 600;">Sắp xếp theo:</label>
-            <select id="comment-sort" [(ngModel)]="sortOption" (change)="sortCommentsList()" style="border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; background: var(--surface-color); color: var(--text-main); font-size: 13px; outline: none; cursor: pointer;">
-              <option value="newest">Mới nhất</option>
-              <option value="oldest">Cũ nhất</option>
-            </select>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <h2 class="text-3xl font-bold font-headline tracking-tight text-on-surface">{{ comments.length }} Bình luận</h2>
+          <div class="flex items-center bg-surface-container-low p-1 rounded-lg">
+            <!-- Simple sort dropdown mapped to buttons -->
+            <button class="px-4 py-2 text-xs font-bold rounded-md transition-colors shadow-sm"
+                    [class.bg-white]="sortOption === 'newest'" [class.text-primary]="sortOption === 'newest'"
+                    [class.text-on-surface-variant]="sortOption !== 'newest'" (click)="sortOption = 'newest'; sortCommentsList()">
+              Mới nhất
+            </button>
+            <button class="px-4 py-2 text-xs font-bold rounded-md transition-colors"
+                    [class.bg-white]="sortOption === 'oldest'" [class.text-primary]="sortOption === 'oldest'"
+                    [class.text-on-surface-variant]="sortOption !== 'oldest'" (click)="sortOption = 'oldest'; sortCommentsList()">
+              Cũ nhất
+            </button>
           </div>
         </div>
 
-        <!-- Recursive Comment Template -->
-        <ng-template #commentNode let-comment="comment">
-          <div class="comment-thread" [id]="'comment-' + comment.id" [class.highlighted-comment]="highlightedCommentId === comment.id" style="transition: background-color 1s ease;">
-            <div class="comment-avatar">
-              <img *ngIf="comment.user?.avatarUrl" [src]="comment.user.avatarUrl" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
-              <div *ngIf="!comment.user?.avatarUrl" class="avatar-placeholder small">
-                {{ (comment.user?.displayName || comment.user?.username)?.charAt(0) | uppercase }}
+        <!-- Add Comment Form -->
+        <div class="bg-surface-container-lowest p-6 rounded-3xl ghost-border mb-8 shadow-sm">
+          <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4" *ngIf="isLoggedIn">Tạo bình luận dưới tên <span class="text-primary">{{ currentUser?.username }}</span></p>
+          
+          <div *ngIf="isLoggedIn; else loginPrompt">
+            <div class="bg-surface-container-low rounded-2xl ring-1 ring-outline-variant/10 p-4 mb-4">
+              <textarea class="w-full bg-transparent border-none focus:ring-0 p-0 text-sm placeholder:text-on-surface-variant/50 resize-none font-medium text-on-surface outline-none" rows="3" [(ngModel)]="newCommentContent" placeholder="Viết bình luận hoặc phân tích của bạn..."></textarea>
+              
+              <!-- Attached GIF -->
+              <div class="attached-gif-preview mt-4 relative inline-block rounded-xl overflow-hidden" *ngIf="selectedMainGif">
+                 <img [src]="selectedMainGif" class="max-h-48 rounded-xl object-contain bg-black/5" alt="selected-gif" loading="lazy" />
+                 <button class="absolute top-2 right-2 bg-black/60 text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-error transition-colors" (click)="removeMainGif()"><span class="material-symbols-outlined text-[14px]">close</span></button>
               </div>
             </div>
-            
-            <div class="comment-content-block">
-              <div class="comment-header">
-                <span class="comment-author">{{ comment.user?.displayName || comment.user?.username }}</span>
-                <span class="dot-separator">•</span>
-                <span class="comment-date">{{ comment.createdAt | date:'short' }}</span>
-                
-                <div class="kebab-menu-wrapper" style="margin-left: auto;">
-                  <button class="kebab-btn">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"></path></svg>
-                  </button>
-                  <div class="kebab-dropdown">
-                    <button class="dropdown-item" *ngIf="currentUser?.username === comment.user?.username || currentUser?.roles?.includes('ROLE_ADMIN')" (click)="deleteComment(comment.id)">Xóa bình luận</button>
-                    <button class="dropdown-item" *ngIf="currentUser?.username !== comment.user?.username">Báo cáo vi phạm</button>
-                  </div>
+
+            <div class="flex items-center justify-between relative">
+              <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container-high text-on-surface-variant transition-colors" (click)="toggleMainGifPicker()">
+                <span class="material-symbols-outlined text-xl">gif_box</span>
+              </button>
+              <button class="kinetic-gradient text-white font-bold px-8 py-2.5 rounded-full text-sm shadow-md hover:scale-95 transition-transform" (click)="submitComment()">Gửi Bình Luận</button>
+              
+              <!-- GIF Picker -->
+              <div class="absolute left-0 top-12 z-50 bg-surface-container-lowest p-4 rounded-2xl shadow-xl w-64 h-64 overflow-y-auto ghost-border" *ngIf="showMainGifPicker">
+                <div class="grid grid-cols-2 gap-2">
+                  <img *ngFor="let gif of availableGifs" [src]="gif" (click)="insertGif(gif, false)" class="rounded-lg cursor-pointer hover:scale-105 transition-transform bg-surface-container-low h-24 w-full object-cover" loading="lazy" />
                 </div>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #loginPrompt>
+            <div class="text-center py-6">
+              <h3 class="text-lg font-bold font-headline mb-4 text-on-surface">Tham gia thảo luận</h3>
+              <div class="flex justify-center gap-4">
+                <button (click)="openLoginModal()" class="px-6 py-2 rounded-full font-bold text-sm bg-surface-container-high hover:bg-surface-container transition-colors text-on-surface">Đăng nhập</button>
+                <button routerLink="/register" class="px-6 py-2 rounded-full font-bold text-sm kinetic-gradient text-white hover:scale-95 transition-transform shadow-md">Đăng ký mới</button>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Comments List using Nested Template -->
+        <ng-template #commentNode let-comment="comment">
+          <div class="relative bg-surface-container-lowest p-6 rounded-3xl mb-6 shadow-sm ring-1 ring-outline-variant/10 group/comment transition-colors duration-500" 
+               [id]="'comment-' + comment.id" 
+               [class.bg-primary/5]="highlightedCommentId === comment.id"
+               [class.ring-primary/20]="highlightedCommentId === comment.id">
+            
+            <div class="flex gap-4 sm:gap-6">
+              <!-- Comment Voting -->
+              <div class="flex flex-col items-center gap-3 pt-1">
+                <button class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-primary transition-all" [class.text-primary]="isCommentLiked(comment.id)" [class.bg-primary/10]="isCommentLiked(comment.id)" (click)="toggleCommentLike(comment.id)">
+                  <span class="material-symbols-outlined text-[18px]">favorite</span>
+                </button>
+                <span class="font-bold text-xs font-mono text-on-surface-variant">{{ isCommentLiked(comment.id) ? '1' : '0' }}</span>
               </div>
               
-              <ng-container>
-                <div class="comment-body">
-                  <div class="comment-body-content" [innerHTML]="comment.content | safeHtml"></div>
-                </div>
-                
-                <div class="comment-action-bar">
-                  <button class="action-btn fb-like-btn" [class.liked]="isCommentLiked(comment.id)" (click)="toggleCommentLike(comment.id)">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"></path></svg>
-                    <span class="action-text">Thích <ng-container *ngIf="isCommentLiked(comment.id)">(1)</ng-container></span>
-                  </button>
-                  
-                  <button class="action-btn" (click)="setReply(comment.id)">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"></path></svg>
-                    <span class="action-text">Trả lời</span>
-                  </button>
-                </div>
-
-                <!-- Reply Input form -->
-                <div class="reply-form" *ngIf="replyingToId === comment.id">
-                  <textarea id="reply-input-{{comment.id}}" name="reply-input-{{comment.id}}" [(ngModel)]="replyContent" placeholder="Viết phản hồi..." rows="3"></textarea>
-                  
-                  <!-- Reply Selected GIF Preview -->
-                  <div class="attached-gif-preview" *ngIf="selectedReplyGifs[comment.id]" style="position: relative; display: inline-block; margin: 8px 12px;">
-                     <img [src]="selectedReplyGifs[comment.id]" class="comment-attached-img" style="margin-top:0;" alt="selected-gif" loading="lazy" decoding="async" />
-                     <button class="remove-gif-btn" (click)="removeReplyGif(comment.id)" style="position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-3">
+                  <img *ngIf="comment.user?.avatarUrl" [src]="comment.user.avatarUrl" class="w-7 h-7 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity" (click)="showUserSummary(comment.user?.username, $event)">
+                  <div *ngIf="!comment.user?.avatarUrl" class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[10px] uppercase cursor-pointer hover:opacity-80 transition-opacity" (click)="showUserSummary(comment.user?.username, $event)">
+                    {{ (comment.user?.displayName || comment.user?.username)?.charAt(0) }}
+                  </div>
+                  <div>
+                    <span class="text-sm font-bold text-primary cursor-pointer hover:underline" (click)="showUserSummary(comment.user?.username, $event)">{{ comment.user?.displayName || comment.user?.username }}</span>
+                    <span class="text-xs text-on-surface-variant font-medium ml-2">— {{ comment.createdAt | timeAgo }}</span>
                   </div>
 
-                  <div class="reply-actions" style="display: flex; gap: 8px; position: relative;">
-                    <button class="btn-outline" (click)="toggleReplyGifPicker(comment.id)" style="padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase;">GIF</button>
-                    <button class="btn-outline" (click)="setReply(comment.id)">Huỷ</button>
-                    <button class="btn-primary" (click)="submitReply(comment.id)">Bình luận</button>
+                  <!-- Comment Kebab Menu -->
+                  <div class="ml-auto relative group/cmenu cursor-pointer">
+                    <span class="material-symbols-outlined text-outline-variant hover:text-on-surface text-[18px]">more_horiz</span>
+                    <div class="absolute right-0 top-6 w-40 bg-surface-container-lowest border border-outline-variant/15 rounded-xl shadow-xl overflow-hidden invisible group-hover/cmenu:visible opacity-0 group-hover/cmenu:opacity-100 transition-all z-[60]">
+                      <button class="w-full text-left px-4 py-2 hover:bg-error/10 text-error text-xs font-bold" *ngIf="currentUser?.username === comment.user?.username || currentUser?.roles?.includes('ROLE_ADMIN')" (click)="deleteComment(comment.id)">Xóa bình luận</button>
+                      <button class="w-full text-left px-4 py-2 hover:bg-surface-container-low text-xs font-medium" *ngIf="currentUser?.username !== comment.user?.username">Báo cáo</button>
+                    </div>
+                  </div>
+                </div>
 
-                    <!-- Reply GIF Picker -->
-                    <div class="gif-picker-modal" *ngIf="activeReplyGifPicker === comment.id">
-                      <div class="gif-grid">
-                        <img *ngFor="let gif of availableGifs" [src]="gif" (click)="insertGif(gif, true)" class="gif-option" alt="gif" loading="lazy" decoding="async" />
+                <div class="prose prose-sm prose-slate max-w-none text-on-surface font-medium leading-relaxed" [innerHTML]="comment.content | safeHtml"></div>
+                
+                <div class="mt-4 flex gap-4">
+                  <button class="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1" (click)="setReply(comment.id)">
+                    <span class="material-symbols-outlined text-[16px]">reply</span> Trả lời
+                  </button>
+                </div>
+                
+                <!-- Reply Form -->
+                <div class="mt-6 bg-surface-container-low rounded-2xl p-4 ring-1 ring-outline-variant/10" *ngIf="replyingToId === comment.id">
+                  <textarea class="w-full bg-transparent border-none outline-none text-sm p-2 focus:ring-0 resize-none font-medium placeholder:text-on-surface-variant/50" rows="2" [(ngModel)]="replyContent" placeholder="Bình luận đối đáp..."></textarea>
+                  
+                  <div class="attached-gif-preview mt-2 relative inline-block rounded-xl overflow-hidden" *ngIf="selectedReplyGifs[comment.id]">
+                     <img [src]="selectedReplyGifs[comment.id]" class="max-h-32 rounded-xl object-contain bg-black/5" loading="lazy" />
+                     <button class="absolute top-2 right-2 bg-black/60 text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-error" (click)="removeReplyGif(comment.id)"><span class="material-symbols-outlined text-[14px]">close</span></button>
+                  </div>
+
+                  <div class="flex items-center justify-between mt-2 relative">
+                    <button class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors" (click)="toggleReplyGifPicker(comment.id)">
+                      <span class="material-symbols-outlined text-xl">gif_box</span>
+                    </button>
+                    <div class="flex gap-2">
+                       <button class="px-4 py-1.5 rounded-full text-xs font-bold text-on-surface-variant hover:bg-surface-container transition-colors" (click)="setReply(comment.id)">Hủy</button>
+                       <button class="px-6 py-1.5 rounded-full text-xs font-bold kinetic-gradient text-white hover:scale-95 transition-transform" (click)="submitReply(comment.id)">Gửi</button>
+                    </div>
+
+                    <div class="absolute left-0 top-10 z-50 bg-surface-container-lowest p-3 rounded-2xl shadow-xl w-56 h-56 overflow-y-auto ghost-border" *ngIf="activeReplyGifPicker === comment.id">
+                      <div class="grid grid-cols-2 gap-2">
+                        <img *ngFor="let gif of availableGifs" [src]="gif" (click)="insertGif(gif, true)" class="rounded-lg cursor-pointer hover:scale-105 transition-transform bg-surface-container-low h-20 w-full object-cover" loading="lazy" />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Toggle Replies Button -->
-                <div class="replies-toggle-bar" *ngIf="comment.replies && comment.replies.length > 0" style="margin-top: 4px;">
-                  <button class="toggle-replies-btn" (click)="toggleReplies(comment.id)" style="background: transparent; border: none; font-weight: 600; font-size: 13px; color: var(--text-meta); cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 12px; transition: background 0.2s;">
-                    <span style="font-size: 16px;">⮑</span>
-                    <span *ngIf="!isRepliesExpanded(comment.id)">Xem {{ comment.replies.length }} câu trả lời</span>
-                    <span *ngIf="isRepliesExpanded(comment.id)">Ẩn câu trả lời</span>
-                  </button>
+                <!-- Show/Hide Replies Toggle -->
+                <div class="mt-4" *ngIf="comment.replies && comment.replies.length > 0">
+                   <button class="flex items-center gap-2 text-xs font-bold text-primary bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors" (click)="toggleReplies(comment.id)">
+                     <span class="material-symbols-outlined text-[14px]" [class.rotate-180]="isRepliesExpanded(comment.id)">expand_more</span>
+                     <span *ngIf="!isRepliesExpanded(comment.id)">Xem {{ comment.replies.length }} phản hồi</span>
+                     <span *ngIf="isRepliesExpanded(comment.id)">Ẩn phản hồi</span>
+                   </button>
                 </div>
-                
-                <!-- Nested Replies Recursive call -->
-                <div class="nested-replies" *ngIf="comment.replies && comment.replies.length > 0 && isRepliesExpanded(comment.id)">
-                  <ng-container *ngFor="let reply of comment.replies">
-                    <ng-container *ngTemplateOutlet="commentNode; context: {comment: reply}"></ng-container>
-                  </ng-container>
+
+                <!-- Nested Replies Wrapper -->
+                <div class="mt-4 pl-4 sm:pl-8 border-l border-outline-variant/20 space-y-4" *ngIf="comment.replies && comment.replies.length > 0 && isRepliesExpanded(comment.id)">
+                   <ng-container *ngFor="let reply of comment.replies">
+                     <ng-container *ngTemplateOutlet="commentNode; context: {comment: reply}"></ng-container>
+                   </ng-container>
                 </div>
-              </ng-container>
+
+              </div>
             </div>
           </div>
         </ng-template>
 
         <!-- Init Root Comments -->
-        <ng-container *ngFor="let c of comments">
-          <ng-container *ngTemplateOutlet="commentNode; context: {comment: c}"></ng-container>
-        </ng-container>
+        <div>
+          <div *ngIf="comments.length === 0" class="text-center py-10 bg-surface-container-lowest rounded-3xl ghost-border text-on-surface-variant font-medium text-sm">
+             Chưa có câu trả lời nào. Ý kiến phân tích của bạn là gì?
+          </div>
+          <ng-container *ngFor="let c of comments">
+            <ng-container *ngTemplateOutlet="commentNode; context: {comment: c}"></ng-container>
+          </ng-container>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right Sidebar (Metadata / Author Info) -->
+    <div class="xl:col-span-4 space-y-8">
+      
+      <!-- Post Meta Bento -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-surface-container-lowest p-6 rounded-3xl ghost-border">
+          <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Interactions</p>
+          <div class="flex items-baseline gap-2">
+            <p class="text-3xl font-headline font-bold text-primary">{{ post.likes }}</p>
+            <span class="material-symbols-outlined text-xs text-primary">arrow_upward</span>
+          </div>
+        </div>
+        <div class="bg-surface-container-lowest p-6 rounded-3xl ghost-border">
+          <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Responses</p>
+          <p class="text-3xl font-headline font-bold text-on-surface">{{ comments.length }}</p>
+        </div>
       </div>
 
-      <div *ngIf="comments.length === 0" class="empty-comments">
-        <p>Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ suy nghĩ của bạn!</p>
+      <!-- Author Card -->
+      <div class="bg-surface-container-lowest p-8 rounded-3xl ghost-border shadow-sm border-t-4 border-t-primary">
+        <h4 class="text-[10px] font-bold text-primary uppercase tracking-widest mb-6">Original Poster</h4>
+        <div class="flex items-center gap-4 mb-6">
+          <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" class="w-14 h-14 rounded-2xl object-cover shadow-sm bg-surface-container">
+          <div *ngIf="!post.author?.avatarUrl" class="w-14 h-14 rounded-2xl bg-secondary-container text-on-secondary-container flex items-center justify-center font-headline font-bold text-xl shadow-sm uppercase">
+             {{ (post.author?.displayName || post.author?.username)?.charAt(0) }}
+          </div>
+          <div>
+            <p class="font-bold text-on-surface text-lg leading-tight">{{ post.author?.displayName || post.author?.username }}</p>
+            <p class="text-xs font-medium text-on-surface-variant mt-1">&commat;{{ post.author?.username }}</p>
+          </div>
+        </div>
+        <button [routerLink]="['/profile', post.author?.username]" class="w-full py-3 border border-outline-variant/30 text-on-surface text-xs font-bold rounded-xl hover:bg-surface-container-low transition-all">View Profile</button>
+      </div>
+
+      <!-- Static Related Questions block -->
+      <div class="bg-surface-container-low/50 p-8 rounded-3xl border border-outline-variant/15">
+        <h4 class="text-lg font-bold font-headline mb-6 text-on-surface">Khám phá thêm</h4>
+        <div class="space-y-6">
+          <a routerLink="/popular" class="block group">
+             <h5 class="text-sm font-semibold text-on-surface-variant group-hover:text-primary transition-colors leading-snug">Tìm hiểu các chủ đề đang hot nhất trên diễn đàn</h5>
+          </a>
+          <a routerLink="/explore" class="block group">
+             <h5 class="text-sm font-semibold text-on-surface-variant group-hover:text-primary transition-colors leading-snug">Tham gia các cộng đồng chuyên sâu</h5>
+          </a>
+        </div>
       </div>
 
     </div>
   </div>
+
+  <!-- User Summary Modal -->
+  <div *ngIf="summaryUser" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" (click)="closeUserSummary($event)">
+    <div class="bg-surface-container-lowest w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl relative p-6 m-4" (click)="$event.stopPropagation()">
+      <button class="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all cursor-pointer focus:outline-none" (click)="closeUserSummary($event)">
+         <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+      
+      <div class="flex flex-col items-center mt-4 text-center">
+         <img *ngIf="summaryUser.avatarUrl" [src]="summaryUser.avatarUrl" class="w-24 h-24 rounded-full object-cover shadow-md border-4 border-surface-container-low mb-4">
+         <div *ngIf="!summaryUser.avatarUrl" class="w-24 h-24 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-3xl uppercase shadow-md border-4 border-surface-container-low mb-4">
+            {{ (summaryUser.displayName || summaryUser.username)?.charAt(0) }}
+         </div>
+         
+         <h3 class="text-xl font-bold font-headline text-on-surface">{{ summaryUser.displayName || summaryUser.username }}</h3>
+         <p class="text-sm font-medium text-on-surface-variant mb-4">&commat;{{ summaryUser.username }}</p>
+         
+         <div class="flex gap-8 mb-8 mt-2">
+            <div class="text-center">
+               <div class="font-bold text-xl text-primary">{{ summaryUser.followersCount || 0 }}</div>
+               <div class="text-[10px] uppercase font-bold text-on-surface-variant tracking-widest mt-1">Lượt theo dõi</div>
+            </div>
+            <div class="text-center">
+               <div class="font-bold text-xl text-primary">{{ summaryUser.followingCount || 0 }}</div>
+               <div class="text-[10px] uppercase font-bold text-on-surface-variant tracking-widest mt-1">Đang theo dõi</div>
+            </div>
+         </div>
+
+         <div class="flex gap-3 w-full">
+             <a [routerLink]="['/profile', summaryUser.username]" class="flex-1 text-center py-3 rounded-full kinetic-gradient text-white font-bold text-sm tracking-widest uppercase hover:scale-[0.98] transition-transform shadow-md block" (click)="closeUserSummary($event)">
+                Xem trang cá nhân
+             </a>
+         </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="reading-container loading-state" *ngIf="!post">
-  <div class="spinner"></div>
+<!-- Loading state -->
+<div class="min-h-screen flex items-center justify-center bg-surface" *ngIf="!post">
+  <div class="flex items-center gap-3 text-primary text-xl font-bold font-headline animate-pulse">
+    <span class="material-symbols-outlined text-4xl animate-spin text-gradient">sync</span>
+    Đang tải bài viết...
+  </div>
+</div>
+
+<!-- === MODAL XÓA BÀI VIẾT === -->
+<div *ngIf="showDeleteModal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in" (click)="cancelDeletePost()">
+  <div class="bg-surface-container-lowest w-full max-w-md rounded-3xl shadow-2xl p-8 m-4 relative" (click)="$event.stopPropagation()">
+    <div class="flex items-center gap-4 mb-6">
+      <div class="w-12 h-12 rounded-2xl bg-error/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-error text-2xl">delete_forever</span>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold font-headline text-on-surface">Xóa bài viết?</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Hành động này không thể hoàn tác.</p>
+      </div>
+    </div>
+    <p class="text-sm text-on-surface-variant mb-8 leading-relaxed">
+      Bạn có chắc chắn muốn xóa bài viết <strong class="text-on-surface">"{{ post?.title }}"</strong> không?
+      Tất cả bình luận liên quan cũng sẽ bị xóa.
+    </p>
+    <div class="flex gap-3">
+      <button class="flex-1 py-3 rounded-2xl border border-outline-variant/30 text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-colors"
+              (click)="cancelDeletePost()">Huỷ bỏ</button>
+      <button class="flex-1 py-3 rounded-2xl bg-error text-white font-bold text-sm hover:bg-error/90 transition-colors"
+              (click)="confirmDeletePost()">Xác nhận xóa</button>
+    </div>
+  </div>
+</div>
+
+<!-- === MODAL SỬa BÀI VIẾT === -->
+<div *ngIf="showEditModal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in" (click)="closeEditModal()">
+  <div class="bg-surface-container-lowest w-full max-w-2xl rounded-3xl shadow-2xl m-4 overflow-hidden" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="px-8 py-6 border-b border-outline-variant/10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary">edit_note</span>
+        <h3 class="text-lg font-bold font-headline text-on-surface">Chỉnh sửa bài viết</h3>
+      </div>
+      <button class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors" (click)="closeEditModal()">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+    <!-- Body -->
+    <div class="px-8 py-6 space-y-5">
+      <!-- Tiêu đề -->
+      <div>
+        <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Tiêu đề bài viết</label>
+        <input type="text" [(ngModel)]="editTitle"
+               class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary rounded-xl px-4 py-3 text-sm font-bold text-on-surface outline-none transition-all"
+               placeholder="Nhập tiêu đề mới...">
+      </div>
+      <!-- Nội dung (plain textarea — simple edit) -->
+      <div>
+        <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Nội dung</label>
+        <textarea [(ngModel)]="editContent" rows="10"
+                  class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary rounded-xl px-4 py-3 text-sm font-medium text-on-surface outline-none transition-all resize-none"
+                  placeholder="Nhập nội dung mới..."></textarea>
+        <p class="text-[10px] text-on-surface-variant mt-1">Hỗ trợ HTML cơ bản (&lt;b&gt;, &lt;i&gt;, &lt;a&gt;, &lt;p&gt;...)</p>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="px-8 py-5 bg-surface-container/30 border-t border-outline-variant/10 flex justify-end gap-3">
+      <button class="px-6 py-2.5 rounded-full border border-outline-variant/30 text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-colors"
+              (click)="closeEditModal()">Huỷ</button>
+      <button class="px-8 py-2.5 rounded-full kinetic-gradient text-white font-bold text-sm hover:opacity-90 transition-all disabled:opacity-50"
+              (click)="submitEditPost()" [disabled]="!editTitle.trim() || editSaving">
+        {{ editSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+      </button>
+    </div>
+  </div>
 </div>

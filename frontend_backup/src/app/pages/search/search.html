@@ -1,0 +1,110 @@
+<div class="search-container" style="max-width: 840px; margin: 0 auto; padding: 24px;">
+  <h2 style="margin-bottom: 24px; color: var(--text-main); font-size: 20px;">
+    Kết quả tìm kiếm cho: <span style="font-weight: bold; color: var(--primary-color)">"{{ searchQuery }}"</span>
+  </h2>
+
+  <div *ngIf="loading" style="text-align: center; padding: 40px; color: var(--text-meta);">
+     Đang tìm kiếm...
+  </div>
+
+  <div *ngIf="!loading && posts.length === 0 && users.length === 0" style="text-align: center; padding: 40px; color: var(--text-meta); background: var(--surface-color); border-radius: 8px;">
+     <i class="fa-solid fa-ghost" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+     <p>Không tìm thấy kết quả nào phù hợp.</p>
+  </div>
+
+  <div class="users-list" *ngIf="!loading && users.length > 0" style="margin-bottom: 24px;">
+    <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--text-main);">Người dùng</h3>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <a *ngFor="let user of users" [routerLink]="['/user', user.username]" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; text-decoration: none; color: inherit; transition: background 0.2s;">
+        <img [src]="user.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+        <div>
+          <div style="font-weight: bold; font-size: 16px;">{{ user.displayName || user.username }}</div>
+          <div style="color: var(--text-meta); font-size: 14px;">u/{{ user.username }}</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="posts-list" *ngIf="!loading && posts.length > 0">
+    <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--text-main);">Bài đăng</h3>
+    <div class="post-card" *ngFor="let post of posts">
+      <!-- Content Area -->
+      <div class="post-content-area">
+        <div class="post-meta-top" style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px; font-size: 12px; color: var(--text-meta); margin-bottom: 8px;">
+          <ng-container *ngIf="post.category">
+            <div class="community-info">
+              <span class="community-icon" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:var(--primary-color); color:#fff; font-size:12px; font-weight:bold; margin-right:4px;">
+                {{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name)?.charAt(0) | uppercase}}
+              </span>
+              <span class="community-name" style="font-weight: 600; color: var(--text-main);">{{ post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name }}</span>
+            </div>
+            <button class="btn-join-sm" 
+                    *ngIf="!isLoggedIn || !commMock.isJoined(post.category.name, currentUser?.username)" 
+                    (click)="joinCommunity(post.category.name, $event)"
+                    style="margin-left: 4px; font-weight: 700; font-size: 12px; color: #fff; background-color: #0045ac; border-radius: 99px; padding: 4px 12px; border: none; cursor: pointer;">
+              Tham gia
+            </button>
+            <span class="dot-separator">•</span>
+            <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar d-inline-block">
+            <span *ngIf="post.author && !post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right: 4px;">
+               {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
+            </span>
+            <span class="post-author" *ngIf="post.author">{{ post.author.displayName || post.author.username }}</span>
+          </ng-container>
+
+          <ng-container *ngIf="!post.category">
+            <div class="community-info">
+              <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar">
+              <span *ngIf="!post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right:4px;">
+                {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
+              </span>
+              <span class="community-name" style="font-weight: 600; color: var(--text-main);">{{ post.author?.displayName || post.author?.username }}</span>
+            </div>
+          </ng-container>
+          
+          <span class="dot-separator" *ngIf="post.author">•</span>
+          <span class="post-date">{{ post.createdAt | timeAgo }}</span>
+        </div>
+        
+        <a [routerLink]="['/post', post.id]" class="post-title-link" style="text-decoration: none;">
+          <h3 class="post-title" style="margin-bottom: 12px; color: var(--text-main); font-size: 18px;">{{ post.title }}</h3>
+        </a>
+        
+        <div class="post-excerpt" style="max-height: 250px; overflow: hidden; position: relative;">
+          <div [innerHTML]="post.strippedContent | safeHtml" class="clamped-content" style="color: var(--text-main); line-height: 1.5;"></div>
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px; background: linear-gradient(transparent, var(--surface-color));"></div>
+        </div>
+
+        <div class="post-carousel" *ngIf="post.extractedImages && post.extractedImages.length > 1" style="position: relative; margin-top: 12px; border-radius: 8px; overflow: hidden;">
+          <button class="carousel-btn prev-btn" [class.dimmed]="post.currentImageIndex === 0" (click)="prevImage($event, post)" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❮</button>
+          <img [src]="post.extractedImages[post.currentImageIndex]" style="width: 100%; max-height: 400px; object-fit: contain; background: #000; cursor: zoom-in;" loading="eager" (click)="openImageOverlay(post.extractedImages[post.currentImageIndex])">
+          <button class="carousel-btn next-btn" [class.dimmed]="post.currentImageIndex === post.extractedImages.length - 1" (click)="nextImage($event, post)" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❯</button>
+          
+          <div class="carousel-indicators" style="position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px;">
+            <span *ngFor="let src of post.extractedImages; let i = index" [style.background]="i === post.currentImageIndex ? '#fff' : 'rgba(255,255,255,0.5)'" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+          </div>
+        </div>
+        
+        <div class="post-single-image" *ngIf="post.extractedImages && post.extractedImages.length === 1" style="margin-top: 12px; border-radius: 8px; overflow: hidden;">
+           <img [src]="post.extractedImages[0]" style="width: 100%; max-height: 400px; object-fit: contain; background: #000; cursor: zoom-in;" loading="eager" (click)="openImageOverlay(post.extractedImages[0])">
+        </div>
+        
+        <div class="post-action-bar" style="display: flex; gap: 4px; margin-top: 16px;">
+          <button class="action-btn fb-like-btn" [class.liked]="isPostLiked(post.id)" (click)="votePost(post)" style="background: transparent; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-meta);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"></path></svg>
+            <span class="action-text">Thích ({{ post.likes }})</span>
+          </button>
+          
+          <a [routerLink]="['/post', post.id]" class="action-btn" style="background: transparent; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-meta); text-decoration: none;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"></path></svg>
+            <span class="action-text">Bình luận {{ post.commentCount > 0 ? '(' + post.commentCount + ')' : '' }}</span>
+          </a>
+          <button class="action-btn" style="background: transparent; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-meta);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="m14 2 6 6-6 6V9c-4.5 0-8.1 3.2-8.9 7.5-.1.5-.5.9-1 .8-.5-.1-.8-.5-.8-1C3.3 9.7 8.3 5 14 5V2z"></path></svg>
+            <span class="action-text">Chia sẻ</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

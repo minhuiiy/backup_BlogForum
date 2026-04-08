@@ -1,26 +1,42 @@
-<div class="explore-container">
+<div class="max-w-[1440px] mx-auto px-8 py-10 w-full min-h-screen">
   
-  <div class="feed-header explore-mode">
-    <h2 class="feed-title"><i class="fa-solid fa-compass" style="color: #24a0ed; margin-right: 8px;"></i>Khám phá cộng đồng</h2>
-    <p class="feed-subtitle">Tìm kiếm và tham gia vào những chủ đề công nghệ bạn yêu thích dựa trên hàng ngàn cộng đồng hoạt động mỗi ngày.</p>
+  <div class="mb-12">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="bg-primary/10 text-primary text-[10px] font-bold tracking-widest px-2 py-1 rounded uppercase flex items-center gap-1">
+        <span class="material-symbols-outlined text-[12px]">explore</span> Discovery
+      </span>
+    </div>
+    <h1 class="text-4xl lg:text-5xl font-bold font-headline tracking-tighter text-on-surface leading-[1.1] max-w-2xl mb-4">Khám phá cộng đồng</h1>
+    <p class="text-lg text-on-surface-variant font-medium max-w-2xl">Tìm kiếm và tham gia vào những chủ đề chuyên sâu mà bạn quan tâm. Hàng ngàn cộng đồng hoạt động mỗi ngày.</p>
   </div>
 
-  <div class="explore-grid">
-    <a routerLink="/" class="community-grid-card" *ngFor="let comm of communities">
-      <div class="community-banner">
-        <img [src]="comm.banner" alt="Banner">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+    <a [routerLink]="['/community', comm.name | slugify]" class="group bg-surface-container-lowest rounded-3xl overflow-hidden ghost-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col relative" *ngFor="let comm of communities">
+      
+      <!-- Banner -->
+      <div class="h-28 w-full overflow-hidden relative" [ngClass]="comm.banner ? 'bg-surface-container' : 'bg-primary/20'">
+        <img *ngIf="comm.banner" [src]="comm.banner" alt="Banner" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        <div *ngIf="!comm.banner" class="absolute inset-0 bg-grid-pattern opacity-20 hover:scale-105 transition-transform duration-700"></div>
       </div>
-      <div class="community-card-body">
-        <div class="community-avatar-overlap">
-          <img [src]="comm.icon" [alt]="comm.name">
+      
+      <!-- Body -->
+      <div class="p-6 pt-0 flex-1 flex flex-col relative z-10">
+        <!-- Floating Avatar -->
+        <div class="w-16 h-16 rounded-2xl bg-surface-container-low border-4 border-surface-container-lowest shadow-sm overflow-hidden flex items-center justify-center -mt-8 mb-4 relative z-20">
+           <img *ngIf="comm.icon" [src]="comm.icon" [alt]="comm.name" class="w-full h-full object-cover">
+           <span *ngIf="!comm.icon" class="text-xl font-bold text-primary font-headline uppercase">{{ comm.name?.charAt(0) || 'C' }}</span>
         </div>
-        <h3 class="community-card-name">{{ comm.name }}</h3>
-        <p class="community-card-title">{{ comm.title }}</p>
-        <p class="community-card-desc">{{ comm.description }}</p>
         
-        <div class="community-card-footer">
-          <span class="community-members">{{ comm.members }} thành viên</span>
-          <button class="btn-primary" (click)="$event.preventDefault();"><i class="fa-solid fa-plus me-1"></i> Tham gia</button>
+        <h3 class="text-lg font-bold font-headline text-on-surface group-hover:text-primary transition-colors">{{ comm.name }}</h3>
+        <p class="text-xs font-bold text-on-surface-variant mb-2">{{ comm.title }}</p>
+        <p class="text-sm text-on-surface-variant leading-relaxed line-clamp-3 mb-6">{{ comm.description }}</p>
+        
+        <div class="mt-auto flex items-center justify-between border-t border-outline-variant/15 pt-4">
+          <span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest flex items-center gap-1">
+             <span class="material-symbols-outlined text-[14px]">group</span> {{ comm.members }}
+          </span>
+          <button class="bg-primary/10 text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-full text-xs font-bold transition-colors uppercase tracking-widest" (click)="$event.preventDefault(); joinCommunity(comm, $event)">Tham gia</button>
         </div>
       </div>
     </a>

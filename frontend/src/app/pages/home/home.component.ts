@@ -29,6 +29,7 @@ export class HomeComponent implements OnInit {
   hotCommunities: any[] = [];
 
   likedPosts: Set<number> = new Set();
+  savedPosts: Set<number> = new Set();
   isLoggedIn = false;
   currentUser: any;
 
@@ -49,9 +50,11 @@ export class HomeComponent implements OnInit {
     if (this.isLoggedIn) {
       this.currentUser = this.tokenStorage.getUser();
       this.blogService.getLikedPosts().subscribe({
-        next: ids => {
-          this.likedPosts = new Set(ids);
-        },
+        next: ids => { this.likedPosts = new Set(ids); },
+        error: err => console.error(err)
+      });
+      this.blogService.getSavedPosts().subscribe({
+        next: ids => { this.savedPosts = new Set(ids); },
         error: err => console.error(err)
       });
     }
@@ -199,5 +202,57 @@ export class HomeComponent implements OnInit {
 
   openImageOverlay(imageUrl: string): void {
     this.imageModalService.open(imageUrl);
+  }
+
+  deletePost(post: any, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    if (confirm('Bạn có chắc chắn muốn xóa bài viết này không?')) {
+      this.blogService.deletePost(post.id).subscribe({
+        next: () => {
+          this.posts = this.posts.filter(p => p.id !== post.id);
+        },
+        error: err => {
+          console.error(err);
+          alert('Có lỗi xảy ra khi xóa bài viết.');
+        }
+      });
+    }
+  }
+
+  // ===== SHARE =====
+  sharePost(post: any, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    const url = `${window.location.origin}/post/${post.id}`;
+    if (navigator.share) {
+      navigator.share({ title: post.title, url });
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Đã sao chép link bài viết!');
+      });
+    }
+  }
+
+  // ===== SAVE / BOOKMARK =====
+  isPostSaved(postId: number): boolean {
+    return this.savedPosts.has(postId);
+  }
+
+  toggleSave(post: any, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    if (!this.isLoggedIn) {
+      this.authModalService.open();
+      return;
+    }
+    const isSaved = this.savedPosts.has(post.id);
+    if (isSaved) {
+      this.savedPosts.delete(post.id);
+      this.blogService.unsavePost(post.id).subscribe({ error: () => this.savedPosts.add(post.id) });
+    } else {
+      this.savedPosts.add(post.id);
+      this.blogService.savePost(post.id).subscribe({ error: () => this.savedPosts.delete(post.id) });
+    }
   }
 }

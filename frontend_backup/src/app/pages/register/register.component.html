@@ -1,0 +1,53 @@
+<div class="auth-container">
+  <div class="auth-box glass-effect">
+    <h2 class="auth-title gradient-text">Tạo Tài Khoản</h2>
+    <p class="auth-subtitle">Tham gia BlogForum ngay hôm nay!</p>
+    
+    <div *ngIf="isSuccessful" class="alert-success">
+      Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...
+    </div>
+
+    <form *ngIf="!isSuccessful" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+      <div class="form-group">
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" id="username" name="username" [(ngModel)]="form.username" required minlength="3" maxlength="20" #username="ngModel" [ngClass]="{ 'is-invalid': f.submitted && username.errors }" />
+        <div *ngIf="username.errors && f.submitted" class="error-msg">
+          <div *ngIf="username.errors['required']">Tên đăng nhập không được để trống</div>
+          <div *ngIf="username.errors['minlength']">Tên đăng nhập phải có ít nhất 3 ký tự</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" [(ngModel)]="form.email" required email #email="ngModel" [ngClass]="{ 'is-invalid': f.submitted && email.errors }" />
+        <div *ngIf="email.errors && f.submitted" class="error-msg">
+          <div *ngIf="email.errors['required']">Email không được để trống</div>
+          <div *ngIf="email.errors['email']">Email không đúng định dạng</div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input type="password" id="password" name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel" [ngClass]="{ 'is-invalid': f.submitted && password.errors }" />
+        <div *ngIf="password.errors && f.submitted" class="error-msg">
+          <div *ngIf="password.errors['required']">Mật khẩu không được để trống</div>
+          <div *ngIf="password.errors['minlength']">Mật khẩu phải có ít nhất 6 ký tự</div>
+        </div>
+      </div>
+      
+      <div class="form-group row-submit">
+        <button class="btn-primary auth-btn">Đăng ký</button>
+      </div>
+      
+      <div class="form-group">
+        <div *ngIf="f.submitted && isSignUpFailed" class="alert-error">
+          {{ errorMessage }}
+        </div>
+      </div>
+    </form>
+    
+    <div class="auth-footer" *ngIf="!isSuccessful">
+      Đã có tài khoản? <a href="/login">Đăng nhập</a>
+    </div>
+  </div>
+</div>

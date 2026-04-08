@@ -1,238 +1,489 @@
-<div class="profile-container">
-
-  <div class="profile-content">
-
-    <!-- Profile Header Core: Covers Avatar and Tabs -->
-    <div class="profile-main-header">
-      <div class="profile-user-summary">
-        <div class="big-avatar-wrapper" style="position: relative;" (mouseenter)="isHoveringAvatar = true" (mouseleave)="isHoveringAvatar = false">
-          <img [src]="userProfile?.avatarUrl || 'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png'" />
-          <div class="big-online-dot"></div>
-          
-          <div *ngIf="isHoveringAvatar && isOwnProfile" class="edit-avatar-btn" (click)="fileInput.click()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.5); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" title="Đổi ảnh đại diện">
-            <i class="fa-solid fa-pen" style="font-size: 14px;"></i>
-          </div>
-          <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
-          <div *ngIf="isUploading" style="position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--primary-color); white-space: nowrap; font-weight: bold;">Đang tải...</div>
+<div class="max-w-[1440px] mx-auto px-8 py-10 w-full min-h-screen">
+  
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-12">
+    <!-- Main Content Canvas -->
+    <div class="xl:col-span-8 space-y-8">
+      
+      <!-- Profile Header / Banner -->
+      <div class="bg-surface-container-lowest rounded-3xl overflow-hidden ghost-border shadow-sm">
+        <div class="h-32 bg-primary/5 w-full relative">
+          <!-- Optional Banner background -->
+          <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
         </div>
-        <div class="user-info-text">
-          <h1 class="user-display" style="display: flex; align-items: center; gap: 8px; margin: 0;">
-            <span *ngIf="!isEditingName">{{ userProfile?.displayName || username }}</span>
-            <input *ngIf="isEditingName" type="text" [(ngModel)]="editData.displayName" class="form-control" style="font-size: 24px; font-weight: bold; padding: 0 8px; width: auto; max-width: 300px; height: 36px; display: inline-block;" (keyup.enter)="saveName()" (blur)="saveName()">
-            
-            <button *ngIf="!isEditingName && isOwnProfile" (click)="startEditName()" style="background: transparent; border: none; color: var(--text-meta); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%; transition: background 0.2s;" title="Đổi tên hiển thị">
-              <i class="fa-solid fa-pen" style="font-size: 14px;"></i>
-            </button>
-          </h1>
-          <p class="user-handle" style="margin-top: 4px;">{{ username }}</p>
+        
+        <div class="px-8 pb-8 relative -mt-16">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 relative z-10">
+            <div class="flex flex-col gap-3">
+              <div class="w-32 h-32 rounded-3xl bg-surface border-4 border-surface-container-lowest shadow-lg overflow-hidden relative group flex items-center justify-center bg-primary/10" (mouseenter)="isHoveringAvatar = true" (mouseleave)="isHoveringAvatar = false">
+                <img *ngIf="userProfile?.avatarUrl" [src]="userProfile.avatarUrl" class="w-full h-full object-cover">
+                <span *ngIf="!userProfile?.avatarUrl" class="text-4xl font-bold font-headline text-primary uppercase">
+                   {{ (userProfile?.displayName || username)?.charAt(0) }}
+                </span>
+                
+                <div *ngIf="isHoveringAvatar && isOwnProfile" class="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer transition-all" (click)="fileInput.click()">
+                  <span class="material-symbols-outlined text-white text-3xl">add_a_photo</span>
+                </div>
+                <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" />
+                <div *ngIf="isUploading" class="absolute bottom-0 inset-x-0 bg-primary text-white text-[10px] uppercase font-bold tracking-widest text-center py-1">Tải lên...</div>
+              </div>
+              
+              <div>
+                <h1 class="text-3xl font-bold font-headline text-on-surface flex items-center gap-2">
+                  <span *ngIf="!isEditingName">{{ userProfile?.displayName || username }}</span>
+                  <input id="displayNameInput" *ngIf="isEditingName" type="text" [(ngModel)]="editData.displayName" class="bg-surface-container focus:bg-surface-container-high rounded px-2 py-1 outline-none font-bold text-2xl w-48 transition-colors border-2 border-primary" (keyup.enter)="saveName()" (blur)="saveName()">
+                  
+                  <button *ngIf="!isEditingName && isOwnProfile" (click)="startEditName()" class="w-8 h-8 rounded hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors">
+                    <span class="material-symbols-outlined text-sm">edit</span>
+                  </button>
+                </h1>
+                <p class="text-on-surface-variant font-medium mt-1">&commat;{{ username }}</p>
+              </div>
+            </div>
+
+            <!-- Follow / Action buttons -->
+            <div class="flex items-center gap-4">
+               <button *ngIf="isLoggedIn && !isOwnProfile" class="px-6 py-2 rounded-full font-bold text-sm tracking-wide transition-all shadow-md flex items-center gap-2"
+                       [class.bg-surface-container-high]="isFollowing" [class.text-on-surface]="isFollowing" 
+                       [class.kinetic-gradient]="!isFollowing" [class.text-white]="!isFollowing"
+                       (click)="toggleFollow()">
+                 <span class="material-symbols-outlined text-[18px]">{{ isFollowing ? 'person_check' : 'person_add' }}</span>
+                 {{ isFollowing ? 'Đang Theo dõi' : 'Theo dõi' }}
+               </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="profile-tabs-wrapper">
-        <button *ngFor="let tab of tabs" class="tab-btn" [class.active]="activeTab === tab.id" (click)="setTab(tab.id)">
+      <!-- Content Tabs -->
+      <div class="flex items-center gap-2 border-b border-outline-variant/15 px-2">
+        <button *ngFor="let tab of tabs" 
+                class="px-6 py-4 font-bold text-sm transition-all focus:outline-none relative"
+                [class.text-primary]="activeTab === tab.id"
+                [class.text-on-surface-variant]="activeTab !== tab.id"
+                (click)="setTab(tab.id)">
           {{ tab.label }}
+          <div *ngIf="activeTab === tab.id" class="absolute bottom-0 inset-x-0 h-1 bg-primary rounded-t-full"></div>
         </button>
       </div>
 
-      <!-- Content Toolbar (Quick create post) -->
-      <div class="profile-content-toolbar">
-        <div class="filter-btn">
-          <i class="fa-regular fa-eye"></i> Hiển thị tất cả nội dung
-          <i class="fa-solid fa-chevron-right ms-auto"></i>
+      <!-- Toolbar -->
+      <div class="flex items-center justify-between py-2">
+        <button class="flex items-center gap-2 text-on-surface-variant text-sm font-bold bg-surface-container-low px-4 py-2 rounded-full hover:bg-surface-container transition-colors">
+           <span class="material-symbols-outlined text-[18px]">sort</span> Sắp xếp
+        </button>
+        <a routerLink="/create-post" class="flex items-center gap-2 text-primary font-bold text-sm bg-primary/10 hover:bg-primary/20 transition-colors px-4 py-2 rounded-full">
+          <span class="material-symbols-outlined text-[18px]">edit_document</span> Tạo bài đăng
+        </a>
+      </div>
+
+      <!-- ====== TAB CONTENT ====== -->
+
+      <!-- Loading -->
+      <div *ngIf="(loadingFeed && (activeTab === 'posts' || activeTab === 'overview' || activeTab === 'upvoted'))" class="flex flex-col gap-4 py-6">
+        <div *ngFor="let i of [1,2,3]" class="bg-surface-container-lowest p-6 rounded-3xl ghost-border animate-pulse h-36"></div>
+      </div>
+
+      <!-- ===== TAB: POSTS / OVERVIEW ===== -->
+      <div class="space-y-6" *ngIf="!loadingFeed && (activeTab === 'posts' || activeTab === 'overview')">
+        <div *ngIf="posts.length === 0" class="bg-surface-container-lowest p-12 rounded-3xl ghost-border flex flex-col items-center text-center py-20">
+          <span class="material-symbols-outlined text-6xl text-outline-variant/30 mb-4">post_add</span>
+          <h2 class="text-xl font-bold font-headline text-on-surface mb-2">Chưa có bài đăng nào</h2>
+          <a *ngIf="isOwnProfile" routerLink="/create-post" class="kinetic-gradient text-white font-bold px-8 py-3 rounded-full shadow-md text-sm">Tạo bài đăng đầu tiên</a>
         </div>
-        <div class="create-post-quick">
-          <a routerLink="/create-post" class="quick-create-btn">
-            <i class="fa-solid fa-plus"></i> Tạo bài đăng
+
+        <div class="bg-surface-container-lowest p-6 rounded-3xl ghost-border hover:shadow-md transition-shadow group/post" *ngFor="let post of posts">
+          <div class="flex items-center gap-2 mb-4 text-[10px] uppercase font-bold tracking-widest text-on-surface-variant">
+            <span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded" *ngIf="post.category">{{ post.category.name }}</span>
+            <span class="bg-surface-container-high text-on-surface-variant px-2 py-1 rounded" *ngIf="!post.category">Tường cá nhân</span>
+            <span>•</span><span>{{ post.createdAt | timeAgo }}</span>
+          </div>
+          <a [routerLink]="['/post', post.id]" class="block hover:text-primary transition-colors">
+            <h3 class="text-xl font-bold font-headline text-on-surface mb-3 line-clamp-2">{{ post.title }}</h3>
           </a>
+          <div class="relative max-h-24 overflow-hidden mb-3">
+            <div [innerHTML]="post.strippedContent | safeHtml" class="prose prose-sm max-w-none text-on-surface leading-relaxed"></div>
+            <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-surface-container-lowest to-transparent pointer-events-none"></div>
+          </div>
+          <div class="flex flex-wrap gap-3 pt-4 mt-2 border-t border-outline-variant/10">
+            <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-primary/10 hover:text-primary text-on-surface-variant text-xs font-bold uppercase tracking-widest transition-colors" [class.text-primary]="isPostLiked(post.id)" (click)="votePost(post)">
+              <span class="material-symbols-outlined text-[16px]">arrow_upward</span> {{ post.likes }}
+            </button>
+            <a [routerLink]="['/post', post.id]" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant text-xs font-bold uppercase tracking-widest">
+              <span class="material-symbols-outlined text-[16px]">chat_bubble</span> {{ post.commentCount || 0 }}
+            </a>
+            <button *ngIf="isOwnProfile" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-error/10 hover:bg-error/20 text-error text-xs font-bold uppercase tracking-widest ml-auto" (click)="deletePost(post, $event)">
+              <span class="material-symbols-outlined text-[16px]">delete</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="empty-state" *ngIf="!loadingFeed && posts.length === 0 && (activeTab === 'posts' || activeTab === 'overview')">
-      <img src="/Snoo_Expression_NoMouth.png" alt="Sad Snoo" class="snoo-empty" />
-      <h2 class="empty-title">Bạn chưa có bài đăng nào</h2>
-      <p class="empty-subtitle">Khi bạn đăng bài vào một cộng đồng, bài đăng đó sẽ hiển thị ở đây. Nếu bạn muốn ẩn bài
-        đăng của mình, hãy cập nhật phần cài đặt.</p>
-      <a routerLink="/profile" class="btn-primary-rounded mt-4">Cập nhật cài đặt</a>
-    </div>
-
-    <div *ngIf="loadingFeed && (activeTab === 'posts' || activeTab === 'overview')" style="padding: 40px; text-align: center; color: var(--text-meta);">
-      Đang tải bài đăng...
-    </div>
-
-    <div class="posts-list mt-3" *ngIf="!loadingFeed && posts.length > 0 && (activeTab === 'posts' || activeTab === 'overview')">
-      <div class="post-card" *ngFor="let post of posts" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 16px; padding: 12px;">
-        <div class="post-content-area">
-          <div class="post-meta-top" style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px; font-size: 12px; color: var(--text-meta); margin-bottom: 8px;">
-            <ng-container *ngIf="post.category">
-              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
-                <span class="community-icon" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:var(--primary-color); color:#fff; font-size:12px; font-weight:bold;">
-                  {{ (post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name)?.charAt(0) | uppercase}}
-                </span>
-                <span class="community-name">{{ post.category.name?.startsWith('r/') ? post.category.name.substring(2) : post.category.name }}</span>
-              </div>
-              <span class="dot-separator">•</span>
-              <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar d-inline-block">
-              <span *ngIf="post.author && !post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right: 4px;">
-                 {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
-              </span>
-              <span class="post-author" *ngIf="post.author">{{ post.author.displayName || post.author.username }}</span>
-            </ng-container>
-
-            <ng-container *ngIf="!post.category">
-              <div class="community-info" style="display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-main);">
-                <img *ngIf="post.author?.avatarUrl" [src]="post.author.avatarUrl" style="width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right: 4px;" class="author-avatar">
-                <span *ngIf="!post.author?.avatarUrl" class="author-avatar" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#ccc; color:#333; font-size:12px; font-weight:bold; margin-right:4px;">
-                  {{ (post.author?.displayName || post.author?.username)?.charAt(0) | uppercase }}
-                </span>
-                <span class="community-name">{{ post.author?.displayName || post.author?.username }}</span>
-              </div>
-            </ng-container>
-            
-            <span class="dot-separator" *ngIf="post.author">•</span>
-            <span class="post-date">{{ post.createdAt | timeAgo }}</span>
+      <!-- ===== TAB: COMMENTS ===== -->
+      <div *ngIf="activeTab === 'comments'" class="space-y-4">
+        <div *ngIf="loadingComments" class="flex flex-col gap-4">
+          <div *ngFor="let i of [1,2,3]" class="bg-surface-container-lowest p-5 rounded-2xl animate-pulse h-24"></div>
+        </div>
+        <div *ngIf="!loadingComments && userComments.length === 0" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">chat_bubble</span>
+          <p class="font-bold">Chưa có bình luận nào</p>
+        </div>
+        <a *ngFor="let c of userComments" [routerLink]="['/post', c.post?.id]" [fragment]="'comment-' + c.id"
+           class="flex gap-4 p-5 bg-surface-container-lowest rounded-2xl ghost-border hover:shadow-md transition-shadow cursor-pointer">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-[18px]">chat_bubble</span>
           </div>
-          
-          <a [routerLink]="['/post', post.id]" class="post-title-link" style="text-decoration: none;">
-            <h3 class="post-title" style="margin-bottom: 12px; color: var(--text-main); font-size: 18px;">{{ post.title }}</h3>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-widest">
+              Bình luận trong: <span class="text-primary">{{ c.post?.title }}</span>
+            </p>
+            <p class="text-sm text-on-surface leading-relaxed line-clamp-3">{{ c.content }}</p>
+            <p class="text-[10px] text-on-surface-variant font-medium mt-2">{{ c.createdAt | timeAgo }}</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- ===== TAB: SAVED ===== -->
+      <div *ngIf="activeTab === 'saved'" class="space-y-4">
+        <div *ngIf="!isOwnProfile" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">lock</span>
+          <p class="font-bold">Chỉ chủ nhân mới xem được bài đã lưu</p>
+        </div>
+        <div *ngIf="isOwnProfile && loadingSaved" class="flex flex-col gap-4">
+          <div *ngFor="let i of [1,2]" class="bg-surface-container-lowest p-5 rounded-2xl animate-pulse h-28"></div>
+        </div>
+        <div *ngIf="isOwnProfile && !loadingSaved && savedPosts.length === 0" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">bookmark</span>
+          <p class="font-bold">Bạn chưa lưu bài viết nào</p>
+          <p class="text-sm mt-1">Nhấn icon bookmark trong bài viết để lưu</p>
+        </div>
+        <div *ngFor="let post of savedPosts" class="bg-surface-container-lowest p-5 rounded-2xl ghost-border hover:shadow-md transition-shadow">
+          <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">{{ post.category?.name || 'Tường cá nhân' }}</p>
+          <a [routerLink]="['/post', post.id]" class="text-lg font-bold text-on-surface hover:text-primary transition-colors block mb-2">{{ post.title }}</a>
+          <p class="text-xs text-on-surface-variant">{{ post.createdAt | timeAgo }} • {{ post.likes }} thích</p>
+        </div>
+      </div>
+
+      <!-- ===== TAB: HISTORY ===== -->
+      <div *ngIf="activeTab === 'history'" class="space-y-3">
+        <div class="flex justify-between items-center mb-2">
+          <p class="text-sm text-on-surface-variant font-medium">{{ historyPosts.length }} bài viết đã xem</p>
+          <button *ngIf="historyPosts.length > 0" class="text-xs font-bold text-error hover:underline" (click)="clearHistory()">Xóa lịch sử</button>
+        </div>
+        <div *ngIf="historyPosts.length === 0" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">history</span>
+          <p class="font-bold">Lịch sử trống</p>
+          <p class="text-sm mt-1">Các bài bạn đã xem sẽ xuất hiện tại đây</p>
+        </div>
+        <a *ngFor="let post of historyPosts" [routerLink]="['/post', post.id]"
+           class="flex gap-4 p-4 bg-surface-container-lowest rounded-2xl ghost-border hover:shadow-md transition-shadow items-start">
+          <span class="material-symbols-outlined text-on-surface-variant text-[20px] mt-0.5 flex-shrink-0">history</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold text-on-surface line-clamp-2 hover:text-primary transition-colors">{{ post.title }}</p>
+            <p class="text-[10px] text-on-surface-variant font-medium mt-1">Xem lúc {{ post.viewedAt | timeAgo }}</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- ===== TAB: HIDDEN (BÍ ẨN) ===== -->
+      <div *ngIf="activeTab === 'hidden'" class="p-12 text-center bg-surface-container-lowest rounded-3xl ghost-border">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">visibility_off</span>
+        <h3 class="text-xl font-bold font-headline text-on-surface mb-2">Chế độ Bí ẩn</h3>
+        <p class="text-sm text-on-surface-variant max-w-sm mx-auto mb-6">Khi bạn ẩn một bài viết, nó sẽ không xuất hiện trong feed của bạn nữa. Tính năng này đang được phát triển.</p>
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest">
+          <span class="material-symbols-outlined text-[16px]">construction</span> Sắp ra mắt
+        </div>
+      </div>
+
+      <!-- ===== TAB: UPVOTED (ĐÃ THÍCH) ===== -->
+      <div *ngIf="activeTab === 'upvoted'" class="space-y-4">
+        <div *ngIf="!isOwnProfile" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+          <span class="material-symbols-outlined text-5xl opacity-30 mb-3">lock</span>
+          <p class="font-bold">Thông tin riêng tư</p>
+        </div>
+        <ng-container *ngIf="isOwnProfile">
+          <div *ngIf="loadingFeed" class="flex flex-col gap-4">
+            <div *ngFor="let i of [1,2]" class="bg-surface-container-lowest p-5 rounded-2xl animate-pulse h-20"></div>
+          </div>
+          <div *ngIf="!loadingFeed && posts.filter(p => isPostLiked(p.id)).length === 0" class="p-12 text-center text-on-surface-variant bg-surface-container-lowest rounded-3xl ghost-border">
+            <span class="material-symbols-outlined text-5xl opacity-30 mb-3">thumb_up</span>
+            <p class="font-bold">Bạn chưa thích bài nào</p>
+          </div>
+          <a *ngFor="let post of posts" [routerLink]="['/post', post.id]"
+             [class.hidden]="!isPostLiked(post.id)"
+             class="flex gap-4 p-4 bg-surface-container-lowest rounded-2xl ghost-border hover:shadow-md transition-shadow items-start">
+            <span class="material-symbols-outlined text-primary text-[20px] mt-0.5 flex-shrink-0" style="font-variation-settings:'FILL' 1">thumb_up</span>
+            <div>
+              <p class="text-sm font-bold text-on-surface hover:text-primary transition-colors">{{ post.title }}</p>
+              <p class="text-[10px] text-on-surface-variant mt-1">{{ post.likes }} thích • {{ post.createdAt | timeAgo }}</p>
+            </div>
           </a>
-          
-          <div class="post-excerpt" style="max-height: 250px; overflow: hidden; position: relative; margin-bottom: 12px; font-size: 14px; color: var(--text-main); line-height: 1.5;">
-            <div [innerHTML]="post.strippedContent | safeHtml" class="clamped-content"></div>
-            <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px; background: linear-gradient(transparent, var(--surface-color));"></div>
-          </div>
+        </ng-container>
+      </div>
 
-          <!-- Carousel -->
-          <div class="post-carousel" *ngIf="post.extractedImages && post.extractedImages.length > 1" style="position: relative; margin-top: 12px; border-radius: 8px; overflow: hidden; background: #000; text-align: center;">
-            <button class="carousel-btn prev-btn" [class.dimmed]="post.currentImageIndex === 0" (click)="prevImage($event, post)" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❮</button>
-            <img [src]="post.extractedImages[post.currentImageIndex]" style="width: 100%; max-height: 400px; object-fit: contain; cursor: zoom-in;" loading="eager" (click)="openImageOverlay(post.extractedImages[post.currentImageIndex])">
-            <button class="carousel-btn next-btn" [class.dimmed]="post.currentImageIndex === post.extractedImages.length - 1" (click)="nextImage($event, post)" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.2s;">❯</button>
-            
-            <div class="carousel-indicators" style="position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px;">
-              <span *ngFor="let src of post.extractedImages; let i = index" [style.background]="i === post.currentImageIndex ? '#fff' : 'rgba(255,255,255,0.5)'" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+      <!-- ===== TAB: DOWNVOTED (ĐÃ KHÔNG THÍCH) ===== -->
+      <div *ngIf="activeTab === 'downvoted'" class="p-12 text-center bg-surface-container-lowest rounded-3xl ghost-border">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">thumb_down</span>
+        <h3 class="text-xl font-bold font-headline text-on-surface mb-2">Bài đã không thích</h3>
+        <p class="text-sm text-on-surface-variant max-w-sm mx-auto mb-6">Tính năng downvote đang được xây dựng. Hệ thống sẽ tự động điều chỉnh feed để bạn không thấy nội dung tương tự.</p>
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest">
+          <span class="material-symbols-outlined text-[16px]">construction</span> Sắp ra mắt
+        </div>
+      </div>
+
+      <!-- ===== TAB: SETTINGS (CÀI ĐẶT HỒ SƠ) ===== -->
+      <div *ngIf="activeTab === 'settings' && isOwnProfile" class="space-y-6">
+        <div class="bg-surface-container-lowest p-8 rounded-3xl ghost-border">
+          <h3 class="text-lg font-bold font-headline text-on-surface mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[22px]">manage_accounts</span> Chỉnh sửa hồ sơ
+          </h3>
+
+          <div class="space-y-5">
+            <!-- Avatar -->
+            <div class="flex items-center gap-6 pb-5 border-b border-outline-variant/15">
+              <div class="w-20 h-20 rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center flex-shrink-0 relative group cursor-pointer" (click)="fileInput2.click()">
+                <img *ngIf="userProfile?.avatarUrl" [src]="userProfile.avatarUrl" class="w-full h-full object-cover">
+                <span *ngIf="!userProfile?.avatarUrl" class="text-2xl font-bold text-primary uppercase">{{ username.charAt(0) }}</span>
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="material-symbols-outlined text-white">add_a_photo</span>
+                </div>
+              </div>
+              <input #fileInput2 type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+              <div>
+                <p class="font-bold text-on-surface mb-1">Ảnh đại diện</p>
+                <p class="text-xs text-on-surface-variant mb-2">JPG, PNG, GIF — tối đa 5MB</p>
+                <button class="text-xs font-bold text-primary hover:underline" (click)="fileInput2.click()">Thay đổi ảnh</button>
+                <span *ngIf="isUploading" class="ml-3 text-xs text-on-surface-variant">Đang tải...</span>
+              </div>
+            </div>
+
+            <!-- Display Name -->
+            <div>
+              <label class="block text-xs font-bold text-on-surface uppercase tracking-widest mb-2">Tên hiển thị</label>
+              <input type="text" [(ngModel)]="settingsData.displayName"
+                     class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-bold text-on-surface outline-none transition-all"
+                     placeholder="Tên của bạn...">
+            </div>
+
+            <!-- Bio -->
+            <div>
+              <label class="block text-xs font-bold text-on-surface uppercase tracking-widest mb-2">Giới thiệu bản thân</label>
+              <textarea [(ngModel)]="settingsData.bio" rows="4"
+                        class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-medium text-on-surface outline-none transition-all resize-none"
+                        placeholder="Viết vài dòng về bản thân..."></textarea>
+              <p class="text-xs text-on-surface-variant mt-1">{{ settingsData.bio.length || 0 }}/200 ký tự</p>
+            </div>
+
+            <!-- Gender -->
+            <div>
+              <label class="block text-xs font-bold text-on-surface uppercase tracking-widest mb-2">Giới tính</label>
+              <select [(ngModel)]="settingsData.gender"
+                      class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3 font-medium text-on-surface outline-none transition-all">
+                <option value="">Không tiết lộ</option>
+                <option value="male">Nam</option>
+                <option value="female">Nữ</option>
+                <option value="other">Khác</option>
+              </select>
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex items-center gap-4 pt-2">
+              <button class="kinetic-gradient text-white px-8 py-3 rounded-full font-bold text-sm tracking-widest hover:scale-[0.98] transition-transform disabled:opacity-50"
+                      [disabled]="settingsSaving"
+                      (click)="saveSettings()">
+                {{ settingsSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+              </button>
+              <div *ngIf="settingsSaved" class="flex items-center gap-2 text-green-600 text-sm font-bold animate-fade-in">
+                <span class="material-symbols-outlined text-[18px]">check_circle</span> Đã lưu!
+              </div>
             </div>
           </div>
-          
-          <div class="post-single-image" *ngIf="post.extractedImages && post.extractedImages.length === 1" style="margin-top: 12px; border-radius: 8px; overflow: hidden; text-align: center; background: #000;">
-             <img [src]="post.extractedImages[0]" style="width: 100%; max-height: 400px; object-fit: contain; cursor: zoom-in;" loading="eager" (click)="openImageOverlay(post.extractedImages[0])">
-          </div>
-          
-          <div class="post-action-bar" style="display: flex; gap: 4px; margin-top: 16px;">
-            <button class="action-btn fb-like-btn" [class.liked]="isPostLiked(post.id)" (click)="votePost(post)" style="background: transparent; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-meta);">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"></path></svg>
-              <span class="action-text">Thích ({{ post.likes }})</span>
-            </button>
-            <a [routerLink]="['/post', post.id]" class="action-btn" style="background: transparent; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-meta); text-decoration: none;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"></path></svg>
-              <span class="action-text">Bình luận {{ post.commentCount > 0 ? '(' + post.commentCount + ')' : '' }}</span>
-            </a>
-          </div>
         </div>
       </div>
-    </div>
 
-  </div>
-
-  <!-- Right Sidebar Profile Card -->
-  <div class="profile-sidebar">
-    <div class="profile-card">
-      <div class="card-banner">
-        <button class="settings-gear-btn"><i class="fa-solid fa-gear"></i></button>
+      <!-- Settings: không phải own profile -->
+      <div *ngIf="activeTab === 'settings' && !isOwnProfile" class="p-12 text-center bg-surface-container-lowest rounded-3xl ghost-border">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">lock</span>
+        <p class="font-bold">Bạn không có quyền xem phần này</p>
       </div>
 
-      <div class="card-body">
-        <h2 class="card-username">{{ username }}</h2>
-        <div style="display: flex; gap: 8px; margin-top: 8px;">
-          <button class="btn-share" style="flex: 1;"><i class="fa-solid fa-share"></i> Chia sẻ</button>
+
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="xl:col-span-4 space-y-8">
+      
+      <!-- Stats Bento Card -->
+      <div class="bg-surface-container-lowest p-8 rounded-3xl ghost-border overflow-hidden relative">
+        <span class="material-symbols-outlined absolute -bottom-8 -right-8 text-[120px] opacity-5 text-primary rotate-12">monitoring</span>
+        
+        <h3 class="text-sm font-bold font-headline text-on-surface mb-6 uppercase tracking-widest">Tóm tắt hoạt động</h3>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="bg-surface-container-low p-4 rounded-2xl text-center">
+             <p class="text-3xl font-bold font-headline text-primary">{{ followersCount }}</p>
+             <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mt-1">Lượt theo dõi</p>
+          </div>
+          <div class="bg-surface-container-low p-4 rounded-2xl text-center">
+             <p class="text-3xl font-bold font-headline text-primary">{{ followingCount }}</p>
+             <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mt-1">Đang theo dõi</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+           <div class="flex items-center justify-between border-b border-outline-variant/10 pb-3">
+             <span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Điểm Karma</span>
+             <span class="font-mono font-bold text-on-surface">1</span>
+           </div>
+           <div class="flex items-center justify-between border-b border-outline-variant/10 pb-3">
+             <span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Tuổi Tài Khoản</span>
+             <span class="font-mono font-bold text-on-surface">1 Ngày</span>
+           </div>
+        </div>
+      </div>
+
+      <!-- Settings List -->
+      <div class="bg-surface-container-low/50 p-8 rounded-3xl border border-outline-variant/15" *ngIf="isOwnProfile">
+        <h3 class="text-sm font-bold font-headline text-on-surface mb-6 uppercase tracking-widest flex items-center gap-2">
+           <span class="material-symbols-outlined text-[18px] text-primary">settings</span> Cài đặt hồ sơ
+        </h3>
+        
+        <div class="space-y-2">
+          <button class="w-full flex items-center justify-between p-4 bg-surface-container-lowest hover:bg-surface-container transition-colors rounded-2xl ghost-border group">
+             <div class="flex items-center gap-3">
+               <div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                  <span class="material-symbols-outlined text-[20px]">person</span>
+               </div>
+               <div class="text-left">
+                  <p class="text-sm font-bold text-on-surface">Thông tin cơ bản</p>
+                  <p class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-0.5">Cập nhật hồ sơ</p>
+               </div>
+             </div>
+             <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+          </button>
           
-          <button *ngIf="isLoggedIn && !isOwnProfile" 
-                  class="btn-follow" style="flex: 1; padding: 8px; border-radius: 20px; font-weight: 600; cursor: pointer; border: 1px solid var(--primary-color);"
-                  [style.backgroundColor]="isFollowing ? 'transparent' : 'var(--primary-color)'"
-                  [style.color]="isFollowing ? 'var(--primary-color)' : 'white'"
-                  (click)="toggleFollow()">
-            <i class="fa-solid" [class.fa-user-check]="isFollowing" [class.fa-user-plus]="!isFollowing"></i> 
-            {{ isFollowing ? 'Đang theo dõi' : 'Theo dõi' }}
+          <button class="w-full flex items-center justify-between p-4 bg-surface-container-lowest hover:bg-surface-container transition-colors rounded-2xl ghost-border group">
+             <div class="flex items-center gap-3">
+               <div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                  <span class="material-symbols-outlined text-[20px]">palette</span>
+               </div>
+               <div class="text-left">
+                  <p class="text-sm font-bold text-on-surface">Tùy chỉnh giao diện</p>
+                  <p class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-0.5">Quản lý nhận diện</p>
+               </div>
+             </div>
+             <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
           </button>
         </div>
+      </div>
 
-        <div class="follower-count" style="display: flex; gap: 16px; margin: 16px 0;">
-          <div><strong>{{ followersCount }}</strong> người theo dõi</div>
-          <div><strong>{{ followingCount }}</strong> đang theo dõi</div>
+      <!-- Telegram Connection Card -->
+      <div *ngIf="isOwnProfile" class="bg-surface-container-lowest rounded-3xl ghost-border overflow-hidden shadow-sm">
+        <!-- Header -->
+        <div class="p-6 flex items-center justify-between cursor-pointer select-none" (click)="showTelegramPanel = !showTelegramPanel">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-md"
+                 [style.background]="'linear-gradient(135deg, #229ED9, #31aee6)'">
+              ✈️
+            </div>
+            <div>
+              <p class="text-sm font-bold text-on-surface">Telegram Thông báo</p>
+              <p class="text-[10px] font-bold uppercase tracking-widest mt-0.5" [ngClass]="telegramLinked ? 'text-green-600' : 'text-on-surface-variant'">
+                {{ telegramLinked ? '● Đã kết nối' : '○ Chưa kết nối' }}
+              </p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-outline-variant transition-transform duration-300" [class.rotate-180]="showTelegramPanel">expand_more</span>
         </div>
 
-        <div class="metrics-grid">
-          <div class="metric-item">
-            <span class="metric-val">1</span>
-            <span class="metric-label">Điểm karma</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-val">0</span>
-            <span class="metric-label">Lượt đóng góp</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-val">1 ngày</span>
-            <span class="metric-label">tuổi Reddit</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-val">0</span>
-            <span class="metric-label">Đang hoạt động trong</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-val">0</span>
-            <span class="metric-label">Lượng vàng kiếm được</span>
-          </div>
-        </div>
+        <!-- Panel Content -->
+        <div *ngIf="showTelegramPanel" class="px-6 pb-6 space-y-4 border-t border-outline-variant/10 pt-5 animate-fade-in">
 
+          <!-- Đã liên kết -->
+          <div *ngIf="telegramLinked" class="space-y-3">
+            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30 rounded-2xl p-4 flex items-start gap-3">
+              <span class="text-green-500 text-xl mt-0.5">✅</span>
+              <div>
+                <p class="text-sm font-bold text-green-700 dark:text-green-400">Đã kết nối thành công!</p>
+                <p class="text-xs text-green-600/80 mt-0.5">Chat ID: <code class="font-mono bg-green-100 dark:bg-green-900/40 px-1 rounded">{{ telegramChatId }}</code></p>
+              </div>
+            </div>
 
+            <!-- Danh sách loại thông báo -->
+            <div class="bg-surface-container rounded-2xl p-3 space-y-2">
+              <p class="text-[10px] font-bold text-on-surface uppercase tracking-widest mb-2">Bạn sẽ nhận thông báo khi:</p>
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">✅</span> Bài viết được duyệt / từ chối
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">💬</span> Có bình luận mới vào bài của bạn
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">↩️</span> Có người trả lời bình luận của bạn
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">❤️</span> Bài viết của bạn được thích
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">🔔</span> Có người theo dõi bạn
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="text-sm">✉️</span> Có tin nhắn mới (giới hạn 5 phút/lần)
+                </div>
+              </div>
+            </div>
 
-        <div class="achievements-section">
-          <h3>Thành tích</h3>
-          <div class="badges-row">
-            <div class="badge-icon badge-explorer"><i class="fa-solid fa-compass"></i></div>
-            <div class="badge-icon badge-security"><i class="fa-solid fa-shield-halved"></i></div>
-            <div class="badge-texts">
-              <span class="badge-title">Nhà khám phá, Gia nhập Reddit...</span>
-              <span class="badge-desc">Tài khoản được bảo mật</span>
+            <div class="flex gap-2">
+              <button class="flex-1 py-2 bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-1.5" (click)="testTelegramNotification()">
+                <span class="material-symbols-outlined text-[14px]">notifications</span> Gửi Test
+              </button>
+              <button class="flex-1 py-2 bg-error/10 text-error hover:bg-error/20 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors" (click)="unlinkTelegram()">
+                Hủy liên kết
+              </button>
             </div>
           </div>
-          <div class="badge-footer">
-            <span class="unlock-info">Đã mở khóa 3 cúp</span>
-            <a href="javascript:void(0)" class="view-all-link">Xem tất cả</a>
-          </div>
-        </div>
 
-        <div class="settings-list">
-          <h3 class="settings-header">Cài đặt</h3>
+          <!-- Chưa liên kết -->
+          <div *ngIf="!telegramLinked" class="space-y-4">
 
-          <div *ngIf="isOwnProfile" class="settings-item">
-            <div class="settings-icon"><i class="fa-solid fa-user-circle"></i></div>
-            <div class="settings-text">
-              <span class="settings-title">Hồ sơ</span>
-              <span class="settings-desc">Tùy chỉnh hồ sơ của bạn</span>
+            <!-- Trạng thái đang chờ liên kết -->
+            <div *ngIf="telegramLinking" class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3 animate-pulse">
+              <span class="text-blue-500 text-xl mt-0.5">🔄</span>
+              <div>
+                <p class="text-sm font-bold text-blue-800">Đang chờ bạn xác nhận trên Telegram...</p>
+                <p class="text-xs text-blue-700 mt-0.5">Hãy nhấn <strong>START</strong> trong cửa sổ Telegram vừa mở.</p>
+                <a *ngIf="telegramLinkUrl" [href]="telegramLinkUrl" target="_blank"
+                   class="inline-flex items-center gap-1 mt-2 text-xs font-bold text-blue-600 underline">
+                  ✈️ Mở lại Telegram nếu chưa mở
+                </a>
+              </div>
             </div>
-            <button class="btn-update">Cập nhật</button>
+
+            <!-- Nút liên kết 1 click -->
+            <div *ngIf="!telegramLinking" class="space-y-3">
+              <div class="bg-surface-container rounded-2xl p-4">
+                <p class="text-xs font-bold text-on-surface mb-2">Chỉ cần 1 bước:</p>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Nhấn nút bên dưới → Telegram sẽ mở tự động → Nhấn <strong>START</strong> → Xong! 🎉</p>
+              </div>
+
+              <button class="w-full py-3 rounded-xl text-white text-sm font-bold uppercase tracking-widest transition-all hover:opacity-90 shadow-md flex items-center justify-center gap-2"
+                      [style.background]="'linear-gradient(135deg, #229ED9, #31aee6)'"
+                      (click)="startTelegramLinking()">
+                <span class="text-lg">✈️</span> Liên kết Telegram ngay
+              </button>
+            </div>
+
           </div>
 
-          <div *ngIf="isOwnProfile" class="settings-item">
-            <div class="settings-icon"><i class="fa-solid fa-eye"></i></div>
-            <div class="settings-text">
-              <span class="settings-title">Quản lý hồ sơ của bạn</span>
-              <span class="settings-desc">Quản lý những gì mọi người nhìn thấy khi họ truy cập hồ sơ của bạn</span>
-            </div>
-            <button class="btn-update">Cập nhật</button>
-          </div>
-
-          <div *ngIf="isOwnProfile" class="settings-item">
-            <div class="settings-icon"><i class="fa-solid fa-shirt"></i></div>
-            <div class="settings-text">
-              <span class="settings-title">Avatar</span>
-              <span class="settings-desc">Tạo phong cách cho avatar</span>
-            </div>
-            <button class="btn-update">Cập nhật</button>
+          <!-- Toast message -->
+          <div *ngIf="telegramMessage" class="p-3 rounded-xl text-xs font-bold animate-fade-in"
+               [ngClass]="telegramSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+            {{ telegramMessage }}
           </div>
         </div>
       </div>
+      
     </div>
-  </div>
 
+  </div>
 </div>
