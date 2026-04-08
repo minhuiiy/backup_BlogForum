@@ -241,9 +241,16 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     this.showEditModal = false;
   }
 
+  editError: string = '';
+
   submitEditPost(): void {
     if (!this.editTitle.trim()) return;
+    if (!this.editContent || !this.editContent.trim()) {
+      this.editError = 'Nội dung bài viết không được để trống.';
+      return;
+    }
     this.editSaving = true;
+    this.editError = '';
     const payload = { id: this.postId, title: this.editTitle, content: this.editContent };
     this.blogService.updatePost(payload).subscribe({
       next: (updated: any) => {
@@ -251,10 +258,11 @@ export class PostDetailComponent implements OnInit, OnDestroy {
         this.post.content = updated.content;
         this.showEditModal = false;
         this.editSaving = false;
+        this.editError = '';
       },
       error: err => {
-        console.error(err);
         this.editSaving = false;
+        this.editError = err?.error?.message || err?.error?.error || 'Có lỗi xảy ra khi cập nhật bài viết. Vui lòng thử lại.';
       }
     });
   }
