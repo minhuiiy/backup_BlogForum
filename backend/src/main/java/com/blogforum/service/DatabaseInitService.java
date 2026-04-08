@@ -18,8 +18,10 @@ public class DatabaseInitService {
         
         try {
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS user_interests (" +
+                    "id BIGINT NOT NULL AUTO_INCREMENT," +
                     "user_id BIGINT NOT NULL," +
-                    "interest VARCHAR(255)" +
+                    "interest VARCHAR(255)," +
+                    "PRIMARY KEY (id)" +
                     ")");
             System.out.println("===> Created user_interests table (if not existed).");
         } catch (Exception e) {
@@ -28,8 +30,10 @@ public class DatabaseInitService {
 
         try {
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS user_tags (" +
+                    "id BIGINT NOT NULL AUTO_INCREMENT," +
                     "user_id BIGINT NOT NULL," +
-                    "tag VARCHAR(255)" +
+                    "tag VARCHAR(255)," +
+                    "PRIMARY KEY (id)" +
                     ")");
             System.out.println("===> Created user_tags table (if not existed).");
         } catch (Exception e) {
