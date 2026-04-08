@@ -7,7 +7,7 @@
     {
       "source": "/ws/:path*",
       "destination": "https://backupblogforum-production.up.railway.app/ws/:path*"
-    }
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
