@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://RAILWAY_BACKEND_URL/api/:path*"
+      "destination": "https://backupblogforum-production.up.railway.app/api/:path*"
     },
     {
       "source": "/ws/:path*",
-      "destination": "https://RAILWAY_BACKEND_URL/ws/:path*"
+      "destination": "https://backupblogforum-production.up.railway.app/ws/:path*"
     },
     {
       "source": "/(.*)",
