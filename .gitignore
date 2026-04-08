@@ -1,0 +1,25 @@
+# Environment variables - KHÔNG commit lên GitHub
+.env
+.env.local
+.env.production
+*.env
+
+# Uploads local
+uploads/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# SSL Certs (nếu lưu local)
+*.pem
+*.key
+*.crt
