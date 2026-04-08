@@ -8,11 +8,9 @@
       "source": "/ws/:path*",
       "destination": "https://backupblogforum-production.up.railway.app/ws/:path*"
     }
-  ],
-  "routes": [
     {
-      "src": "^/(?!api|ws|_next).*",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
