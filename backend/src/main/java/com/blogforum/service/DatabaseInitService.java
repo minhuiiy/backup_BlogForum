@@ -15,13 +15,19 @@ public class DatabaseInitService {
     @PostConstruct
     public void init() {
         System.out.println("===> RUNNING AUTOMATIC DATABASE FIX...");
-        
+
+        // Tắt yêu cầu Primary Key bắt buộc của Aiven để tạo bảng ElementCollection
+        try {
+            jdbcTemplate.execute("SET SESSION sql_require_primary_key = OFF");
+            System.out.println("===> Disabled sql_require_primary_key for this session.");
+        } catch (Exception e) {
+            System.err.println("Could not disable sql_require_primary_key: " + e.getMessage());
+        }
+
         try {
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS user_interests (" +
-                    "id BIGINT NOT NULL AUTO_INCREMENT," +
                     "user_id BIGINT NOT NULL," +
-                    "interest VARCHAR(255)," +
-                    "PRIMARY KEY (id)" +
+                    "interest VARCHAR(255)" +
                     ")");
             System.out.println("===> Created user_interests table (if not existed).");
         } catch (Exception e) {
@@ -30,10 +36,8 @@ public class DatabaseInitService {
 
         try {
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS user_tags (" +
-                    "id BIGINT NOT NULL AUTO_INCREMENT," +
                     "user_id BIGINT NOT NULL," +
-                    "tag VARCHAR(255)," +
-                    "PRIMARY KEY (id)" +
+                    "tag VARCHAR(255)" +
                     ")");
             System.out.println("===> Created user_tags table (if not existed).");
         } catch (Exception e) {
