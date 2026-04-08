@@ -7,20 +7,12 @@
     {
       "source": "/ws/:path*",
       "destination": "https://backupblogforum-production.up.railway.app/ws/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Authorization,Content-Type" }
-      ]
+      "src": "^/(?!api|ws|_next).*",
+      "dest": "/index.html"
     }
   ]
 }
