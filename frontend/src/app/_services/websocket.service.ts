@@ -15,15 +15,16 @@ export class WebSocketService {
 
   constructor(private tokenStorage: TokenStorageService, private zone: NgZone) {
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS(environment.wsUrl),
+      // Chỉ dùng HTTP polling, tránh lỗi wss:// trên Vercel
+      webSocketFactory: () => new SockJS(environment.wsUrl, null, {
+        transports: ['xhr-polling', 'xhr-streaming', 'jsonp-polling']
+      }),
       reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
+      heartbeatIncoming: 0,
+      heartbeatOutgoing: 0,
     });
 
     this.stompClient.onConnect = (frame) => {
-      console.log('Connected: ' + frame);
-      
       const user = this.tokenStorage.getUser();
       if (user && user.username) {
         this.stompClient.subscribe(`/topic/notifications/${user.username}`, (message) => {
@@ -33,16 +34,15 @@ export class WebSocketService {
           this.zone.run(() => this.chatMessages.next(JSON.parse(message.body)));
         });
       }
-      
       this.stompClient.subscribe('/topic/public', (message) => {
         this.zone.run(() => this.notifications.next(message.body));
       });
     };
 
-    this.stompClient.onStompError = (frame) => {
-      console.error('Broker reported error: ' + frame.headers['message']);
-      console.error('Additional details: ' + frame.body);
-    };
+    // Ẩn tất cả lỗi WebSocket/STOMP khỏi console
+    this.stompClient.onStompError = () => {};
+    this.stompClient.onWebSocketError = () => {};
+    this.stompClient.onWebSocketClose = () => {};
   }
 
   public connect(): void {
