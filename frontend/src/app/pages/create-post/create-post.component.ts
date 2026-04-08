@@ -11,6 +11,7 @@ import { TokenStorageService } from '../../_services/token-storage.service';
 import { TagService, Tag } from '../../_services/tag.service';
 import { QuillModule } from 'ngx-quill';
 import { HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http';
+import hljs from 'highlight.js';
 
 @Component({
   selector: 'app-create-post',
@@ -48,12 +49,16 @@ export class CreatePostComponent implements OnInit {
   isUploading = false;
 
   quillModules = {
+    syntax: {
+      highlight: (text: string) => hljs.highlightAuto(text).value
+    },
     toolbar: [
       ['bold', 'italic', 'strike'], 
       ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],
       [{ 'script': 'sub'}, { 'script': 'super' }], 
       [{ 'list': 'bullet' }, { 'list': 'ordered'}],
-      ['link']
+      ['link', 'image']
     ]
   };
 

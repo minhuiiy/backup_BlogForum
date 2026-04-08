@@ -79,7 +79,10 @@
         
         <!-- Post Description & Formatting -->
         <div class="flex-1 order-1 md:order-2 post-content-body">
-          <div class="prose prose-slate prose-lg max-w-none prose-headings:font-headline font-body text-on-surface leading-relaxed" [innerHTML]="post.content | safeHtml"></div>
+          <div class="prose prose-slate prose-lg max-w-none prose-headings:font-headline font-body text-on-surface leading-relaxed post-code-container"
+               [codeHighlight]="post.content"
+               [innerHTML]="post.content | safeHtml">
+          </div>
           
           <div class="flex flex-wrap gap-2 pt-8">
              <span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-bold rounded-md uppercase tracking-wider ghost-border" *ngIf="post.category">Discussion</span>

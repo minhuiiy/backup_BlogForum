@@ -16,11 +16,12 @@ import { TimeAgoPipe } from '../../_pipes/time-ago.pipe';
 import { Title } from '@angular/platform-browser';
 import { FollowService } from '../../_services/follow.service';
 import { environment } from '../../../environments/environment';
+import { CodeHighlightDirective } from '../../_directives/code-highlight.directive';
 
 @Component({
   selector: 'app-post-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SafeHtmlPipe, TimeAgoPipe],
+  imports: [CommonModule, FormsModule, RouterLink, SafeHtmlPipe, TimeAgoPipe, CodeHighlightDirective],
   templateUrl: './post-detail.component.html',
   styleUrls: ['./post-detail.component.css']
 })
