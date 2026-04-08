@@ -49,9 +49,7 @@ export class CreatePostComponent implements OnInit {
   isUploading = false;
 
   quillModules = {
-    syntax: {
-      highlight: (text: string) => hljs.highlightAuto(text).value
-    },
+    syntax: { hljs },
     toolbar: [
       ['bold', 'italic', 'strike'], 
       ['blockquote', 'code-block'],
