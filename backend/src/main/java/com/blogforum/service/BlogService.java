@@ -103,14 +103,21 @@ public class BlogService {
                 Category newCat = new Category();
                 newCat.setName(categoryName);
                 newCat.setDescription("Cộng đồng " + categoryName);
-                // Người đầu tiên post tự động được làm mod và member luôn (do không có CategoryController create ở đây)
                 return categoryRepository.save(newCat);
             });
             post.setCategory(cat);
-            
-            // Logic phân quyền duyệt: Nếu người đăng không phải là moderator của category này, bài sẽ PENDING
+
+            // Kiểm tra quyền moderator và admin
             boolean isModerator = cat.getModerators().contains(user);
             boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().name().equals("ROLE_ADMIN"));
+
+            // ✅ Bắt buộc phải là member, moderator, hoặc admin mới được đăng bài
+            boolean isMember = cat.getMembers().contains(user);
+            if (!isMember && !isModerator && !isAdmin) {
+                throw new RuntimeException("Bạn cần tham gia cộng đồng '" + categoryName + "' trước khi đăng bài.");
+            }
+
+            // Logic phân quyền duyệt: mod/admin tự duyệt, member thường cần chờ
             if (!isModerator && !isAdmin) {
                 post.setStatus(EPostStatus.PENDING);
             } else {
@@ -156,9 +163,10 @@ public class BlogService {
         return savedPost;
     }
 
+    @Transactional
     public Post updatePost(Post post) {
         Post existingPost = postRepository.findById(post.getId())
-            .orElseThrow(() -> new RuntimeException("Post not found"));
+            .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại"));
             
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
@@ -166,10 +174,18 @@ public class BlogService {
             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_MODERATOR"));
             
         if (!existingPost.getAuthor().getUsername().equals(username) && !isAdmin) {
-            throw new RuntimeException("You are not authorized to update this post");
+            throw new RuntimeException("Bạn không có quyền chỉnh sửa bài viết này");
+        }
+
+        // Validate: tiêu đề và nội dung không được để trống
+        if (post.getTitle() == null || post.getTitle().trim().isEmpty()) {
+            throw new com.blogforum.exception.ContentModerationException("Tiêu đề bài viết không được để trống");
+        }
+        if (post.getContent() == null || post.getContent().trim().isEmpty()) {
+            throw new com.blogforum.exception.ContentModerationException("Nội dung bài viết không được để trống");
         }
         
-        // Kiểm duyệt bài viết trước khi cập nhật
+        // Kiểm duyệt nội dung
         contentModerationService.validateText(post.getTitle());
         contentModerationService.validateText(post.getContent());
         contentModerationService.validateImagesInHtml(post.getContent());

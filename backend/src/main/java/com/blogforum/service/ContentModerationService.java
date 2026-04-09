@@ -10,10 +10,10 @@ import com.blogforum.exception.ContentModerationException;
 @Service
 public class ContentModerationService {
 
-    // Danh sách giả lập một số từ khóa nhạy cảm. Thực tế có thể lưu ở DB để dễ thêm
-    // bớt.
+    // Danh sách từ khóa tục tĩu/vi phạm. Chỉ dùng những từ RÕ RÀNG là tục tĩu.
+    // Không dùng từ chung chung (vd: "chó" vì có thể là tên con vật, tư thế yoga...)
     private static final List<String> SENSITIVE_WORDS = Arrays.asList(
-            "cặc", "lồn", "mẹ mày", "đụ", "chó", "khốn nạn", "đồ tồi", "fuck", "shit");
+            "cặc", "lồn", "mẹ mày", "đụ má", "đụ mẹ", "khốn nạn", "đồ tồi", "fuck you", "motherfucker");
 
     // Một số dấu hiệu giả lập cho ảnh vi phạm
     private static final List<String> BANNED_IMAGE_KEYWORDS = Arrays.asList(

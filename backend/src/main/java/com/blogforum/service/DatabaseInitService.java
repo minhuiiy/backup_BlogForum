@@ -15,7 +15,15 @@ public class DatabaseInitService {
     @PostConstruct
     public void init() {
         System.out.println("===> RUNNING AUTOMATIC DATABASE FIX...");
-        
+
+        // Tắt yêu cầu Primary Key bắt buộc của Aiven để tạo bảng ElementCollection
+        try {
+            jdbcTemplate.execute("SET SESSION sql_require_primary_key = OFF");
+            System.out.println("===> Disabled sql_require_primary_key for this session.");
+        } catch (Exception e) {
+            System.err.println("Could not disable sql_require_primary_key: " + e.getMessage());
+        }
+
         try {
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS user_interests (" +
                     "user_id BIGINT NOT NULL," +

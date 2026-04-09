@@ -11,6 +11,7 @@ import { TokenStorageService } from '../../_services/token-storage.service';
 import { TagService, Tag } from '../../_services/tag.service';
 import { QuillModule } from 'ngx-quill';
 import { HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http';
+import hljs from 'highlight.js';
 
 @Component({
   selector: 'app-create-post',
@@ -34,6 +35,8 @@ export class CreatePostComponent implements OnInit {
   communities: any[] = [];
   selectedCommunity: any = null;
   showDropdown = false;
+  isMemberOfSelected = true; // true theo mặc định (không cần check khi chưa chọn cộng đồng)
+  private currentUsername = '';
 
   // Tag selection UI
   selectedTags: Tag[] = [];
@@ -48,12 +51,14 @@ export class CreatePostComponent implements OnInit {
   isUploading = false;
 
   quillModules = {
+    syntax: { hljs },
     toolbar: [
       ['bold', 'italic', 'strike'], 
       ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],
       [{ 'script': 'sub'}, { 'script': 'super' }], 
       [{ 'list': 'bullet' }, { 'list': 'ordered'}],
-      ['link']
+      ['link', 'image']
     ]
   };
 
@@ -70,6 +75,7 @@ export class CreatePostComponent implements OnInit {
   ngOnInit() {
     const user = this.tokenStorage.getUser();
     const username = user?.username;
+    this.currentUsername = username || '';
 
     // Fetch dữ liệu từ API
     this.commMock.fetchAllCommunities();
@@ -107,7 +113,11 @@ export class CreatePostComponent implements OnInit {
       if (commName) {
         let found = this.communities.find(c => c.name.toLowerCase() === commName.toLowerCase());
         if (!found) {
+          // User chưa tham gia cộng đồng này
           found = { name: commName, description: 'Cộng đồng chỉ định từ URL' };
+          this.isMemberOfSelected = false;
+        } else {
+          this.isMemberOfSelected = true;
         }
         this.selectedCommunity = found;
       }
@@ -141,6 +151,8 @@ export class CreatePostComponent implements OnInit {
   selectCommunity(comm: any) {
     this.selectedCommunity = comm;
     this.showDropdown = false;
+    // Kiểm tra user có phải member không (communities[] chỉ chứa cộng đồng đã join)
+    this.isMemberOfSelected = this.communities.some(c => c.name.toLowerCase() === comm.name.toLowerCase());
   }
 
   // === Tag methods ===
@@ -189,7 +201,8 @@ export class CreatePostComponent implements OnInit {
   get titleLength(): number { return this.form.title ? this.form.title.length : 0; }
 
   isFormReady(): boolean {
-    // Không bắt buộc chọn cộng đồng
+    // Block nếu chọn cộng đồng nhưng chưa tham gia
+    if (this.selectedCommunity && !this.isMemberOfSelected) return false;
     if (this.activeTab === 'media') {
       return this.titleLength > 0 && this.uploadedMedia.length > 0 && !this.isUploading;
     }

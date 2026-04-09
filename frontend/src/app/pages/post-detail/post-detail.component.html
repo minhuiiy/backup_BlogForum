@@ -79,7 +79,10 @@
         
         <!-- Post Description & Formatting -->
         <div class="flex-1 order-1 md:order-2 post-content-body">
-          <div class="prose prose-slate prose-lg max-w-none prose-headings:font-headline font-body text-on-surface leading-relaxed" [innerHTML]="post.content | safeHtml"></div>
+          <div class="prose prose-slate prose-lg max-w-none prose-headings:font-headline font-body text-on-surface leading-relaxed post-code-container"
+               [codeHighlight]="post.content"
+               [innerHTML]="post.content | safeHtml">
+          </div>
           
           <div class="flex flex-wrap gap-2 pt-8">
              <span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-bold rounded-md uppercase tracking-wider ghost-border" *ngIf="post.category">Discussion</span>
@@ -433,13 +436,20 @@
       </div>
     </div>
     <!-- Footer -->
-    <div class="px-8 py-5 bg-surface-container/30 border-t border-outline-variant/10 flex justify-end gap-3">
-      <button class="px-6 py-2.5 rounded-full border border-outline-variant/30 text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-colors"
-              (click)="closeEditModal()">Huỷ</button>
-      <button class="px-8 py-2.5 rounded-full kinetic-gradient text-white font-bold text-sm hover:opacity-90 transition-all disabled:opacity-50"
-              (click)="submitEditPost()" [disabled]="!editTitle.trim() || editSaving">
-        {{ editSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}
-      </button>
+    <div class="px-8 py-5 bg-surface-container/30 border-t border-outline-variant/10">
+      <!-- Error message -->
+      <div *ngIf="editError" class="mb-3 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm flex items-start gap-2">
+        <span class="material-symbols-outlined text-[16px] mt-0.5 flex-shrink-0">error</span>
+        <span>{{ editError }}</span>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button class="px-6 py-2.5 rounded-full border border-outline-variant/30 text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-colors"
+                (click)="closeEditModal()">Huỷ</button>
+        <button class="px-8 py-2.5 rounded-full kinetic-gradient text-white font-bold text-sm hover:opacity-90 transition-all disabled:opacity-50"
+                (click)="submitEditPost()" [disabled]="!editTitle.trim() || editSaving">
+          {{ editSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

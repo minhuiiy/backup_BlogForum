@@ -34,6 +34,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
   likedPosts: Set<number> = new Set<number>();
   isModerator = false;
   isCreator = false;
+  communityCreator: any = null;  // 👑 Chủ cộng đồng
   
   memberCount = 1;
   onlineCount = 1;
@@ -128,19 +129,23 @@ export class CommunityComponent implements OnInit, OnDestroy {
 
       // Kiểm tra creator từ backend
       this.isCreator = this.communityData?.creator?.username === this.currentUser?.username;
+      // Lưu thông tin creator để hiển thị UI
+      this.communityCreator = this.communityData?.creator || null;
     }
   }
 
   loadCommunityInfo() {
     const formatName = this.communityName;
-    // Cố gắng móc thông tin từ ổ đĩa Service
     this.commMock.communities$.subscribe(list => {
       const found = list.find(c => c.name.toLowerCase() === formatName.toLowerCase());
       if (found) {
         this.communityData = found;
+        // Lưu creator để hiển thị UI
+        this.communityCreator = found.creator || null;
         this.checkModeratorRole();
       } else {
         this.communityData = { name: this.communityName, description: 'Cộng đồng mặc định', members: 1 };
+        this.communityCreator = null;
       }
     });
     this.updateStats();
@@ -314,8 +319,13 @@ export class CommunityComponent implements OnInit, OnDestroy {
         const rawPosts = data.content || data;
         let pList = rawPosts;
         
-        // Filter by Backend Category mapped exactly
-        pList = rawPosts.filter((p: any) => p.category && p.category.name && p.category.name.toLowerCase() === this.communityName.toLowerCase());
+        // Filter by Backend Category mapped exactly, CHỈ hiện bài APPROVED
+        pList = rawPosts.filter((p: any) =>
+          p.category &&
+          p.category.name &&
+          p.category.name.toLowerCase() === this.communityName.toLowerCase() &&
+          p.status === 'APPROVED'  // ✅ Ẩn bài PENDING/REJECTED khỏi feed
+        );
         
         this.filteredPosts = pList.map((post: any) => this.processPostContent(post));
         this.loadingFeed = false;

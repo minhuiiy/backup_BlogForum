@@ -28,6 +28,11 @@
             "styles": [
               "node_modules/quill/dist/quill.snow.css",
               "src/styles.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "sockjs-client",
+              "quill-delta",
+              "highlight.js"
             ]
           },
           "configurations": {
@@ -35,8 +40,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1MB",
-                  "maximumError": "2MB"
+                  "maximumWarning": "3MB",
+                  "maximumError": "4MB"
                 },
                 {
                   "type": "anyComponentStyle",
