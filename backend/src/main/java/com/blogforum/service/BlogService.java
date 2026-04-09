@@ -103,14 +103,21 @@ public class BlogService {
                 Category newCat = new Category();
                 newCat.setName(categoryName);
                 newCat.setDescription("Cộng đồng " + categoryName);
-                // Người đầu tiên post tự động được làm mod và member luôn (do không có CategoryController create ở đây)
                 return categoryRepository.save(newCat);
             });
             post.setCategory(cat);
-            
-            // Logic phân quyền duyệt: Nếu người đăng không phải là moderator của category này, bài sẽ PENDING
+
+            // Kiểm tra quyền moderator và admin
             boolean isModerator = cat.getModerators().contains(user);
             boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().name().equals("ROLE_ADMIN"));
+
+            // ✅ Bắt buộc phải là member, moderator, hoặc admin mới được đăng bài
+            boolean isMember = cat.getMembers().contains(user);
+            if (!isMember && !isModerator && !isAdmin) {
+                throw new RuntimeException("Bạn cần tham gia cộng đồng '" + categoryName + "' trước khi đăng bài.");
+            }
+
+            // Logic phân quyền duyệt: mod/admin tự duyệt, member thường cần chờ
             if (!isModerator && !isAdmin) {
                 post.setStatus(EPostStatus.PENDING);
             } else {

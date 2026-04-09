@@ -161,11 +161,30 @@
           {{ communityData?.description || 'Chưa có thông tin mô tả cho cộng đồng này.' }}
         </p>
 
+        <!-- 👑 Người sáng lập -->
+        <div class="mt-5 pt-5 border-t border-outline-variant/15" *ngIf="communityCreator">
+          <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-amber-500">workspace_premium</span>
+            Người sáng lập
+          </p>
+          <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-container transition-colors">
+            <div class="w-9 h-9 rounded-full bg-amber-500/10 border border-amber-400/30 overflow-hidden flex items-center justify-center text-amber-600 font-bold text-sm shrink-0">
+              <img *ngIf="communityCreator.avatarUrl" [src]="communityCreator.avatarUrl" class="w-full h-full object-cover">
+              <span *ngIf="!communityCreator.avatarUrl">{{ communityCreator.username?.charAt(0)?.toUpperCase() }}</span>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <span class="text-sm font-bold text-on-surface truncate">@{{ communityCreator.username }}</span>
+              <span class="text-[10px] font-bold text-amber-600 uppercase tracking-widest">👑 Creator</span>
+            </div>
+          </div>
+        </div>
+
         <div class="flex flex-wrap gap-2 mt-6" *ngIf="communityData?.topics?.length > 0">
            <span *ngFor="let t of communityData.topics" class="bg-surface-container-high text-on-surface text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-outline-variant/10">{{ t }}</span>
         </div>
       </div>
     </div>
+
 
     <!-- Right Column (Feed) -->
     <div class="flex-1 min-w-0 mt-8 lg:mt-0">

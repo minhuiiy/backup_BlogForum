@@ -55,14 +55,32 @@
     </div>
   </div>
 
-  <!-- Banner: Bài cần duyệt (chỉ hiện khi đã chọn cộng đồng) -->
-  <div *ngIf="selectedCommunity" class="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 mb-6">
+  <!-- Banner: Chưa tham gia cộng đồng (chỉ hiện khi chưa join) -->
+  <div *ngIf="selectedCommunity && !isMemberOfSelected"
+       class="flex items-start gap-3 bg-red-50 border border-red-200 rounded-2xl px-5 py-4 mb-6">
+    <span class="material-symbols-outlined text-red-500 text-xl mt-0.5">block</span>
+    <div>
+      <p class="text-sm font-bold text-red-800">Bạn chưa tham gia cộng đồng này!</p>
+      <p class="text-xs text-red-700 mt-0.5">
+        Hãy <strong>tham gia r/{{ selectedCommunity.name }}</strong> trước, sau đó mới có thể đăng bài.
+      </p>
+      <a [routerLink]="['/r', selectedCommunity.name]"
+         class="inline-block mt-2 text-xs font-bold text-red-700 underline hover:text-red-900">
+        → Đến trang cộng đồng để tham gia
+      </a>
+    </div>
+  </div>
+
+  <!-- Banner: Bài cần duyệt (chỉ hiện khi đã join cộng đồng) -->
+  <div *ngIf="selectedCommunity && isMemberOfSelected"
+       class="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 mb-6">
     <span class="material-symbols-outlined text-blue-500 text-xl mt-0.5">pending_actions</span>
     <div>
       <p class="text-sm font-bold text-blue-800">Bài đăng sẽ cần được duyệt</p>
       <p class="text-xs text-blue-700 mt-0.5">Bài của bạn sẽ chờ Moderator hoặc người tạo cộng đồng <strong>{{ selectedCommunity.name }}</strong> phê duyệt.</p>
     </div>
   </div>
+
 
   <!-- Body Content -->
   <div class="w-full">
