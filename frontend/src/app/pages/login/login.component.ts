@@ -6,7 +6,7 @@ import { AuthService } from '../../_services/auth.service';
 import { TokenStorageService } from '../../_services/token-storage.service';
 import { AuthModalService } from '../../_services/auth-modal.service';
 import { OnboardingModalService } from '../../_services/onboarding-modal.service';
-import { SocialAuthService, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
+import { SocialAuthService, GoogleSigninButtonModule, GoogleLoginProvider } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'app-login',
@@ -24,13 +24,6 @@ export class LoginComponent implements OnInit {
   isLoginFailed = false;
   errorMessage = '';
 
-  /** Width của nút Google tự động theo kích thước màn hình */
-  get googleBtnWidth(): number {
-    const w = window.innerWidth;
-    if (w < 380) return 260;
-    if (w < 480) return 300;
-    return 360;
-  }
 
   constructor(
     private authService: AuthService,
@@ -75,6 +68,14 @@ export class LoginComponent implements OnInit {
 
   close(): void {
     this.authModalService.close();
+  }
+
+  loginWithGoogle(): void {
+    this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID).catch(err => {
+      console.error('Google sign-in error:', err);
+      this.errorMessage = 'Không thể đăng nhập bằng Google. Vui lòng thử lại.';
+      this.isLoginFailed = true;
+    });
   }
 
   closeAndNavigateToRegister(): void {
