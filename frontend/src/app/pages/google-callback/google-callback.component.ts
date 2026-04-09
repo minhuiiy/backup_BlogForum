@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../_services/auth.service';
 import { TokenStorageService } from '../../_services/token-storage.service';
-import { OnboardingModalService } from '../../_services/onboarding-modal.service';
 
 @Component({
   selector: 'app-google-callback',
@@ -39,9 +38,7 @@ export class GoogleCallbackComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private tokenStorage: TokenStorageService,
-    private router: Router,
-    private onboardingModalService: OnboardingModalService
+    private tokenStorage: TokenStorageService
   ) {}
 
   ngOnInit(): void {
@@ -61,7 +58,7 @@ export class GoogleCallbackComponent implements OnInit {
     if (!idToken) {
       this.statusMessage = 'Không tìm thấy token';
       this.errorMessage = 'Phiên đăng nhập không hợp lệ. Vui lòng thử lại.';
-      setTimeout(() => this.router.navigate(['/home']), 2000);
+      setTimeout(() => { window.location.href = '/home'; }, 2000);
       return;
     }
 
@@ -81,11 +78,11 @@ export class GoogleCallbackComponent implements OnInit {
         this.statusMessage = 'Đăng nhập thành công! Đang chuyển hướng...';
 
         if (data.onboardingCompleted === false) {
-          this.router.navigate(['/home']).then(() => {
-            this.onboardingModalService.open();
-          });
+          // Reload về home rồi mở onboarding
+          window.location.href = '/home?onboarding=1';
         } else {
-          this.router.navigate(['/home']);
+          // Force full reload để navbar cập nhật trạng thái đăng nhập
+          window.location.href = '/home';
         }
       },
       error: err => {
