@@ -7,6 +7,8 @@ import { TokenStorageService } from '../../_services/token-storage.service';
 import { CommunityMockService } from '../../_services/community-mock.service';
 import { AuthModalService } from '../../_services/auth-modal.service';
 import { SlugifyPipe } from '../../_pipes/slugify.pipe';
+import { combineLatest, forkJoin, of } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-explore',
@@ -18,6 +20,7 @@ import { SlugifyPipe } from '../../_pipes/slugify.pipe';
 export class Explore implements OnInit {
   communities: any[] = [];
   currentUser: any;
+  loading = true;
 
   constructor(
     private http: HttpClient,
@@ -31,27 +34,57 @@ export class Explore implements OnInit {
     this.currentUser = this.tokenStorage.getUser();
     const myUsername = this.currentUser?.username;
 
-    this.http.get<any[]>(environment.apiUrl + '/categories').subscribe({
-      next: data => {
-        let filtered = data;
-        if (myUsername) {
-          filtered = data.filter(c => {
-            if (!c.members) return true;
-            return !c.members.some((m: any) => m.username === myUsername);
-          });
+    // Bước 1: Lấy danh sách cộng đồng + memberships song song
+    const categories$ = this.http.get<any[]>(environment.apiUrl + '/categories');
+    const memberships$ = myUsername
+      ? this.http.get<{ [key: string]: string }>(environment.apiUrl + '/categories/my-memberships').pipe(
+          catchError(() => of({} as { [key: string]: string }))
+        )
+      : of({} as { [key: string]: string });
+
+    combineLatest([categories$, memberships$]).pipe(
+      switchMap(([allCategories, memberships]) => {
+        // Lọc ra cộng đồng user CHƯA tham gia
+        const joinedKeys = Object.keys(memberships).map(k => k.toLowerCase());
+        const notJoined = allCategories.filter(c =>
+          !joinedKeys.includes(c.name?.toLowerCase())
+        );
+
+        if (notJoined.length === 0) {
+          return of({ categories: notJoined, statsMap: {} as any });
         }
 
-        this.communities = filtered.map(c => ({
+        // Bước 2: Lấy stats (member count) cho từng cộng đồng chưa join
+        const statsRequests = notJoined.reduce((acc: any, c: any) => {
+          acc[c.name] = this.http.get<any>(
+            `${environment.apiUrl}/categories/${encodeURIComponent(c.name)}/stats`
+          ).pipe(catchError(() => of({ memberCount: 0 })));
+          return acc;
+        }, {});
+
+        return forkJoin(statsRequests).pipe(
+          switchMap((statsMap: any) => of({ categories: notJoined, statsMap })),
+          catchError(() => of({ categories: notJoined, statsMap: {} }))
+        );
+      })
+    ).subscribe({
+      next: ({ categories, statsMap }: any) => {
+        this.communities = categories.map((c: any) => ({
           id: c.id,
           name: c.name,
           title: c.displayName || c.name,
-          members: c.members ? c.members.length : 0,
+          // ✅ Lấy member count từ stats API thực (không dùng c.members bị JsonIgnore)
+          members: statsMap[c.name]?.memberCount ?? 0,
           description: c.description || 'Chưa có thông tin.',
           icon: c.imageUrl || '',
           banner: ''
         }));
+        this.loading = false;
       },
-      error: err => console.error(err)
+      error: err => {
+        console.error(err);
+        this.loading = false;
+      }
     });
   }
 
@@ -62,10 +95,10 @@ export class Explore implements OnInit {
       this.authModalService.open();
       return;
     }
-    
+
     // Gọi API để join cộng đồng
     this.commMock.joinCommunity(comm.name, this.currentUser.username, 'member');
-    
+
     const slug = comm.name.toLowerCase().trim().replace(/\s+/g, '-');
     setTimeout(() => {
       this.router.navigate(['/community', slug]);
