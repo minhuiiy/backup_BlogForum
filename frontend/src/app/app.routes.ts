@@ -14,6 +14,7 @@ import { CreateCommunity } from './pages/create-community/create-community';
 import { CommunityComponent } from './pages/community/community';
 import { Search } from './pages/search/search';
 import { AdminComponent } from './pages/admin/admin';
+import { GoogleCallbackComponent } from './pages/google-callback/google-callback.component';
 
 export const routes: Routes = [
   { path: 'profile', component: Profile },
@@ -33,5 +34,6 @@ export const routes: Routes = [
   { path: 'create-post', component: CreatePostComponent, canActivate: [AuthGuard] },
   { path: 'post/:id', component: PostDetailComponent },
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
+  { path: 'auth/google/callback', component: GoogleCallbackComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];

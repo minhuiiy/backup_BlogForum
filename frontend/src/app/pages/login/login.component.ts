@@ -6,12 +6,11 @@ import { AuthService } from '../../_services/auth.service';
 import { TokenStorageService } from '../../_services/token-storage.service';
 import { AuthModalService } from '../../_services/auth-modal.service';
 import { OnboardingModalService } from '../../_services/onboarding-modal.service';
-import { SocialAuthService, GoogleSigninButtonModule, GoogleLoginProvider } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, GoogleSigninButtonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -30,8 +29,7 @@ export class LoginComponent implements OnInit {
     private tokenStorage: TokenStorageService,
     private router: Router,
     private authModalService: AuthModalService,
-    private onboardingModalService: OnboardingModalService,
-    private socialAuthService: SocialAuthService
+    private onboardingModalService: OnboardingModalService
   ) { }
 
   ngOnInit(): void {
@@ -39,31 +37,6 @@ export class LoginComponent implements OnInit {
       this.isLoggedIn = true;
       this.close();
     }
-
-    this.socialAuthService.authState.subscribe((user) => {
-      if (user && user.idToken) {
-        this.authService.loginWithGoogle(user.idToken).subscribe({
-          next: data => {
-            this.tokenStorage.saveToken(data.token);
-            this.tokenStorage.saveUser({ username: data.username, id: data.id, email: data.email, roles: data.roles, onboardingCompleted: data.onboardingCompleted });
-            this.isLoginFailed = false;
-            this.isLoggedIn = true;
-            this.close();
-
-            if (data.onboardingCompleted === false) {
-              this.onboardingModalService.open();
-            } else {
-              window.location.reload();
-            }
-          },
-          error: err => {
-            console.error('Google login backend error', err);
-            this.errorMessage = err.error?.message || 'Lỗi hệ thống: Không thể xử lý Google token!';
-            this.isLoginFailed = true;
-          }
-        });
-      }
-    });
   }
 
   close(): void {
@@ -71,11 +44,21 @@ export class LoginComponent implements OnInit {
   }
 
   loginWithGoogle(): void {
-    this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID).catch(err => {
-      console.error('Google sign-in error:', err);
-      this.errorMessage = 'Không thể đăng nhập bằng Google. Vui lòng thử lại.';
-      this.isLoginFailed = true;
-    });
+    const clientId = '131278915848-0l7blp4v8bv7m9fkvs4n89r74767k7ll.apps.googleusercontent.com';
+    const redirectUri = encodeURIComponent(window.location.origin + '/auth/google/callback');
+    const scope = encodeURIComponent('email profile openid');
+    // Nonce ngẫu nhiên để chống CSRF
+    const nonce = Math.random().toString(36).substring(2) + Date.now().toString(36);
+
+    const googleAuthUrl =
+      `https://accounts.google.com/o/oauth2/v2/auth` +
+      `?client_id=${clientId}` +
+      `&redirect_uri=${redirectUri}` +
+      `&response_type=id_token` +
+      `&scope=${scope}` +
+      `&nonce=${nonce}`;
+
+    window.location.href = googleAuthUrl;
   }
 
   closeAndNavigateToRegister(): void {
