@@ -15,54 +15,6 @@
     var process = { env: { DEBUG: undefined } };
   </script>
 
-  <!-- Chặn DevTools & ẩn log console -->
-  <script>
-    (function() {
-      // 1. Vô hiệu hóa chuột phải
-      document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-
-      // 2. Vô hiệu hóa phím tắt DevTools
-      document.addEventListener('keydown', function(e) {
-        if (
-          e.key === 'F12' ||
-          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-          (e.ctrlKey && e.key === 'U')
-        ) {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-      });
-
-      // 3. Phát hiện DevTools đang mở và redirect
-      var devtoolsOpen = false;
-      var threshold = 160;
-      function detectDevTools() {
-        var widthDiff = window.outerWidth - window.innerWidth;
-        var heightDiff = window.outerHeight - window.innerHeight;
-        if (widthDiff > threshold || heightDiff > threshold) {
-          if (!devtoolsOpen) {
-            devtoolsOpen = true;
-            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0f172a;color:#fff;font-family:sans-serif;flex-direction:column;gap:16px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><h1 style="font-size:24px;margin:0">Truy cập bị từ chối</h1><p style="color:#94a3b8;margin:0">Vui lòng đóng công cụ nhà phát triển để tiếp tục.</p></div>';
-          }
-        } else {
-          if (devtoolsOpen) {
-            devtoolsOpen = false;
-            location.reload();
-          }
-        }
-      }
-      setInterval(detectDevTools, 1000);
-
-      // 4. Ẩn tất cả console output
-      if (typeof window !== 'undefined') {
-        var noop = function() {};
-        ['log', 'warn', 'error', 'info', 'debug', 'trace', 'group', 'groupEnd'].forEach(function(method) {
-          console[method] = noop;
-        });
-      }
-    })();
-  </script>
 </head>
 
 <body>
